@@ -1,0 +1,636 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.1//EN"
+    "http://struts.apache.org/dtds/struts-2.1.dtd">
+<struts>
+	<!-- 这只浏览器时候缓存静态内容，默认值为true(生产环境下使用),开发阶段最好关闭 -->
+	<constant name="struts.serve.static.vrowserCache" value="true"></constant>
+	<!-- 当struts的配置文件修改后，系统是否自动重新加载该文件，默认为false(生产环境下使用),开发阶段最好打开 -->
+	<constant name="struts.serve.static.vrowserCache" value="false"></constant>
+	<constant name="struts.ui.theme" value="simple"></constant>
+	<!-- 资源视图 -->
+	<package name="com.neusoft.mid.cloong.resourceManagement.resView"
+		namespace="/resourceManagement_resView" extends="struts-default">
+		<interceptors>
+			<interceptor name="authenticate" class="authenticateInterceptor" />
+			<interceptor name="turnPageInter" class="turnPageInterceptor" />
+			<interceptor-stack name="authStack">
+				<interceptor-ref name="authenticate" />
+				<interceptor-ref name="defaultStack" />
+				<interceptor-ref name="turnPageInter" />
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="authStack" />
+		<global-results>
+			<result name="LOGIN" type="redirectAction">logout</result>
+			<result name="error" type="chain">exceptionIntercepor
+			</result>
+		</global-results>
+		<global-exception-mappings>
+			<exception-mapping exception="java.lang.Exception"
+				result="error" />
+		</global-exception-mappings>
+		<action name="exceptionIntercepor" class="exceptionIntercepor">
+			<result name="success">/WEB-INF/pages/exception/error.jsp
+			</result>
+		</action>
+
+		<action name="allResourceAction" class="allResourceAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/resView/allResource.jsp
+			</result>
+		</action>
+		
+		<action name="exportResReportAction" class="exportResReportAction">
+			<result name="error">/WEB-INF/pages/resourceManagement/resView/allResource.jsp
+			</result>
+		</action>
+		
+		<action name="exportAllResAction" class="exportAllResAction">
+			<result name="error">/WEB-INF/pages/resourceManagement/resView/allResource.jsp
+			</result>
+		</action>
+		
+		<action name="resViewPmListAction" class="pmListAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/pm/pm_list.jsp
+			</result>
+		</action>
+		
+		<action name="resViewPmInfoDetail" class="pmInfoDetailAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/pm/pmInfoDetail.jsp
+			</result>
+		</action>
+		
+		<action name="resViewVmListAction" class="vmListAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/vm/vm_list.jsp
+			</result>
+		</action>
+		
+		<action name="resViewVmInfoDetail" class="vmInfoDetailAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/vm/vmInfoDetail.jsp
+			</result>
+		</action>
+		
+		<action name="resViewEbsListAction" class="ebsListAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/ebs/ebs_list.jsp
+			</result>
+		</action>
+		
+		<action name="resViewEbsInfoDetail" class="ebsInfoDetailAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/ebs/ebsInfoDetail.jsp
+			</result>
+		</action>
+		
+		<action name="miniPmListAction" class="miniPmListAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/miniPm/miniPm_list.jsp
+			</result>
+		</action>
+		
+		<action name="miniPmInfoDetail" class="miniPmInfoDetailAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/miniPm/miniPmInfoDetail.jsp
+			</result>
+		</action>
+		
+		<action name="miniPmParListAction" class="miniPmParListAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/miniPmPar/miniPmPar_list.jsp
+			</result>
+		</action>
+		
+		<action name="miniPmParInfoDetail" class="miniPmParInfoDetailAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/miniPmPar/miniPmParInfoDetail.jsp
+			</result>
+		</action>
+		
+		<action name="raidListAction" class="raidListAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/raid/raid_list.jsp
+			</result>
+		</action>
+		
+		<action name="raidInfoDetail" class="raidInfoDetailAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/raid/raidInfoDetail.jsp
+			</result>
+		</action>
+		
+		<action name="swListAction" class="swListAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/sw/sw_list.jsp
+			</result>
+		</action>
+		
+		<action name="swInfoDetail" class="swInfoDetailAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/sw/swInfoDetail.jsp
+			</result>
+		</action>
+		
+		<action name="swIfListAction" class="swIfListAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/sw/swIf_list.jsp
+			</result>
+		</action>
+		
+		<action name="swIfInfoDetail" class="swIfInfoDetailAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/sw/swIfInfoDetail.jsp
+			</result>
+		</action>
+		
+		<action name="rtListAction" class="rtListAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/rt/rt_list.jsp
+			</result>
+		</action>
+		
+		<action name="rtInfoDetail" class="rtInfoDetailAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/rt/rtInfoDetail.jsp
+			</result>
+		</action>
+		
+		<action name="rtifListAction" class="rtifListAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/rt/rt_if_list.jsp
+			</result>
+		</action>
+		
+		<action name="rtifInfoDetail" class="rtifInfoDetailAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/rt/rtifInfoDetail.jsp
+			</result>
+		</action>
+		
+		<action name="fwListAction" class="fwListAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/fw/fw_list.jsp
+			</result>
+		</action>
+		
+		<action name="fwInfoDetail" class="fwInfoDetailAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/fw/fwInfoDetail.jsp
+			</result>
+		</action>
+		
+		<!-- 实时性能 报表-->
+		<action name="realTimeReport" class="realTimeReport">
+			<result name="success">/WEB-INF/pages/resourceManagement/realTime/realTime_report.jsp
+			</result>
+		</action>
+		<action name="realTimeDiskReport" class="realTimeDiskReport">
+			<result name="success">/WEB-INF/pages/resourceManagement/realTime/realTime_disk_report.jsp
+			</result>
+		</action>
+	</package>
+	<package name="com.neusoft.mid.cloong.resourceManagement.resView.json"
+		namespace="/resourceManagement_resView" extends="json-default">
+		<interceptors>
+			<interceptor name="authenticate" class="authenticateInterceptor" />
+			<interceptor name="turnPageInter" class="turnPageInterceptor" />
+			<interceptor-stack name="authStack">
+				<interceptor-ref name="authenticate" />
+				<interceptor-ref name="jsonValidationWorkflowStack" />
+				<interceptor-ref name="defaultStack" />
+				<interceptor-ref name="turnPageInter" />
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="authStack" />
+		<global-results>
+			<result name="LOGIN" type="redirectAction">logout</result>
+			<result name="error" type="chain">exceptionIntercepor
+			</result>
+		</global-results>
+		<global-exception-mappings>
+			<exception-mapping exception="java.lang.Exception"
+				result="error" />
+		</global-exception-mappings>
+		<action name="exceptionIntercepor" class="exceptionIntercepor">
+			<result name="success">/WEB-INF/pages/exception/error.jsp
+			</result>
+		</action>
+		<action name="creatTreeActionJson" class="createTreeAction">
+			<result type="json" name="success"></result>
+			<result type="json" name="error"></result>
+			<result type="json" name="failure"></result>
+		</action>
+		<!-- 物理机列表查询条件：机房机柜级联-->
+		<action name="resViewPmGetCabinetListAction" class="pmGetCabinetListAction">
+			<result name="success" type="json">
+				<param name="excludeProperties">ibatisDAO</param>
+				<param name="ignoreHierarchy">false</param>
+				<param name="enumAsBean">true</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">cabinetList</param>
+			</result>
+		</action>
+		
+        <!-- 实时性能 列表-->
+        <action name="realTimeList" class="realTimeReport">
+			<result name="success" type="json">
+				<param name="excludeProperties">ibatisDAO,container</param>
+				<param name="ignoreHierarchy">false</param>
+				<param name="enumAsBean">true</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">realTime</param>
+				<param name="root">realTimeList</param>
+			</result>
+		</action>
+		<action name="realTimeDiskList" class="realTimeDiskReport">
+			<result name="success" type="json">
+				<param name="excludeProperties">ibatisDAO,container</param>
+				<param name="ignoreHierarchy">false</param>
+				<param name="enumAsBean">true</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">realTimeRead</param>
+				<param name="root">realTimeWrite</param>
+				<param name="root">timeList</param>
+				<param name="root">y_axisData_read</param>
+				<param name="root">y_axisData_write</param>
+			</result>
+		</action>
+	</package>
+
+
+
+	<!-- 业务视图 -->
+	<package name="com.neusoft.mid.cloong.resourceManagement.appView"
+		namespace="/resourceManagement_appView" extends="struts-default">
+		<interceptors>
+			<interceptor name="authenticate" class="authenticateInterceptor" />
+			<interceptor name="turnPageInter" class="turnPageInterceptor" />
+			<interceptor-stack name="authStack">
+				<interceptor-ref name="authenticate" />
+				<interceptor-ref name="defaultStack" />
+				<interceptor-ref name="turnPageInter" />
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="authStack" />
+		<global-results>
+			<result name="LOGIN" type="redirectAction">logout</result>
+			<result name="error" type="chain">exceptionIntercepor
+			</result>
+		</global-results>
+		<global-exception-mappings>
+			<exception-mapping exception="java.lang.Exception"
+				result="error" />
+		</global-exception-mappings>
+		<action name="exceptionIntercepor" class="exceptionIntercepor">
+			<result name="success">/WEB-INF/pages/exception/error.jsp
+			</result>
+		</action>
+
+		<!-- 业务下性能统计 begin -->
+		<!-- CPU性能 图 -->
+		<action name="cpuUsedPerReportAction" class="cpuUsedPerReportAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/appView/performanceStatistics/cpuUsedPerReport.jsp
+			</result>
+		</action>
+
+		<!-- 内存性能 列表 -->
+		<action name="memUsedPerReportAction" class="memUsedPerReportAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/appView/performanceStatistics/memUsedPerReport.jsp
+			</result>
+		</action>
+
+		<!-- 磁盘性能 图 -->
+		<action name="diskUsedPerReportAction" class="diskUsedPerReportAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/appView/performanceStatistics/diskUsedPerReport.jsp
+			</result>
+		</action>
+		
+		<action name="exportAppReportAction" class="exportAppReportAction">
+			<result name="error">/WEB-INF/pages/resourceManagement/appView/performanceStatistics/cpuUsedPerReport.jsp
+			</result>
+		</action>
+		
+		<!-- 业务下性能统计 end -->
+		<action name="appViewPmListAction" class="pmListAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/pm/pm_list.jsp
+			</result>
+		</action>
+
+		<action name="appViewVmListAction" class="vmListAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/vm/vm_list.jsp
+			</result>
+		</action>
+
+		<action name="appViewEbsListAction" class="ebsListAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/ebs/ebs_list.jsp
+			</result>
+		</action>
+		
+			<action name="resViewPmListAction" class="pmListAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/pm/pm_list.jsp
+			</result>
+		</action>
+		
+		<action name="resViewPmInfoDetail" class="pmInfoDetailAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/pm/pmInfoDetail.jsp
+			</result>
+		</action>
+		
+		<action name="resViewVmListAction" class="vmListAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/vm/vm_list.jsp
+			</result>
+		</action>
+		
+		<action name="resViewVmInfoDetail" class="vmInfoDetailAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/vm/vmInfoDetail.jsp
+			</result>
+		</action>
+		
+		<action name="resViewEbsListAction" class="ebsListAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/ebs/ebs_list.jsp
+			</result>
+		</action>
+		
+		<action name="resViewEbsInfoDetail" class="ebsInfoDetailAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/ebs/ebsInfoDetail.jsp
+			</result>
+		</action>
+		
+		<action name="miniPmListAction" class="miniPmListAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/miniPm/miniPm_list.jsp
+			</result>
+		</action>
+		
+		<action name="miniPmInfoDetail" class="miniPmInfoDetailAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/miniPm/miniPmInfoDetail.jsp
+			</result>
+		</action>
+		
+		<action name="miniPmParListAction" class="miniPmParListAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/miniPmPar/miniPmPar_list.jsp
+			</result>
+		</action>
+		
+		<action name="miniPmParInfoDetail" class="miniPmParInfoDetailAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/miniPmPar/miniPmParInfoDetail.jsp
+			</result>
+		</action>
+		
+		<action name="raidListAction" class="raidListAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/raid/raid_list.jsp
+			</result>
+		</action>
+		
+		<action name="raidInfoDetail" class="raidInfoDetailAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/raid/raidInfoDetail.jsp
+			</result>
+		</action>
+		
+		<action name="swListAction" class="swListAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/sw/sw_list.jsp
+			</result>
+		</action>
+		
+		<action name="swInfoDetail" class="swInfoDetailAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/sw/swInfoDetail.jsp
+			</result>
+		</action>
+		
+		<action name="swIfListAction" class="swIfListAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/sw/swIf_list.jsp
+			</result>
+		</action>
+		
+		<action name="swIfInfoDetail" class="swIfInfoDetailAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/sw/swIfInfoDetail.jsp
+			</result>
+		</action>
+		
+		<action name="rtListAction" class="rtListAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/rt/rt_list.jsp
+			</result>
+		</action>
+		
+		<action name="rtInfoDetail" class="rtInfoDetailAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/rt/rtInfoDetail.jsp
+			</result>
+		</action>
+		
+		<action name="rtifListAction" class="rtifListAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/rt/rt_if_list.jsp
+			</result>
+		</action>
+		
+		<action name="rtifInfoDetail" class="rtifInfoDetailAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/rt/rtifInfoDetail.jsp
+			</result>
+		</action>
+		
+		<action name="fwListAction" class="fwListAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/fw/fw_list.jsp
+			</result>
+		</action>
+		
+		<action name="fwInfoDetail" class="fwInfoDetailAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/fw/fwInfoDetail.jsp
+			</result>
+		</action>
+
+		<!-- 业务维度 统计超标设备数 begin -->
+		<action name="cpuExceededAction" class="cpuExceededAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/appView/exceededStatistics/cpuExceededDeviceReport.jsp
+			</result>
+		</action>
+
+		<action name="memExceededAction" class="memExceededAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/appView/exceededStatistics/memExceededDeviceReport.jsp
+			</result>
+		</action>
+
+		<action name="diskExceededAction" class="diskExceededAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/appView/exceededStatistics/diskExceededDeviceReport.jsp
+			</result>
+		</action>
+		
+		<action name="exportAllAppReportAction" class="exportAllAppReportAction">
+			<result name="error">/WEB-INF/pages/resourceManagement/appView/exceededStatistics/cpuExceededDeviceReport.jsp
+			</result>
+		</action>
+		<!-- 业务维度 统计超标设备数 end -->
+		
+		<!-- 跨业务 设备数统计 -->
+		<action name="appViewAllDeviceNumAction" class="allDeviceNumAction">
+			<result name="success">/WEB-INF/pages/resourceManagement/appView/deviceNum/allDeviceNum_list.jsp
+			</result>
+		</action>
+		
+		<!-- 实时性能 报表-->
+		<action name="realTimeReport" class="realTimeReport">
+			<result name="success">/WEB-INF/pages/resourceManagement/realTime/realTime_report.jsp
+			</result>
+		</action>
+		<action name="realTimeDiskReport" class="realTimeDiskReport">
+			<result name="success">/WEB-INF/pages/resourceManagement/realTime/realTime_disk_report.jsp
+			</result>
+		</action>
+	</package>
+	<package name="com.neusoft.mid.cloong.resourceManagement.appView.json"
+		namespace="/resourceManagement_appView" extends="json-default">
+		<interceptors>
+			<interceptor name="authenticate" class="authenticateInterceptor" />
+			<interceptor name="turnPageInter" class="turnPageInterceptor" />
+			<interceptor-stack name="authStack">
+				<interceptor-ref name="authenticate" />
+				<interceptor-ref name="jsonValidationWorkflowStack" />
+				<interceptor-ref name="defaultStack" />
+				<interceptor-ref name="turnPageInter" />
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="authStack" />
+		<global-results>
+			<result name="LOGIN" type="redirectAction">logout</result>
+			<result name="error" type="chain">exceptionIntercepor
+			</result>
+		</global-results>
+		<global-exception-mappings>
+			<exception-mapping exception="java.lang.Exception"
+				result="error" />
+		</global-exception-mappings>
+		<action name="exceptionIntercepor" class="exceptionIntercepor">
+			<result name="success">/WEB-INF/pages/exception/error.jsp
+			</result>
+		</action>
+		<action name="creatTreeActionJson" class="createTreeAction">
+			<result type="json" name="success"></result>
+			<result type="json" name="error"></result>
+			<result type="json" name="failure"></result>
+		</action>
+		<!-- 具体业务下性能统计begin -->
+		<!-- CPU使用率统计 列表 -->
+		<action name="cpuUsedPerListAction" class="cpuUsedPerListAction">
+			<result name="success" type="json">
+				<param name="excludeProperties">ibatisDAO,container</param>
+				<param name="ignoreHierarchy">false</param>
+				<param name="enumAsBean">true</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">performancelist</param>
+			</result>
+		</action>
+		<!-- 内存使用率统计 列表 -->
+		<action name="memUsedPerListAction" class="memUsedPerListAction">
+			<result name="success" type="json">
+				<param name="excludeProperties">ibatisDAO,container</param>
+				<param name="ignoreHierarchy">false</param>
+				<param name="enumAsBean">true</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">performancelist</param>
+			</result>
+		</action>
+		<!-- 磁盘使用率统计 列表 -->
+		<action name="diskUsedPerListAction" class="diskUsedPerListAction">
+			<result name="success" type="json">
+				<!-- <param name="includeProperties">queryRole,roleList,page,pageSize,url,param,pageBar</param> -->
+				<param name="excludeProperties">ibatisDAO,container</param>
+				<param name="ignoreHierarchy">false</param>
+				<param name="enumAsBean">true</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">performancelist</param>
+			</result>
+		</action>
+		<!-- 具体业务下性能统计end -->
+
+		<!-- 异步分页Ajax 超标应用部分 begin -->
+		<!-- CPU 百分比 -->
+		<action name="cpuExceededPerListByAjax" class="cpuExceededAction"
+			method="getPerListByAjax">
+			<result name="success" type="json">
+				<param name="excludeProperties">ibatisDAO,container</param>
+				<param name="ignoreHierarchy">false</param>
+				<param name="enumAsBean">true</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">exceededlist</param>
+			</result>
+		</action>
+
+		<!-- CPU 个数 -->
+		<action name="cpuExceededNumListByAjax" class="cpuExceededAction"
+			method="getNumListByAjax">
+			<result name="success" type="json">
+				<param name="excludeProperties">ibatisDAO,container</param>
+				<param name="ignoreHierarchy">false</param>
+				<param name="enumAsBean">true</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">exceededlist</param>
+			</result>
+		</action>
+
+		<!-- 内存 百分比 -->
+		<action name="memExceededPerListByAjax" class="memExceededAction"
+			method="getPerListByAjax">
+			<result name="success" type="json">
+				<param name="excludeProperties">ibatisDAO,container</param>
+				<param name="ignoreHierarchy">false</param>
+				<param name="enumAsBean">true</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">exceededlist</param>
+			</result>
+		</action>
+
+		<!-- 内存 个数 -->
+		<action name="memExceededNumListByAjax" class="memExceededAction"
+			method="getNumListByAjax">
+			<result name="success" type="json">
+				<param name="excludeProperties">ibatisDAO,container</param>
+				<param name="ignoreHierarchy">false</param>
+				<param name="enumAsBean">true</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">exceededlist</param>
+			</result>
+		</action>
+		<!-- 磁盘 百分比 -->
+		<action name="diskExceededPerListByAjax" class="diskExceededAction"
+			method="getPerListByAjax">
+			<result name="success" type="json">
+				<param name="excludeProperties">ibatisDAO,container</param>
+				<param name="ignoreHierarchy">false</param>
+				<param name="enumAsBean">true</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">exceededlist</param>
+			</result>
+		</action>
+
+		<!-- 磁盘 个数 -->
+		<action name="diskExceededNumListByAjax" class="diskExceededAction"
+			method="getNumListByAjax">
+			<result name="success" type="json">
+				<param name="excludeProperties">ibatisDAO,container</param>
+				<param name="ignoreHierarchy">false</param>
+				<param name="enumAsBean">true</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">exceededlist</param>
+			</result>
+		</action>
+
+		<!-- 异步分页Ajax 超标应用部分 end -->
+		
+		<!-- 实时性能 列表-->
+        <action name="realTimeList" class="realTimeReport">
+			<result name="success" type="json">
+				<param name="excludeProperties">ibatisDAO,container</param>
+				<param name="ignoreHierarchy">false</param>
+				<param name="enumAsBean">true</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">realTime</param>
+				<param name="root">realTimeList</param>
+			</result>
+		</action>
+		<action name="realTimeDiskList" class="realTimeDiskReport">
+			<result name="success" type="json">
+				<param name="excludeProperties">ibatisDAO,container</param>
+				<param name="ignoreHierarchy">false</param>
+				<param name="enumAsBean">true</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">realTimeRead</param>
+				<param name="root">realTimeWrite</param>
+				<param name="root">timeList</param>
+				<param name="root">y_axisData_read</param>
+				<param name="root">y_axisData_write</param>
+			</result>
+		</action>
+	</package>
+</struts>

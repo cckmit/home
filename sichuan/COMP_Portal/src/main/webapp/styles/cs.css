@@ -1,0 +1,292 @@
+@charset "utf-8";
+/* CSS Document */
+
+/*******
+**云存储
+*******/
+/* 详细布局边距 */
+.cs-detail-info{
+	padding:0 10px 0 10px;
+	background: none repeat scroll 0 0 #F0F3F5;
+}
+/*使用总大小（外框）*/
+.cs-status {
+	margin-top:20px;
+	float:left;
+	width:100px;
+	height: 16px;
+	border:1px solid #d6d7d9;
+	background:#ebeef0;
+	/*圆角*/
+	-moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius:3px;
+	position:relative;
+}
+/*使用大小（内部颜色）*/
+.cs-status-color {
+	margin: 2px;
+	width:10px;
+	height:10px;
+	float:left;
+	border:1px solid #6FB638;
+	background:#78C83C;
+	/*圆角*/
+	-moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius:3px;
+}
+/*使用大小字体样式*/
+.cs-status-label{
+	margin: 0 0 0 0;
+	color:#FFF;
+	font-size:9px;
+	line-height:9px;
+	position: absolute;
+	left:40px;
+	top:3px;
+}
+/*选中按钮颜色*/
+.cs-change{
+	color:#fff;
+	background:#3cb4f0;
+	border: 1px solid #35A0D4;
+	line-height:20px;
+	/*圆角*/
+	-moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius:3px;
+	float:left;
+}
+/*选中按钮字体颜色*/
+.cs-change a{
+	display:block;
+	color:#ffffff;
+	padding: 0 10px;
+	display:block;
+    text-decoration: none;
+}
+
+/*左悬浮按钮*/
+.cs-button-left{
+	float:left;
+	margin-top:1px;
+}
+/*右悬浮按钮*/
+.cs-button-right{
+	float:right;
+	margin:1px 0;
+}
+/*左边距*/
+.cs-bma-l{
+	margin-left: 12px;
+}
+/*顶部 右悬浮按钮*/
+.cs-right{
+	float:right;
+	/*padding:1px 15px;*/
+	margin-top:16px;
+	margin-right: 12px;
+}
+
+/*未选按钮颜色*/
+.cs-move{
+	color:#fff;
+	background:#e6e9eb;
+	border: 1px solid #CDCFD0;
+	line-height:20px;
+	/*圆角*/
+	-moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius:3px;
+}
+/*未选按钮字体颜色*/
+.cs-move a{
+	display:block;
+	color:#000000;
+}
+/*按钮左中右分栏*/
+.cs-info-title-left{
+	margin:10px 0 10px 0;
+	width:25%;
+	float:left;
+	display:inline-block;
+}
+.cs-info-title-right{
+	margin:10px 0 10px 0;
+	width:73%;
+	float:right;
+	display:inline-block;
+}
+/*按钮中间距离微调*/
+.cs-center-button{
+	margin:10px 2px 10px 0;
+}
+/*创建bucket按钮*/
+.cs-button-create{
+	line-height: 20px;
+	width: 100%;
+	text-align:center;
+}
+/*内容左中右分栏*/
+.cs-info-left{
+	width:25%;
+	margin:0 0 10px 0;
+	background:#FFFFFF;
+	border:1px solid #d6d7d9;
+}
+.cs-info-right{
+	width:73%;
+	margin:-1px 0 10px 10px;
+	background:#FFFFFF;
+	border:1px solid #d6d7d9;
+}
+/*内容高度*/
+.cs-info-height{
+	min-height: 420px;
+}
+/*刷新图标*/
+.reboot{
+	background:url(../images/ico_vm_opt_reboot.png) no-repeat
+	5px center;
+}
+/*创建文件夹图标*/
+.cfboot{
+	background:url(../images/cs_file.png) no-repeat
+	5px center;
+}
+
+/*安全认证*/
+.cs-ak-center{
+	border:1px solid #e3e2e2;
+	margin: 5px;
+	/* 兼容IE7 样式调整 */
+	*margin: 20px 10px 0 10px;
+	background-color:#ffffff;
+}
+/*列表中操作按钮*/
+.cs-tab-list-op{
+	text-align:center;
+}
+.cs-tab-list-op span{
+	margin: 0 5px;
+    
+	color:#fff;
+	background:#3cb4f0;
+	border: 1px solid #35A0D4;
+	line-height:20px;
+	/*圆角*/
+	-moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius:3px;
+}
+/*列表隔显示颜色*/
+.cs-tab-list-status{
+	background:#e9f6ff;
+}
+/*安全认证列高度*/
+.cs-ak-detail-h{
+	height:420px;
+}
+/*列表头样式*/
+.cs-ak-tb-title{
+	background-color:#fcfcfc;
+}
+/*bucket列表*/
+#bucketList li{
+	line-height:40px;
+	border-bottom:1px solid #D6D7D9;
+	background:url(../images/ico_bucket.png) no-repeat 10px #eeeeee;
+	text-indent:50px;
+	font-weight:bold;
+}
+#bucketList li a{
+	color:#666666;
+}
+/*右侧表格样式*/
+.cs-info-right{
+	background:#ffffff;
+}
+.cs-info-right table{
+	border-left:0;
+	margin:5px;
+}
+.cs-info-right th{
+	border-top:1px solid #dfdfdf;
+	border-left:1px solid #dfdfdf;
+	border-bottom:1px solid #dfdfdf;
+	line-height:30px;
+	text-align:center;
+	font-weight:normal;
+}
+.cs-info-right .nl{
+	border-left:0;
+}
+.cs-info-right td{
+	border-bottom:1px solid #dfdfdf;
+	line-height:30px;
+}
+/*当前位置*/
+.path{
+	width:200px;
+	float:left;
+	height:20px;
+	line-height:20px;
+}
+#creatBucket label{
+	width:90px;
+	float:left;
+}
+#changeSize label{
+	width:90px;
+	float:left;
+}
+#property{
+	width:600px;
+}
+.property-input input{
+	width:98%;
+}
+.bk-page-form{
+	padding-top: 10px;
+}
+.bk-page-form .section{
+	padding:0;
+}
+.bk-page-form .field{
+	clear: both;
+	overflow: hidden;
+	padding: 5px 0;
+}
+.bk-page-form .caption{
+	float: left;
+	margin-right: 10px;
+	min-height: 12px;
+	padding: 5px 0;
+	text-align: right;
+	width: 70px;
+}
+
+.vmsn-page-form{
+	padding-top: 10px;
+}
+.vmsn-page-form .section{
+	padding:0;
+}
+.vmsn-page-form .field{
+	clear: both;
+	overflow: hidden;
+	padding: 5px 0;
+}
+.vmsn-page-form .caption{
+	float: left;
+	margin-right: 10px;
+	min-height: 12px;
+	padding: 5px 0;
+	text-align: right;
+	width: 140px;
+}
+/*虚拟机详情中创建快照样式 */
+.vmsn-page-form .vmcaption{
+	text-align: left;
+}

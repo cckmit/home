@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="CreatTreeInfo">
+	<typeAlias alias="createTreeInfo" type="com.neusoft.mid.cloong.web.page.resourceManagement.info.CreateTreeInfo" />
+	
+	<select id="queryCreateTreeInfo" parameterClass="createTreeInfo" resultClass="createTreeInfo">
+		SELECT  CAT.APP_ID AS APPID, CAT.APP_NAME AS APPNAME
+		FROM    COMP_APP_T CAT
+		ORDER BY APPID
+	</select>
+</sqlMap>

@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="StandardInfo">
+	<typeAlias alias="StandardSynchronizedState"
+		type="com.neusoft.mid.cloong.stardard.StandardSynchronizedState" />
+	<typeAlias alias="StandardQueryPara"
+		type="com.neusoft.mid.cloong.stardard.StandardQueryPara" />
+	<typeAlias alias="Template"
+		type="com.neusoft.mid.cloong.stardard.vm.info.Template" />
+	<typeAlias alias="StandardSynInfo"
+		type="com.neusoft.mid.cloong.stardard.StandardSynInfo" />
+	<typeAlias alias="TemplateSynchronizeResult"
+		type="com.neusoft.mid.cloong.stardard.vm.info.TemplateSynchronizeResult" />
+	
+	<select id="queryVMSynchronizedState" parameterClass="StandardQueryPara"
+		resultClass="StandardSynchronizedState">
+		select
+		standard_id standardId,res_pool_id
+		resourcePoolId,res_pool_part_id resourcePoolPartId,status
+		standardState,flage synchronizedState from
+		comp_vm_standard_res_v where
+		standard_Id=#standardId# and(
+		<iterate property="resourceInfos" conjunction="or">
+			(res_pool_id
+			=#resourceInfos[].resourcePoolId# and res_pool_part_id=
+			#resourceInfos[].resourcePoolPartId#)
+		</iterate>
+		)
+	</select>
+	<select id="queryEBSSynchronizedState" parameterClass="StandardQueryPara"
+		resultClass="StandardSynchronizedState">
+		select
+		standard_id standardId,res_pool_id
+		resourcePoolId,res_pool_part_id resourcePoolPartId,status
+		standardState,flage synchronizedState from
+		comp_ebs_standard_res_v where
+		standard_Id=#standardId# and(
+		<iterate property="resourceInfos" conjunction="or">
+			(res_pool_id
+			=#resourceInfos[].resourcePoolId# and res_pool_part_id=
+			#resourceInfos[].resourcePoolPartId#)
+		</iterate>
+		)
+	</select>
+	<select id="queryVMBKSynchronizedState" parameterClass="StandardQueryPara"
+		resultClass="StandardSynchronizedState">
+		select
+		standard_id standardId,res_pool_id
+		resourcePoolId,res_pool_part_id resourcePoolPartId,status
+		standardState,flage synchronizedState from
+		comp_vmbak_standard_res_v where
+		standard_Id=#standardId# and(
+		<iterate property="resourceInfos" conjunction="or">
+			(res_pool_id
+			=#resourceInfos[].resourcePoolId# and res_pool_part_id=
+			#resourceInfos[].resourcePoolPartId#)
+		</iterate>
+		)
+	</select>
+	
+	<select id="queryPMSynchronizedState" parameterClass="StandardQueryPara"
+		resultClass="StandardSynchronizedState">
+		select
+		standard_id standardId,res_pool_id
+		resourcePoolId,res_pool_part_id resourcePoolPartId,status
+		standardState,flage synchronizedState from
+		COMP_PM_STANDARD_RES_V where
+		standard_Id=#standardId# and(
+		<iterate property="resourceInfos" conjunction="or">
+			(res_pool_id
+			=#resourceInfos[].resourcePoolId# and res_pool_part_id=
+			#resourceInfos[].resourcePoolPartId#)
+		</iterate>
+		)
+	</select>
+	
+	<update id="updateStandardStatus" parameterClass="StandardSynchronizedState">
+		update
+		comp_standard_syn_t set status=#standardState# where
+		TEMPLATE_ID=#templateId# and
+		RES_POOL_ID=#resourcePoolId# 
+		<isNotEmpty prepend=" AND " property="resourcePoolPartId"> 
+			RES_POOL_PART_ID=#resourcePoolPartId#
+		</isNotEmpty>
+	</update>
+	
+	<!-- 查询要保存到数据库的 信息集合-->
+	<select id="querySaveDbVMSynchronized" parameterClass="StandardQueryPara"
+		resultClass="StandardSynchronizedState">
+			SELECT
+			standard_id standardId,
+			res_pool_id resourcePoolId,
+			res_pool_part_id resourcePoolPartId,
+			os_id osId
+			FROM 
+			comp_vm_template_res_v 
+			WHERE 
+			standard_Id=#standardId# 
+			AND(
+			<iterate property="resourceInfos" conjunction="or">
+			(res_pool_id=#resourceInfos[].resourcePoolId# 
+			and res_pool_part_id=#resourceInfos[].resourcePoolPartId#
+			and os_id=#resourceInfos[].osId#)
+		    </iterate>
+			)
+			AND flage='0'
+	</select>
+	
+	<select id="querySaveDbPMSynchronized" parameterClass="StandardQueryPara"
+		resultClass="StandardSynchronizedState">
+			SELECT
+			standard_id standardId,
+			res_pool_id resourcePoolId,
+			res_pool_part_id resourcePoolPartId,
+			os_id osId
+			FROM 
+			comp_pm_template_res_v 
+			WHERE 
+			standard_Id=#standardId# 
+			AND(
+			<iterate property="poolInfos" conjunction="or">
+			res_pool_id=#poolInfos[].resourcePoolId#  and res_pool_part_id=#poolInfos[].resourcePoolPartId#
+		    </iterate>
+		    )
+		    AND(
+		    <iterate property="osInfos" conjunction="or">
+			os_id=#osInfos[].osId#
+		    </iterate>
+			)
+			AND flage='0'
+	</select>
+	
+	<!-- 根据规格id查询已经存在的模板 信息集合-->
+	<select id="queryTemplateMessage" parameterClass="String" resultClass="Template">
+			SELECT
+			standard_id standardId,
+			template_id templateId,
+			os_id osId
+			FROM 
+			COMP_STANDARD_ISO_T 
+			WHERE 
+			standard_Id=#standardId# 
+	</select>
+	<!-- 从视图中查询出所有要保存的信息集合 -->
+	<select id="queryVmTemplateSynchronizedState" parameterClass="StandardQueryPara"
+		resultClass="StandardSynchronizedState">
+			SELECT
+			standard_id standardId,
+			res_pool_id resourcePoolId,
+			res_pool_part_id resourcePoolPartId,
+			os_id osId,
+			status standardState,
+			flage synchronizedState
+			FROM 
+			comp_vm_template_res_v 
+			WHERE 
+			standard_Id=#standardId# 
+			AND(
+			<iterate property="resourceInfos" conjunction="or">
+			(res_pool_id=#resourceInfos[].resourcePoolId# 
+			and res_pool_part_id=#resourceInfos[].resourcePoolPartId#
+			and os_id=#resourceInfos[].osId#)
+		    </iterate>
+			)
+	</select>
+	
+	<select id="queryPmTemplateSynchronizedState" parameterClass="StandardQueryPara"
+		resultClass="StandardSynchronizedState">
+			SELECT
+			standard_id standardId,
+			res_pool_id resourcePoolId,
+			res_pool_part_id resourcePoolPartId,
+			os_id osId,
+			status standardState,
+			flage synchronizedState
+			FROM 
+			comp_pm_template_res_v 
+			WHERE 
+			standard_Id=#standardId# 
+			AND(
+			<iterate property="poolInfos" conjunction="or">
+			res_pool_id=#poolInfos[].resourcePoolId#  and res_pool_part_id=#poolInfos[].resourcePoolPartId#
+		    </iterate>
+		    )
+		    AND(
+		    <iterate property="osInfos" conjunction="or">
+			os_id=#osInfos[].osId#
+		    </iterate>
+			)
+	</select>
+	
+	<!-- 保存模板到关联表 -->
+	<insert id="insertTemplateInfos" parameterClass="Template">
+		insert into comp_standard_iso_t
+		values(#templateId#,'',#osId#,#standardId#,#createTime#,#createUser#,#status#,#resourcePoolId#)
+	</insert>
+	<!-- 保存模板到同步表 -->
+	<insert id="insertSynchronizedInfos" parameterClass="StandardSynInfo">
+		insert into comp_standard_syn_t
+		values(#standardId#,#resPoolPartId#,#resPoolId#,#standardType#,#status#,#synTime#,#synUser#,#templateId#)
+	</insert>
+	<!-- 更新资源池返回的状态到同步表 -->
+	<update id="updateTemplateSynState" parameterClass="TemplateSynchronizeResult">
+			update comp_standard_syn_t 
+			set status=#state#
+			where
+			res_pool_id=#resourcePoolId# AND res_pool_part_id=#resourcePoolPartId# AND standard_id=#standardId# AND template_id=#templateId#
+	</update>
+	
+	<!-- 查询规格同步表状态为可用的  -->
+	<select id="querySynchronizedDelete" parameterClass="java.lang.String" resultClass="StandardSynInfo">
+		select	STANDARD_ID standardId,
+				RES_POOL_PART_ID resPoolPartId,
+				RES_POOL_ID resPoolId,
+				TEMPLATE_ID templateId,
+				STANDARD_TYPE standardType,
+				STATUS
+		from comp_standard_syn_t where
+				(STATUS='2' OR STATUS='3') AND
+				standard_Id=#standardId#
+	</select>
+</sqlMap>

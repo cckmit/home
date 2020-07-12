@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="ipSegment">
+
+	<typeAlias alias="ipSegmentInfo"
+		type="com.neusoft.mid.cloong.web.page.console.ipSegment.info.IpSegmentInfo" />
+	<typeAlias alias="ipInfo"
+		type="com.neusoft.mid.cloong.web.page.console.ipSegment.info.IpInfo" />
+	<typeAlias alias="vlanIpRel"
+		type="com.neusoft.mid.cloong.web.page.console.vlan.info.VlanIpSegmentRel" />
+	<typeAlias alias="vlanIpRel3Phase"
+		type="com.neusoft.mid.cloong.web.page.console.vlan3Phase.info.VlanIpSegmentRel" />
+	<typeAlias alias="resourceInfo"
+		type="com.neusoft.mid.cloong.web.page.console.business.info.ResourceInfo" />
+
+	<select id="getIpSegmentList" parameterClass="ipSegmentInfo"
+		resultClass="ipSegmentInfo">
+		SELECT
+		ip.CASE_ID AS caseId,
+		ip.IPSEGMENT_ID AS ipSegmentId,
+		ip.IPSEGMENT_DESC AS ipSegmentDesc,
+		b.VLAN_ID AS vlanId,
+		v.VLAN_NAME AS
+		vlanName,
+		ip.APP_ID AS
+		appId,
+		a.APP_NAME AS
+		appName,
+		ip.RES_POOL_ID AS
+		resPoolId,
+		ip.RES_POOL_PART_ID AS
+		resPoolPartId,
+		ip.IP_SUBNET AS
+		ipSubnet,
+		ip.START_IP AS startIp,
+		ip.END_IP AS endIp,
+		ip.IP_TOTAL AS
+		ipTotal,
+		ip.CREATE_TIME AS createTime,
+		ip.RELEASED AS `status`
+		FROM
+		`comp_case_ipsegment_t` ip
+		LEFT JOIN
+		`comp_app_t` a
+		ON
+		ip.APP_ID =
+		a.APP_ID
+		LEFT JOIN
+		comp_vlan_ipsegment_bind_t b ON ip.IPSEGMENT_ID =
+		b.IPSEGMENT_ID AND b.`Status` = '0'
+		LEFT
+		JOIN comp_case_vlan_t v ON b.VLAN_ID = v.VLAN_ID AND v.CANCELED IN ('0','2')
+		WHERE
+		ip.RELEASED in
+		<iterate property="released" open="(" conjunction="," close=")">
+			#released[]#
+		</iterate>
+		<isNotEmpty property="businessList" prepend="AND">
+			ip.APP_ID IN
+			<iterate property="businessList" open="(" conjunction=","
+				close=")">
+				#businessList[]#
+			</iterate>
+		</isNotEmpty>
+		order by ip.CREATE_TIME DESC
+	</select>
+
+	<select id="getIpSegmentCount" parameterClass="ipSegmentInfo"
+		resultClass="java.lang.Integer">
+		SELECT
+		count(*)
+		FROM
+		`comp_case_ipsegment_t` ip
+		LEFT JOIN
+		`comp_app_t` a
+		ON
+		ip.APP_ID =
+		a.APP_ID
+		LEFT JOIN
+		comp_vlan_ipsegment_bind_t b ON ip.IPSEGMENT_ID =
+		b.IPSEGMENT_ID AND b.`Status` = '0'
+		LEFT
+		JOIN comp_case_vlan_t v ON b.VLAN_ID = v.VLAN_ID AND v.CANCELED IN ('0','2')
+		WHERE
+		ip.RELEASED in
+		<iterate property="released" open="(" conjunction="," close=")">
+			#released[]#
+		</iterate>
+		<isNotEmpty property="businessList" prepend="AND">
+			ip.APP_ID IN
+			<iterate property="businessList" open="(" conjunction=","
+				close=")">
+				#businessList[]#
+			</iterate>
+		</isNotEmpty>
+	</select>
+
+	<!-- 获取未绑定的IP段列表 -->
+	<select id="getUnusedIpSegmentList" parameterClass="ipSegmentInfo"
+		resultClass="ipSegmentInfo">
+		SELECT
+		ip.CASE_ID AS caseId,
+		ip.IPSEGMENT_ID AS ipSegmentId,
+		ip.IPSEGMENT_DESC AS ipSegmentDesc,
+		ip.APP_ID AS appId,
+		a.APP_NAME AS
+		appName,
+		ip.RES_POOL_ID AS resPoolId,
+		ip.RES_POOL_PART_ID AS
+		resPoolPartId,
+		ip.IP_SUBNET AS ipSubnet,
+		ip.START_IP AS startIp,
+		ip.END_IP AS endIp,
+		ip.IP_TOTAL AS ipTotal,
+		ip.CREATE_TIME AS createTime,
+		ip.IP_TYPE AS ipType
+		FROM
+		`comp_case_ipsegment_t` ip
+		RIGHT JOIN `comp_app_t` a ON ip.APP_ID =
+		a.APP_ID
+		LEFT JOIN
+		comp_order_t ON ip.order_id = comp_order_t.order_id
+		WHERE
+		ip.RELEASED = '0'
+		AND comp_order_t.order_id IS NOT NULL
+		AND
+		comp_order_t. STATUS !=
+		'2'
+		AND ip.IPSEGMENT_ID NOT IN (
+		SELECT
+		bind.IPSEGMENT_ID
+		FROM
+		comp_vlan_ipsegment_bind_t bind
+		WHERE
+		`Status` !=
+		'1'
+		)
+		<isNotEmpty property="appId" prepend="AND">
+			ip.APP_ID = #appId#
+		</isNotEmpty>
+		<isNotEmpty property="ipType" prepend="AND">
+			ip.IP_TYPE = #ipType#
+		</isNotEmpty>
+	</select>
+
+	<insert id="createIpSegmentInstanceInfo" parameterClass="ipSegmentInfo">
+		insert
+		into
+		comp_case_ipsegment_t(CASE_ID,IPSEGMENT_ID,IPSEGMENT_DESC,ORDER_ID,APP_ID,RES_POOL_ID,RES_POOL_PART_ID,
+		IP_SUBNET,START_IP,END_IP,IP_TOTAL,CREATE_TIME,CREATE_USER,RELEASED,RELEASE_TIME,RELEASE_USER,IP_TYPE)
+		values(
+		#caseId#,
+		#ipSegmentId#,
+		#ipSegmentDesc#,
+		#orderId#,
+		#appId#,
+		
+		#resPoolId#,
+		
+		<!-- #resPoolPartId#, 创建ip跨分区 -->
+		null,
+		#ipSubnet#,
+		#startIp#,
+		#endIp#,
+		#ipTotal#,
+		#createTime#,
+		#createUser#,
+		<iterate property="released">
+			#released[]#,
+		</iterate>
+		#releaseTime#,
+		#releaseUser#,
+		#ipType#
+		)
+	</insert>
+
+	<select id="getIpSegmentById" parameterClass="ipSegmentInfo"
+		resultClass="ipSegmentInfo">
+		SELECT
+		i.CASE_ID AS caseId,
+		i.IPSEGMENT_ID AS ipSegmentId,
+		i.IPSEGMENT_DESC AS ipSegmentDesc,
+		b.VLAN_ID AS vlanId,
+		v.VLAN_NAME AS vlanName,
+		i.ORDER_ID AS
+		orderId,
+		i.APP_ID AS appId,
+		a.APP_NAME AS appName,
+		i.RES_POOL_ID AS
+		resPoolId,
+		i.RES_POOL_PART_ID AS resPoolPartId,
+		i.IP_SUBNET AS ipSubnet,
+		i.START_IP AS startIp,
+		i.END_IP AS endIp,
+		i.IP_TOTAL AS ipTotal,
+		i.CREATE_TIME AS createTime,
+		i.CREATE_USER AS createUser,
+		i.released AS
+		status,
+		i.RELEASE_TIME AS releaseTime,
+		i.RELEASE_USER AS releaseUser,
+		i.IP_TYPE ipType
+		FROM
+		`comp_case_ipsegment_t` i
+		RIGHT JOIN comp_app_t a ON a.APP_ID =
+		i.APP_ID
+		LEFT JOIN comp_vlan_ipsegment_bind_t b ON b.IPSEGMENT_ID =
+		i.IPSEGMENT_ID AND `Status` = '0'
+		LEFT JOIN comp_case_vlan_t v ON b.VLAN_ID = v.VLAN_ID
+		AND v.CANCELED IN ('0','2')
+		WHERE
+		i.RELEASED IN ('0', '2')
+		AND
+		i.IPSEGMENT_ID =
+		#ipSegmentId#
+		and i.RES_POOL_ID =
+		#resPoolId#
+	</select>
+
+	<select id="getUsedIpById" resultClass="ipInfo" parameterClass="ipSegmentInfo">
+		SELECT
+		n.IP AS ip,
+		v.VM_ID AS vmId,
+		v.VM_NAME AS vmName,
+		n.ETH AS eth
+		FROM
+		comp_vlan_ipsegment_bind_t b
+		LEFT
+		JOIN
+		comp_case_ipsegment_t i
+		ON
+		b.IPSEGMENT_ID = i.IPSEGMENT_ID
+		LEFT
+		JOIN
+		comp_case_vm_net_t n ON
+		n.VLAN_ID = b.VLAN_ID
+		LEFT JOIN
+		comp_case_vm_t v
+		ON n.VM_ID = v.VM_ID
+		WHERE
+		b.`Status` = '0'
+		AND
+		i.RELEASED = '0'
+		AND
+		v.`STATUS` != '3'
+		AND
+		i.IPSEGMENT_ID = #ipSegmentId#
+	</select>
+	<select id="getUsedIpCountById" resultClass="java.lang.Integer"
+		parameterClass="ipSegmentInfo">
+		SELECT
+		count(*)
+		FROM
+		comp_vlan_ipsegment_bind_t b
+		LEFT
+		JOIN
+		comp_case_ipsegment_t i ON b.IPSEGMENT_ID = i.IPSEGMENT_ID
+		LEFT
+		JOIN
+		comp_case_vm_net_t n ON n.VLAN_ID = b.VLAN_ID
+		LEFT JOIN
+		comp_case_vm_t v
+		ON n.VM_ID = v.VM_ID
+		WHERE
+		b.`Status` = '0'
+		AND
+		i.RELEASED = '0'
+		AND
+		v.`STATUS` != '3'
+		AND
+		i.IPSEGMENT_ID = #ipSegmentId#
+	</select>
+
+	<select id="getResPoolName" resultClass="java.lang.String"
+		parameterClass="java.lang.String">
+		SELECT p.RES_POOL_NAME
+		FROM `comp_res_pool_t` p
+		WHERE
+		p.RES_POOL_ID = #resPoolId#;
+	</select>
+
+	<select id="getResPoolPartName" resultClass="java.lang.String"
+		parameterClass="java.lang.String">
+		SELECT p.RES_POOL_PART_NAME
+		FROM `comp_res_pool_part_t`
+		p
+		WHERE
+		p.RES_POOL_PART_ID = #resPoolPartId#
+	</select>
+
+	<select id="getIPsegmentByIpSegmentId" parameterClass="java.lang.String"
+		resultClass="ipSegmentInfo">
+		SELECT
+		t.CASE_ID AS caseId,
+		t.IPSEGMENT_ID as ipSegmentId,
+		t.APP_ID AS appId,
+		t.RES_POOL_ID AS resPoolID,
+		t.RES_POOL_PART_ID AS
+		resPoolPartID,
+		t.IP_SUBNET AS ipSubnet,
+		t.START_IP AS startIp,
+		t.END_IP
+		AS endIp,
+		t.IP_TOTAL AS ipTotal,
+		t.RELEASED AS ipRelease
+		FROM
+		comp_case_ipsegment_t t
+		WHERE t.IPSEGMENT_ID= #ipSegmentId#
+		and RELEASED = '0'
+	</select>
+
+	<update id="releaseIpSegment" parameterClass="java.lang.String">
+		UPDATE
+		`comp_case_ipsegment_t`
+		SET
+		RELEASED = '1'
+		WHERE
+		IPSEGMENT_ID =
+		#ipSegmentId#
+		AND
+		RELEASED = '0';
+	</update>
+
+	<update id="invalidateIpSegmentAndVlanAss" parameterClass="vlanIpRel">
+		UPDATE `comp_vlan_ipsegment_bind_t`
+		SET `Status` = '1'
+		WHERE
+		`Status` = '0'
+		<isNotEmpty prepend="AND" property="ipSegmentId">
+			IPSEGMENT_ID = #ipSegmentId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="vlanId">
+			VLAN_ID = #vlanId#
+		</isNotEmpty>
+	</update>
+	
+	<update id="invalidateIpSegmentAndVlanAss3Phase" parameterClass="vlanIpRel3Phase">
+		UPDATE `comp_vlan_ipsegment_bind_t`
+		SET `Status` = '1'
+		WHERE
+		`Status` = '0'
+		<isNotEmpty prepend="AND" property="ipSegmentId">
+			IPSEGMENT_ID = #ipSegmentId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="vlanId">
+			VLAN_ID = #vlanId#
+		</isNotEmpty>
+	</update>
+
+	<update id="updateIpSegmentDesc" parameterClass="ipSegmentInfo">
+		UPDATE
+		`comp_case_ipsegment_t`
+		SET
+		IPSEGMENT_DESC = #ipSegmentDesc#
+		WHERE
+		IPSEGMENT_ID = #ipSegmentId#
+		AND
+		RELEASED IN ('0' , '2');
+	</update>
+
+	<select id="getIpSegmentByBusinessId" resultClass="resourceInfo"
+		parameterClass="java.util.Map">
+		SELECT
+		ip.IPSEGMENT_ID AS resourceId,
+		ip.IPSEGMENT_DESC
+		AS `name`,
+		ip.RELEASED AS `status`,
+		ip.APP_ID AS appId,
+		'4' AS `type`
+		FROM
+		`comp_case_ipsegment_t` ip
+		LEFT JOIN `comp_app_t` a ON ip.APP_ID =
+		a.APP_ID
+		WHERE
+		ip.APP_ID = #businessId#
+		AND
+		ip.RELEASED IN ('0','2')
+		ORDER BY ip.create_time DESC
+	</select>
+	
+	<select id="getlbByBusinessId" resultClass="resourceInfo"
+		parameterClass="java.util.Map">
+		SELECT
+		lb.LBID AS resourceId,
+	    lb.lb_name AS `name`,
+	    lb.create_status AS `status`,
+	    lb.AppId AS appId,
+		'14' AS `type`
+		FROM
+		comp_load_balance_service_tab lb
+		WHERE
+		lb.AppId = #businessId#
+		AND
+		(lb.create_status ='0' OR lb.create_status ='1') ORDER BY lb.create_time DESC 
+	</select>
+	
+	<select id="getReportingIpSegment" resultClass="ipSegmentInfo">
+		SELECT
+			ip.IP_SUBNET AS ipSubnet
+		FROM
+			`comp_order_t` o
+		LEFT JOIN `comp_case_ipsegment_t` ip ON o.CASE_ID = ip.CASE_ID
+		WHERE
+			o.CASE_TYPE = '12'
+		AND o.`STATUS` = '0'
+		AND ip.RELEASED = '2'
+	</select>
+</sqlMap>

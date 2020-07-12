@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE validators PUBLIC 
+  		"-//Apache Struts//XWork Validator 1.0.2//EN"
+  		"http://struts.apache.org/dtds/xwork-validator-1.0.2.dtd">
+<validators>
+	<field name="discSize">
+		<field-validator type="requiredstring">
+			<param name="trim">true</param>
+			<message>磁盘大小不能为空，请重新输入</message>
+		</field-validator>
+	</field>
+
+	<field name="discNum">
+		<field-validator type="requiredstring">
+			<param name="trim">true</param>
+			<message>磁盘个数不能为空，请重新输入</message>
+		</field-validator>
+		<field-validator type="regex">
+			<param name="expression"><![CDATA[^[1-9][0-9]*$]]></param>
+			<message>您输入的磁盘个数格式有误，请填写数字</message>
+		</field-validator>
+	</field>
+
+	<field name="lengthTime">
+		<field-validator type="regex">
+			<param name="expression"><![CDATA[^[0-9]{1,10}_[mhdy]{1}$]]></param>
+			<message>您输入的时长格式错误，请重新选择时长</message>
+		</field-validator>
+	</field>
+
+	<field name="ebsName">
+		<field-validator type="requiredstring">
+			<param name="trim">true</param>
+			<message>云硬盘名称不能为空，请重新输入</message>
+		</field-validator>
+		<field-validator type="stringlength">
+			<param name="minLength">0</param>
+			<param name="maxLength">20</param>
+			<message>云硬盘名称长度需在20字內，请重新输入</message>
+		</field-validator>
+	</field>
+	<field name="appId">
+		<field-validator type="requiredstring">
+			<param name="trim">true</param>
+			<message>所属业务不能为空，请输入</message>
+		</field-validator>
+	</field>
+</validators>

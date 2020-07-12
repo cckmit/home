@@ -1,0 +1,420 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ArtifactsWorkspaceSettings">
+    <artifacts-to-build>
+      <artifact name="COMP_Management:war exploded" />
+    </artifacts-to-build>
+  </component>
+  <component name="AutomaticModuleUnloader">
+    <loaded-modules>
+      <module name="COMP_RPProxy_Interface" />
+      <module name="COMP_Parent" />
+      <module name="COMP_Identity" />
+      <module name="COMP_Common" />
+      <module name="COMP_ResourcePoolProxy" />
+      <module name="COMP_Management" />
+      <module name="COMP_Portal" />
+    </loaded-modules>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="0efc3e34-7763-496d-bc3a-2b614a85fe8d" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/COMP_Management/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/COMP_Management/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/COMP_Management/src/main/java/com/neusoft/mid/cloong/web/action/PageAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/COMP_Management/src/main/java/com/neusoft/mid/cloong/web/action/PageAction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/COMP_Management/src/main/resources/comm_conf/struts/struts-common.xml" beforeDir="false" afterPath="$PROJECT_DIR$/COMP_Management/src/main/resources/comm_conf/struts/struts-common.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/COMP_Portal/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/COMP_Portal/pom.xml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ComposerSettings">
+    <execution>
+      <executable />
+    </execution>
+  </component>
+  <component name="DatabaseView">
+    <option name="SHOW_INTERMEDIATE" value="true" />
+    <option name="GROUP_DATA_SOURCES" value="true" />
+    <option name="GROUP_SCHEMA" value="true" />
+    <option name="GROUP_CONTENTS" value="false" />
+    <option name="SORT_POSITIONED" value="false" />
+    <option name="SHOW_EMPTY_GROUPS" value="false" />
+    <option name="AUTO_SCROLL_FROM_SOURCE" value="false" />
+    <option name="HIDDEN_KINDS">
+      <set />
+    </option>
+    <expand />
+    <select />
+  </component>
+  <component name="DefaultGradleProjectSettings">
+    <option name="isMigrated" value="true" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="JavaFXApplication" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="LogFilters">
+    <option name="FILTER_ERRORS" value="false" />
+    <option name="FILTER_WARNINGS" value="false" />
+    <option name="FILTER_INFO" value="true" />
+    <option name="FILTER_DEBUG" value="true" />
+    <option name="CUSTOM_FILTER" />
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="mavenHome" value="$PROJECT_DIR$/../1环境配置/apache-maven-3.5.4" />
+        <option name="userSettingsFile" value="D:\工作程序\1环境配置\apache-maven-3.5.4\conf\settings.xml" />
+      </MavenGeneralSettings>
+    </option>
+    <option name="importingSettings">
+      <MavenImportingSettings>
+        <option name="vmOptionsForImporter" value="-Xmx768m" />
+      </MavenImportingSettings>
+    </option>
+  </component>
+  <component name="MavenRunner">
+    <option name="skipTests" value="true" />
+  </component>
+  <component name="ProjectId" id="1a7BFmfEfVdcJYiFXOondifGIt5" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
+    <property name="go.import.settings.migrated" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../m_dolphin" />
+    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="project.structure.last.edited" value="Project" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.side.proportion" value="0.39186046" />
+    <property name="settings.editor.selected.configurable" value="MavenSettings" />
+  </component>
+  <component name="RunManager" selected="Application.father">
+    <configuration name="PageAction" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.neusoft.mid.cloong.web.action.PageAction" />
+      <module name="COMP_Management" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="test.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="father" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="test.father" />
+      <module name="COMP_Management" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="test.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="son" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="test.son" />
+      <module name="COMP_Management" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="test.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="COMP_Management" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat 7.0.82" ALTERNATIVE_JRE_ENABLED="true" ALTERNATIVE_JRE_PATH="1.6">
+      <option name="BROWSER_ID" value="98ca6316-2f89-46d9-a9e5-fa9e2b0625b3" />
+      <deployment>
+        <artifact name="COMP_Management:war exploded">
+          <settings>
+            <option name="CONTEXT_PATH" value="/COMP_Management_war_exploded" />
+          </settings>
+        </artifact>
+      </deployment>
+      <server-settings>
+        <option name="BASE_DIRECTORY_NAME" value="Unnamed_COMP_Parent" />
+        <option name="DEPLOY_TOMCAT_APPS" value="true" />
+      </server-settings>
+      <predefined_log_file enabled="true" id="Tomcat" />
+      <predefined_log_file enabled="true" id="Tomcat Catalina" />
+      <predefined_log_file id="Tomcat Manager" />
+      <predefined_log_file id="Tomcat Host Manager" />
+      <predefined_log_file id="Tomcat Localhost Access" />
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="7854" />
+      </RunnerSettings>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Cover">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Debug">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Run">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <method v="2">
+        <option name="Make" enabled="true" />
+        <option name="BuildArtifacts" enabled="true">
+          <artifact name="COMP_Management:war exploded" />
+        </option>
+      </method>
+    </configuration>
+    <configuration name="COMP_Portal" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat 7.0.82" ALTERNATIVE_JRE_ENABLED="true" ALTERNATIVE_JRE_PATH="1.6">
+      <option name="BROWSER_ID" value="98ca6316-2f89-46d9-a9e5-fa9e2b0625b3" />
+      <deployment>
+        <artifact name="COMP_Portal:war exploded">
+          <settings>
+            <option name="CONTEXT_PATH" value="/COMP_Portal_war_exploded" />
+          </settings>
+        </artifact>
+      </deployment>
+      <server-settings>
+        <option name="BASE_DIRECTORY_NAME" value="Unnamed_COMP_Parent_2" />
+        <option name="DEPLOY_TOMCAT_APPS" value="true" />
+        <option name="JNDI_PORT" value="1011" />
+      </server-settings>
+      <predefined_log_file enabled="true" id="Tomcat" />
+      <predefined_log_file enabled="true" id="Tomcat Catalina" />
+      <predefined_log_file id="Tomcat Manager" />
+      <predefined_log_file id="Tomcat Host Manager" />
+      <predefined_log_file id="Tomcat Localhost Access" />
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="11392" />
+      </RunnerSettings>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Cover">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Debug">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Run">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <method v="2">
+        <option name="Make" enabled="true" />
+        <option name="BuildArtifacts" enabled="true">
+          <artifact name="COMP_Portal:war exploded" />
+        </option>
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="Application.PageAction" />
+      <item itemvalue="Application.son" />
+      <item itemvalue="Application.father" />
+      <item itemvalue="Tomcat Server.COMP_Management" />
+      <item itemvalue="Tomcat Server.COMP_Portal" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.father" />
+        <item itemvalue="Application.son" />
+        <item itemvalue="Application.PageAction" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SvnConfiguration" cleanupOnStartRun="true">
+    <configuration>C:\Users\86133\AppData\Roaming\Subversion</configuration>
+    <supportedVersion>125</supportedVersion>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="0efc3e34-7763-496d-bc3a-2b614a85fe8d" name="Default Changelist" comment="" />
+      <created>1577326110222</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1577326110222</updated>
+      <workItem from="1577326111438" duration="2019000" />
+      <workItem from="1577329307069" duration="1041000" />
+      <workItem from="1577695412392" duration="2010000" />
+      <workItem from="1577697663038" duration="264000" />
+      <workItem from="1577936011558" duration="303000" />
+      <workItem from="1577955480673" duration="6532000" />
+      <workItem from="1578019831742" duration="882000" />
+      <workItem from="1578146324515" duration="827000" />
+      <workItem from="1578448463125" duration="1284000" />
+      <workItem from="1578535076113" duration="2105000" />
+      <workItem from="1578623237342" duration="1784000" />
+      <workItem from="1578641758098" duration="2180000" />
+      <workItem from="1579051261985" duration="345000" />
+      <workItem from="1579051624827" duration="258000" />
+      <workItem from="1579051908799" duration="254000" />
+      <workItem from="1579052398449" duration="2743000" />
+      <workItem from="1580797249928" duration="303000" />
+      <workItem from="1582429399768" duration="87000" />
+      <workItem from="1582430132922" duration="23000" />
+      <workItem from="1582430185213" duration="42000" />
+      <workItem from="1582430276808" duration="262000" />
+      <workItem from="1582430611870" duration="4741000" />
+      <workItem from="1584446547816" duration="7910000" />
+      <workItem from="1585210524195" duration="5411000" />
+      <workItem from="1585538070744" duration="663000" />
+      <workItem from="1586076654897" duration="107000" />
+      <workItem from="1586076782346" duration="261000" />
+      <workItem from="1586077069635" duration="416000" />
+      <workItem from="1586077684259" duration="26000" />
+      <workItem from="1586077733880" duration="11000" />
+      <workItem from="1586077883300" duration="108000" />
+      <workItem from="1586095279562" duration="966000" />
+      <workItem from="1586228443731" duration="10722000" />
+      <workItem from="1586786585819" duration="191000" />
+      <workItem from="1586793315967" duration="101000" />
+      <workItem from="1586873370721" duration="111000" />
+      <workItem from="1588755507886" duration="4246000" />
+      <workItem from="1589126092314" duration="4251000" />
+      <workItem from="1589515348885" duration="1168000" />
+      <workItem from="1589949107074" duration="6200000" />
+      <workItem from="1590423474449" duration="977000" />
+      <workItem from="1590657972000" duration="1845000" />
+      <workItem from="1591457867416" duration="1832000" />
+      <workItem from="1594557858148" duration="1997000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TodoView">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="233" y="39" key="#Notifications" timestamp="1586095405506">
+      <screen x="0" y="0" width="1280" height="760" />
+    </state>
+    <state x="233" y="39" key="#Notifications/0.0.1280.760@0.0.1280.760" timestamp="1586095405506" />
+    <state x="391" y="216" key="#com.intellij.ide.actions.ChooseComponentsToExportDialog" timestamp="1586076760245">
+      <screen x="0" y="0" width="1280" height="760" />
+    </state>
+    <state x="391" y="216" key="#com.intellij.ide.actions.ChooseComponentsToExportDialog/0.0.1280.760@0.0.1280.760" timestamp="1586076760245" />
+    <state x="420" y="121" key="FileChooserDialogImpl" timestamp="1591457982128">
+      <screen x="0" y="0" width="1280" height="760" />
+    </state>
+    <state x="420" y="121" key="FileChooserDialogImpl/0.0.1280.760@0.0.1280.760" timestamp="1591457982128" />
+    <state x="121" y="0" key="SettingsEditor" timestamp="1586077916470">
+      <screen x="0" y="0" width="1280" height="760" />
+    </state>
+    <state x="121" y="0" key="SettingsEditor/0.0.1280.760@0.0.1280.760" timestamp="1586077916470" />
+    <state x="330" y="205" key="com.intellij.ide.util.TipDialog" timestamp="1586076659554">
+      <screen x="0" y="0" width="1280" height="760" />
+    </state>
+    <state x="330" y="205" key="com.intellij.ide.util.TipDialog/0.0.1280.760@0.0.1280.760" timestamp="1586076659554" />
+    <state x="455" y="221" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1586077941216">
+      <screen x="0" y="0" width="1280" height="760" />
+    </state>
+    <state x="455" y="221" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1280.760@0.0.1280.760" timestamp="1586077941216" />
+    <state x="-5" y="0" width="1280" height="760" key="find.popup" timestamp="1594559263041">
+      <screen x="0" y="0" width="1280" height="760" />
+    </state>
+    <state x="-5" y="0" width="1280" height="760" key="find.popup/0.0.1280.760@0.0.1280.760" timestamp="1594559263041" />
+    <state x="12" y="-1" key="new project wizard" timestamp="1586762527825">
+      <screen x="0" y="0" width="1280" height="760" />
+    </state>
+    <state x="12" y="-1" key="new project wizard/0.0.1280.760@0.0.1280.760" timestamp="1586762527825" />
+    <state x="313" y="92" width="672" height="678" key="search.everywhere.popup" timestamp="1590657983190">
+      <screen x="0" y="0" width="1280" height="760" />
+    </state>
+    <state x="313" y="92" width="672" height="678" key="search.everywhere.popup/0.0.1280.760@0.0.1280.760" timestamp="1590657983190" />
+    <state x="471" y="171" key="svn.repositoryBrowser" timestamp="1586077987402">
+      <screen x="0" y="0" width="1280" height="760" />
+    </state>
+    <state x="471" y="171" key="svn.repositoryBrowser/0.0.1280.760@0.0.1280.760" timestamp="1586077987402" />
+  </component>
+</project>

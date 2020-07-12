@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
+    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+
+	<!-- vmbk EDIT 2015-03-03 老的虚拟机备份接口全部删除，改用新接口代码 -->
+	<bean id="vmBakCreateProcessor" class="com.neusoft.mid.cloong.host.vmbak.VMBakCreateProcessor">
+		<property name="vmBakCreate" ref="vmBakCreate" />
+		<property name="transactonGen" ref="transactonGen" />
+		<property name="timeStampgen" ref="timeStampgen" />
+		<property name="resourcePoolCacheService" ref="resourcePoolCacheService" />
+	</bean>
+	<bean id="vmBakCreate" class="com.neusoft.mid.cloong.host.vmbak.VMBakCreate">
+		<property name="common" ref="privateWebServiceClientFactory" />
+		<property name="timeout">
+			<value>${requestTimeout}</value>
+		</property>
+	</bean>
+
+	<!-- 虚拟机备份任务删除 -->
+	<bean id="vmBakDeleteProcessor" class="com.neusoft.mid.cloong.host.vmbak.VMBakDeleteProcessor">
+		<property name="vmBakDelete" ref="vmBakDelete" />
+		<property name="transactonGen" ref="transactonGen" />
+		<property name="timeStampgen" ref="timeStampgen" />
+		<property name="resourcePoolCacheService" ref="resourcePoolCacheService" />
+	</bean>
+	<bean id="vmBakDelete" class="com.neusoft.mid.cloong.host.vmbak.VMBakDelete">
+		<property name="common" ref="privateWebServiceClientFactory" />
+		<property name="timeout">
+			<value>${requestTimeout}</value>
+		</property>
+	</bean>
+
+	<!-- 虚拟机备份列表查询 -->
+	<bean id="vmBakListQueryProcessor" class="com.neusoft.mid.cloong.host.vmbak.VMBakListQueryProcessor">
+		<property name="vmBakListQuery" ref="vmBakListQuery" />
+		<property name="transactonGen" ref="transactonGen" />
+		<property name="timeStampgen" ref="timeStampgen" />
+		<property name="resourcePoolCacheService" ref="resourcePoolCacheService" />
+	</bean>
+	<bean id="vmBakListQuery" class="com.neusoft.mid.cloong.host.vmbak.VMBakListQuery">
+		<property name="common" ref="privateWebServiceClientFactory" />
+		<property name="timeout">
+			<value>${requestTimeout}</value>
+		</property>
+	</bean>
+
+	<!-- 虚拟机备份任务状态查询 -->
+	<bean id="vmBakTaskQueryProcessor" class="com.neusoft.mid.cloong.host.vmbak.VMBakTaskQueryProcessor">
+		<property name="vmBakTaskQuery" ref="vmBakTaskQuery" />
+		<property name="transactonGen" ref="transactonGen" />
+		<property name="timeStampgen" ref="timeStampgen" />
+		<property name="resourcePoolCacheService" ref="resourcePoolCacheService" />
+	</bean>
+	<bean id="vmBakTaskQuery" class="com.neusoft.mid.cloong.host.vmbak.VMBakTaskQuery">
+		<property name="common" ref="privateWebServiceClientFactory" />
+		<property name="timeout">
+			<value>${requestTimeout}</value>
+		</property>
+	</bean>
+
+	<!-- 虚拟机备份恢复 -->
+	<bean id="vmBakRestoreProcessor" class="com.neusoft.mid.cloong.host.vmbak.VMBakRestoreProcessor">
+		<property name="vmBakRestore" ref="vmBakRestore" />
+		<property name="transactonGen" ref="transactonGen" />
+		<property name="timeStampgen" ref="timeStampgen" />
+		<property name="resourcePoolCacheService" ref="resourcePoolCacheService" />
+		<property name="retransInterval" value="${retransInterval}" />
+		<property name="vmStateQueue" ref="vmProcessingStateQueue" />
+	</bean>
+	<bean id="vmBakRestore" class="com.neusoft.mid.cloong.host.vmbak.VMBakRestore">
+		<property name="common" ref="privateWebServiceClientFactory" />
+		<property name="timeout">
+			<value>${requestTimeout}</value>
+		</property>
+	</bean>
+
+</beans>

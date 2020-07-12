@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<!-- 该属性指定Struts 2应用所需要的国际化资源文件，如果有多份国际化资源文件，则多个资源文件的文件名以英文逗号（,）隔开 -->
+	<constant name="struts.custom.i18n.resources" value="ApplicationResources" />
+	<constant name="struts.i18n.encoding" value="UTF-8"></constant>
+	<include file="struts-default.xml" />
+	
+	<!-- 指定名字为spring的ObjectFactory是Struts 2的ObjectFactory -->
+	<constant name="struts.objectFactory" value="spring" />
+
+	<include file="comm_conf/struts/struts-common.xml" />
+	<include file="comm_conf/struts/struts-entry.xml" /> 
+	<include file="comm_conf/struts/struts-task.xml" /> 
+	<include file="comm_conf/struts/struts-meterage.xml" /> 
+	<include file="comm_conf/struts/struts-system.xml" /> 
+	<include file="comm_conf/struts/struts-standard.xml" /> 
+	<include file="comm_conf/struts/struts-standard-pm.xml" /> 
+	<include file="comm_conf/struts/struts-user.xml" />
+	<include file="comm_conf/struts/struts-nonamespace.xml" />
+	<include file="comm_conf/struts/struts-report.xml" />
+	<include file="comm_conf/struts/struts-app.xml" />
+	<include file="comm_conf/struts/struts-resourceManagement.xml" />
+	<include file="comm_conf/struts/struts-charges.xml" />
+	<include file="comm_conf/struts/struts-vault.xml" />
+</struts>

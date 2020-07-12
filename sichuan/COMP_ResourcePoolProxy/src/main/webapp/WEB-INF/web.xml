@@ -1,0 +1,668 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	id="COMP_ResourcePoolProxy" version="2.5">
+	<display-name>COMP_ResourcePoolProxy</display-name>
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>
+			classpath*:comm_conf/spring/*.xml
+		</param-value>
+	</context-param>
+	<listener>
+		<listener-class>com.neusoft.mid.cloong.boot.ContextLoaderListener</listener-class>
+	</listener>
+	<resource-ref>
+		<description>DB platform Connection</description>
+		<res-ref-name>comm_datasource</res-ref-name>
+		<res-type>javax.sql.DataSource</res-type>
+		<res-auth>Container</res-auth>
+	</resource-ref>
+	<error-page>
+		<error-code>404</error-code>
+		<location>/404.jsp</location>
+	</error-page>
+	<error-page>
+		<error-code>500</error-code>
+		<location>/500.jsp</location>
+	</error-page>
+	<error-page>
+		<error-code>503</error-code>
+		<location>/error.jsp</location>
+	</error-page>
+	<servlet>
+		<display-name>CXF Servlet</display-name>
+		<servlet-name>CXFServlet</servlet-name>
+		<servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>CXFServlet</servlet-name>
+		<url-pattern>/service/*</url-pattern>
+	</servlet-mapping>
+	<!-- 物理机 -->
+	<!-- 创建 -->
+	<servlet>
+		<servlet-name>lbCreateServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>lbCreateProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>lbCreateServlet</servlet-name>
+		<url-pattern>/lbCreateServlet</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>pmCreateServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>pmCreateProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>pmCreateServlet</servlet-name>
+		<url-pattern>/pmCreateServlet</url-pattern>
+	</servlet-mapping>
+	<!-- 查询状态 -->
+	<servlet>
+		<servlet-name>queryPMStateServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>queryPMStateProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>queryPMStateServlet</servlet-name>
+		<url-pattern>/queryPMStateServlet</url-pattern>
+	</servlet-mapping>
+	<!-- 操作-->
+	<servlet>
+		<servlet-name>pmOperatorServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>pmOperatorProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>pmOperatorServlet</servlet-name>
+		<url-pattern>/pmOperatorServlet</url-pattern>
+	</servlet-mapping>
+	<!-- 更改-->
+	<servlet>
+		<servlet-name>pmModifyServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>pmModifyProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>pmModifyServlet</servlet-name>
+		<url-pattern>/pmModifyServlet</url-pattern>
+	</servlet-mapping>
+	<!-- 删除 -->
+	<servlet>
+		<servlet-name>pmDeleteServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>pmDeleteProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>pmDeleteServlet</servlet-name>
+		<url-pattern>/pmDeleteServlet</url-pattern>
+	</servlet-mapping> 
+	<!-- 虚拟机 -->
+	<servlet>
+		<servlet-name>vmOperatorServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>vmOperatorProcessor</param-value>
+		</init-param>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>vmOperatorServlet</servlet-name>
+		<url-pattern>/vmOperatorServlet</url-pattern>
+	</servlet-mapping>
+	
+	
+	<servlet>
+		<servlet-name>vmCreateServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>vmCreateProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>vmCreateServlet</servlet-name>
+		<url-pattern>/vmCreateServlet</url-pattern>
+	</servlet-mapping>
+	<servlet>
+		<servlet-name>vmModifyServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>vmModifyProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>vmModifyServlet</servlet-name>
+		<url-pattern>/vmModifyServlet</url-pattern>
+	</servlet-mapping>
+	<!-- 克隆 -->
+
+	<servlet>
+		<servlet-name>vmDeleteServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>vmDeleteProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>vmDeleteServlet</servlet-name>
+		<url-pattern>/vmDeleteServlet</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>vmStandardSynchronzedServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>vmStandardSynchronizeProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>vmStandardSynchronzedServlet</servlet-name>
+		<url-pattern>/vmStandardSynchronzedServlet</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>vmTemplateSynchronzedServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>vmTemplateSynchronizeProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>vmTemplateSynchronzedServlet</servlet-name>
+		<url-pattern>/vmTemplateSynchronzedServlet</url-pattern>
+	</servlet-mapping>
+<!-- add by huxin begin -->
+	<!-- 添加端口映射 -->
+	<servlet>
+		<servlet-name>portMapServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>PortMapOperatorProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>portMapServlet</servlet-name>
+		<url-pattern>/portMapServlet</url-pattern>
+	</servlet-mapping>
+	
+	<!-- 删除端口映射 -->
+	<servlet>
+		<servlet-name>delportMapServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>DeletePortMapOperatorProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>delportMapServlet</servlet-name>
+		<url-pattern>/delportMapServlet</url-pattern>
+	</servlet-mapping>
+	<!-- 申请虚拟防火墙 -->
+	<servlet>
+		<servlet-name>applyvirfwServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>ApplyVirfwOperatorProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>applyvirfwServlet</servlet-name>
+		<url-pattern>/applyvirfwServlet</url-pattern>
+	</servlet-mapping>
+	
+	<!-- 删除虚拟防火墙 -->
+	<servlet>
+		<servlet-name>cancelvirfwServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>CancelVirfwOperatorProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>cancelvirfwServlet</servlet-name>
+		<url-pattern>/cancelvirfwServlet</url-pattern>
+	</servlet-mapping>
+	
+	<!-- 添加虚拟防火墙策略 -->
+	<servlet>
+		<servlet-name>addvirfwStrategyServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>AddVirfwStrategyOperatorProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>addvirfwStrategyServlet</servlet-name>
+		<url-pattern>/addvirfwStrategyServlet</url-pattern>
+	</servlet-mapping>
+	
+	<!-- 删除防火墙侧率 -->
+	<servlet>
+		<servlet-name>delvirfwStrategyServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>DelVirfwStrategyOperatorProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>delvirfwStrategyServlet</servlet-name>
+		<url-pattern>/delvirfwStrategyServlet</url-pattern>
+	</servlet-mapping>
+	
+	<!-- 申请分布式文件 -->
+	<servlet>
+		<servlet-name>applyFileStorage</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>FileStorageCreateProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>applyFileStorage</servlet-name>
+		<url-pattern>/applyFileStorage</url-pattern>
+	</servlet-mapping>
+	
+	<!-- 删除分布式文件 -->
+	<servlet>
+		<servlet-name>deleteFileStorage</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>FileStorageDeleteProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>deleteFileStorage</servlet-name>
+		<url-pattern>/deleteFileStorage</url-pattern>
+	</servlet-mapping>
+	
+	<!-- add by huxin end -->
+	
+		
+	<servlet>
+		<servlet-name>queryLogicVlanServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>queryLogicVlanProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>queryLogicVlanServlet</servlet-name>
+		<url-pattern>/queryLogicVlanServlet</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>queryIpOfLogicVlanServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>queryIpOfLogicVlanProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>queryIpOfLogicVlanServlet</servlet-name>
+		<url-pattern>/queryIpOfLogicVlanServlet</url-pattern>
+	</servlet-mapping>
+ 
+	<servlet>
+		<servlet-name>queryVMStateServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>queryVMStateProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>queryVMStateServlet</servlet-name>
+		<url-pattern>/queryVMStateServlet</url-pattern>
+	</servlet-mapping>
+	<servlet>
+		<servlet-name>ebsStandardSynchronzedServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>ebsStandardSynchronizeProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ebsStandardSynchronzedServlet</servlet-name>
+		<url-pattern>/ebsStandardSynchronzedServlet</url-pattern>
+	</servlet-mapping>
+
+	<!-- <servlet>
+		<servlet-name>vmbkStandardSynchronzedServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>vmbkStandardSynchronizeProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>vmbkStandardSynchronzedServlet</servlet-name>
+		<url-pattern>/vmbkStandardSynchronzedServlet</url-pattern>
+	</servlet-mapping> -->
+
+	<servlet>
+		<servlet-name>pmStandardSynchronzedServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>pmStandardSynchronizeProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>pmStandardSynchronzedServlet</servlet-name>
+		<url-pattern>/pmStandardSynchronzedServlet</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>standardDeleteServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>standardSynchronizeDeleteProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>standardDeleteServlet</servlet-name>
+		<url-pattern>/standardDeleteServlet</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>ebsCreateServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>ebsCreateProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ebsCreateServlet</servlet-name>
+		<url-pattern>/ebsCreateServlet</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>ebsAttachServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>ebsAttachProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ebsAttachServlet</servlet-name>
+		<url-pattern>/ebsAttachServlet</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>ebsDetachServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>ebsDetachProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ebsDetachServlet</servlet-name>
+		<url-pattern>/ebsDetachServlet</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>ebsDeleteServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>ebsDeleteProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ebsDeleteServlet</servlet-name>
+		<url-pattern>/ebsDeleteServlet</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>ebsModifyServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>ebsModifyProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ebsModifyServlet</servlet-name>
+		<url-pattern>/ebsModifyServlet</url-pattern>
+	</servlet-mapping>
+
+	<!-- IP -->
+	<servlet>
+		<servlet-name>ipApplyServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>ipApplyProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ipApplyServlet</servlet-name>
+		<url-pattern>/ipApplyServlet</url-pattern>
+	</servlet-mapping>
+	<servlet>
+		<servlet-name>ipQueryServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>ipQueryProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ipQueryServlet</servlet-name>
+		<url-pattern>/ipQueryServlet</url-pattern>
+	</servlet-mapping>
+	<servlet>
+		<servlet-name>ipReleaseServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>ipReleaseProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ipReleaseServlet</servlet-name>
+		<url-pattern>/ipReleaseServlet</url-pattern>
+	</servlet-mapping>
+
+	<!-- Vlan -->
+	<servlet>
+		<servlet-name>vlanApplyServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>vlanApplyProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>vlanApplyServlet</servlet-name>
+		<url-pattern>/vlanApplyServlet</url-pattern>
+	</servlet-mapping>
+
+	<!-- standard -->
+	<servlet>
+		<servlet-name>vlanCancelServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>vlanCancelProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>vlanCancelServlet</servlet-name>
+		<url-pattern>/vlanCancelServlet</url-pattern>
+	</servlet-mapping>
+
+	<!-- vmbak -->
+	<servlet>
+		<servlet-name>vmBakCreateServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>vmBakCreateProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>vmBakCreateServlet</servlet-name>
+		<url-pattern>/vmBakCreateServlet</url-pattern>
+	</servlet-mapping>
+	<servlet>
+		<servlet-name>vmBakDeleteServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>vmBakDeleteProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>vmBakDeleteServlet</servlet-name>
+		<url-pattern>/vmBakDeleteServlet</url-pattern>
+	</servlet-mapping>
+	<servlet>
+		<servlet-name>vmBakListQueryServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>vmBakListQueryProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>vmBakListQueryServlet</servlet-name>
+		<url-pattern>/vmBakListQueryServlet</url-pattern>
+	</servlet-mapping>
+	<servlet>
+		<servlet-name>vmBakRestoreServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>vmBakRestoreProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>vmBakRestoreServlet</servlet-name>
+		<url-pattern>/vmBakRestoreServlet</url-pattern>
+	</servlet-mapping>
+	<servlet>
+		<servlet-name>vmBakTaskQueryServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>vmBakTaskQueryProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>vmBakTaskQueryServlet</servlet-name>
+		<url-pattern>/vmBakTaskQueryServlet</url-pattern>
+	</servlet-mapping>
+	
+	<!-- 虚拟机快照 -->
+	<servlet>
+		<servlet-name>vmSnapshotCreateServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>SnapshotApplyProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>vmSnapshotCreateServlet</servlet-name>
+		<url-pattern>/vmSnapshotCreateServlet</url-pattern>
+	</servlet-mapping>
+	<!-- 虚拟机快照删除 -->
+	<servlet>
+		<servlet-name>vmSnapshotDeleteServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>SnapshotDeleteProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>vmSnapshotDeleteServlet</servlet-name>
+		<url-pattern>/vmSnapshotDeleteServlet</url-pattern>
+	</servlet-mapping>
+	<!-- 虚拟机快照恢复 -->
+	<servlet>
+		<servlet-name>vmSnapshotRestoreServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>SnapshotRecoveryProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>vmSnapshotRestoreServlet</servlet-name>
+		<url-pattern>/vmSnapshotRestoreServlet</url-pattern>
+	</servlet-mapping>
+<!-- 虚拟机快照查询 -->
+	<servlet>
+		<servlet-name>vmSnapshotQueryServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.RequestRecieve</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>vmSnapshotRestoreProcessor</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>vmSnapshotQueryServlet</servlet-name>
+		<url-pattern>/vmSnapshotQueryServlet</url-pattern>
+	</servlet-mapping>
+	
+	<!-- 性能文件全量导入 -->
+	<servlet>
+		<servlet-name>importPerfomanceFileServlet</servlet-name>
+		<servlet-class>com.neusoft.mid.cloong.ImportPerfomanceFile</servlet-class>
+		<init-param>
+			<param-name>processorId</param-name>
+			<param-value>ImportPerfomanceFile</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>importPerfomanceFileServlet</servlet-name>
+		<url-pattern>/importPerfomanceFileServlet</url-pattern>
+	</servlet-mapping>
+
+</web-app>

@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="VmBakInfo">
+	<typeAlias alias="VmBakInstanceInfo"
+		type="com.neusoft.mid.cloong.web.page.console.vmbak.info.VmBakInstanceInfo" />
+	<typeAlias alias="VMInstanceInfo"
+		type="com.neusoft.mid.cloong.web.page.console.host.vm.info.VMInstanceInfo" />
+	<typeAlias alias="OrderInfo"
+		type="com.neusoft.mid.cloong.web.page.host.vm.order.info.OrderInfo" />
+	<typeAlias alias="VmBakCreateFail"
+		type="com.neusoft.mid.cloong.vmbak.core.VmBakCreateFail" />
+
+	<select id="queryVmBakAllStatus" resultClass="VmBakInstanceInfo">
+		select VMBAK_ID vmBakId,STATUS
+		status from COMP_CASE_VMBAK_T where STATUS!='3' and STATUS!='0' and STATUS!='11'
+	</select>
+	
+	<select id="getVmBakSubnetworkByUserId" parameterClass="java.lang.String"
+		resultClass="java.lang.String">
+		select SUBNETWORK from COMP_CASE_VMBAK_T
+		where CREATE_USER =
+		#userId# and CASE_ID = (SELECT MAX(CASE_ID) FROM COMP_CASE_VMBAK_T WHERE CREATE_USER =#userId#)
+	</select>
+	
+	<!-- 更新虚拟机备份任务状态 -->
+	<update id="updateVmBakStatus" parameterClass="VmBakInstanceInfo">
+		UPDATE COMP_CASE_VMBAK_T
+		SET    STATUS = #status#,
+		       UPDATE_TIME = #updateTime#,
+		       UPDATE_USER = #updateUser# 
+		WHERE  VMBAK_ID = #vmBakId#
+	</update>
+	
+	<!-- 更新虚拟机备份恢复信息 -->
+	<update id="updateVmBakRestoreInfo" parameterClass="VmBakInstanceInfo">
+	    UPDATE COMP_CASE_VMBAK_T
+		SET    RESTORE_VMBACK_INTERNAL_ID = #restoreVmBakInternalId#,
+		       RESTORE_TIME = #restoreTime#,
+		       UPDATE_TIME = #updateTime#,
+		       UPDATE_USER = #updateUser# 
+		WHERE  VMBAK_ID = #vmBakId#
+	</update>
+	
+	<update id="updateVmUpdateTime" parameterClass="VMInstanceInfo">
+		update
+		COMP_CASE_VM_T
+		set
+		STATUS=#status#,
+		UPDATE_TIME=#updateTime#,
+		UPDATE_USER=#updateUser# 
+		where
+		VM_ID = (select VM_ID from COMP_CASE_VMBAK_T where  VMBAK_ID=#vmId#)
+	</update>
+	<!-- 更新虚拟机状态为备份中 -->
+	<update id="updateVmStatusBaking" parameterClass="VMInstanceInfo">
+		update
+		COMP_CASE_VM_T
+		set
+		<isNotEmpty prepend="" property="status">
+			STATUS=#status#,
+		</isNotEmpty>
+		UPDATE_TIME=#updateTime#,
+		UPDATE_USER=#updateUser# 
+		where
+		VM_ID = #vmId#
+	</update>
+		
+	
+	
+	<!-- 插入订单信息 -->
+	<insert id="createVmBakOrder" parameterClass="OrderInfo">
+	    INSERT INTO COMP_ORDER_T (
+			ORDER_ID,
+			PARENT_ID,
+			STATUS,
+			EFFECTIVE_TIME,
+			CASE_ID,
+			CASE_TYPE,
+			APP_ID,
+			RES_POOL_ID,
+			CREATE_TIME,
+			CREATE_USER,
+			UPDATE_TIME,
+			UPDATE_USER,
+			EXPIRE_TIME
+		) VALUES (
+			#orderId#,
+			#parentId#,
+			#status#,
+			#effectiveTime#,
+			#caseId#,
+			#caseType#,
+			#appId#,
+			#resPoolId#,
+			#createTime#,
+			#createUser#,
+			#updateTime#,
+			#updateUser#,
+			''
+		)
+	</insert>
+	
+	<!-- 插入实例信息 -->
+	<insert id="createVmBakInstanceInfo" parameterClass="VmBakInstanceInfo">
+	    INSERT INTO COMP_CASE_VMBAK_T (
+			CASE_ID,
+			VMBAK_ID,
+			VMBAK_NAME,
+		    BACKUP_CYC,
+		    BACK_STORE_TIME,
+		    BACKUP_START_TIME,
+		    ACCEPT_TIME,
+		    VM_ID,
+		    STATUS,
+		    RES_POOL_ID,
+			RES_POOL_PART_ID,
+		    ORDER_ID,
+		    DESCRIPTION,
+			CREATE_TIME,
+			CREATE_USER,
+			UPDATE_TIME,
+			UPDATE_USER
+		) VALUES (
+		    #caseId#,
+		    #vmBakId#,
+		    #vmBakName#,
+		    #backupCyc#,
+		    #backStoreTime#,
+		    #backupStartTime#,
+		    #acceptTime#,
+		    #vmId#,
+		    #status#,
+		    #resPoolId#,
+		    #resPoolPartId#,
+		    #orderId#,
+		    #description#,
+		    #createTime#,
+		    #createUser#,
+		    #updateTime#,
+		    #updateUser#
+		)
+	</insert>	
+	
+	<!-- 查看虚拟机备份任务详情 -->
+	<select id="queryVmBakDetailInfo" parameterClass="VmBakInstanceInfo" resultClass="VmBakInstanceInfo">
+		SELECT
+			VMBAK.CASE_ID AS caseId,
+			VMBAK.VMBAK_ID AS vmBakId,
+			VMBAK.VMBAK_NAME AS vmBakName,
+			VMBAK.BACKUP_CYC AS backupCyc,
+			VMBAK.BACK_STORE_TIME AS backStoreTime,
+			VMBAK.BACKUP_START_TIME AS backupStartTime,
+			VMBAK.ACCEPT_TIME AS acceptTime,
+			VMBAK.VM_ID AS vmId,
+			VM.VM_NAME AS vmName,
+			VM.APP_ID AS appId,
+			APP.APP_NAME AS appName,
+			VMBAK. STATUS AS STATUS,
+			VMBAK.RES_POOL_ID AS resPoolId,
+			VMBAK.RES_POOL_PART_ID AS resPoolPartId,
+			VMBAK.ORDER_ID AS orderId,
+			VMBAK.DESCRIPTION AS description,
+			VMBAK.CREATE_TIME AS createTime,
+			VMBAK.CREATE_USER AS createUser,
+			VMBAK.UPDATE_TIME AS updateTime,
+			VMBAK.UPDATE_USER AS updateUser,
+		    VMBAK.RESTORE_VMBACK_INTERNAL_ID AS restoreVmBakInternalId,
+		    VMBAK.RESTORE_TIME AS restoreTime
+		FROM
+			COMP_CASE_VMBAK_T VMBAK
+		LEFT JOIN COMP_CASE_VM_T VM ON VMBAK.VM_ID = VM.VM_ID
+		LEFT JOIN COMP_APP_T APP ON VM.APP_ID = APP.APP_ID
+		WHERE
+			VMBAK.VMBAK_ID = #vmBakId#
+	</select>
+	
+	<!-- 查看虚拟机备份任务详情 -->
+	<select id="queryVmBakDetailInfoByCaseId" parameterClass="VmBakInstanceInfo" resultClass="VmBakInstanceInfo">
+		SELECT
+			VMBAK.CASE_ID AS caseId,
+			VMBAK.VMBAK_ID AS vmBakId,
+			VMBAK.VMBAK_NAME AS vmBakName,
+			VMBAK.BACKUP_CYC AS backupCyc,
+			VMBAK.BACK_STORE_TIME AS backStoreTime,
+			VMBAK.BACKUP_START_TIME AS backupStartTime,
+			VMBAK.ACCEPT_TIME AS acceptTime,
+			VMBAK.VM_ID AS vmId,
+			VM.VM_NAME AS vmName,
+			VM.APP_ID AS appId,
+			APP.APP_NAME AS appName,
+			VMBAK. STATUS AS STATUS,
+			VMBAK.RES_POOL_ID AS resPoolId,
+			VMBAK.RES_POOL_PART_ID AS resPoolPartId,
+			VMBAK.ORDER_ID AS orderId,
+			VMBAK.DESCRIPTION AS description,
+			VMBAK.CREATE_TIME AS createTime,
+			VMBAK.CREATE_USER AS createUser,
+			VMBAK.UPDATE_TIME AS updateTime,
+			VMBAK.UPDATE_USER AS updateUser,
+		    VMBAK.RESTORE_VMBACK_INTERNAL_ID AS restoreVmBakInternalId,
+		    VMBAK.RESTORE_TIME AS restoreTime
+		FROM
+			COMP_CASE_VMBAK_T VMBAK
+		LEFT JOIN COMP_CASE_VM_T VM ON VMBAK.VM_ID = VM.VM_ID
+		LEFT JOIN COMP_APP_T APP ON VM.APP_ID = APP.APP_ID
+		WHERE
+			VMBAK.CASE_ID = #caseId#
+	</select>
+	
+	<!-- 通过虚拟机ID查询虚拟机信息 -->
+	<select id="queryVmInfoByVmId" parameterClass="VMInstanceInfo" resultClass="VMInstanceInfo">
+		SELECT vm.app_id AS appId,
+			   vm.res_pool_id AS resPoolId,
+			   vm.res_pool_part_id AS resPoolPartId
+		FROM   comp_case_vm_t vm
+		WHERE  vm.vm_id = #vmId#  
+	</select>
+	
+	<!-- 取得虚拟机备份任务的资源池ID和资源池分区ID -->
+	<select id="getRespoolPartIdByVmBakId" parameterClass="java.lang.String" resultClass="RespoolPartInfo">
+		SELECT
+			RES_POOL_PART_ID respoolPartId,
+			RES_POOL_ID respoolId
+		FROM
+			COMP_CASE_VMBAK_T
+		WHERE
+			VMBAK_ID = #vmBakId#
+	</select>
+	
+	<!-- 创建虚拟机备份任务，取得虚拟机 -->
+	<select id="queryVmList" parameterClass="VmBakInstanceInfo" resultClass="VmBakInstanceInfo">
+		SELECT
+			comp_case_vm_t.case_id caseId,
+			comp_case_vm_t.vm_id vmId,
+			IFNULL(comp_case_vm_t.vm_name, '') vmName
+		FROM
+			comp_case_vm_t
+		LEFT JOIN comp_order_t ON comp_case_vm_t.order_id = comp_order_t.order_id
+		LEFT JOIN comp_app_t ON comp_case_vm_t.app_id = comp_app_t.app_id
+		WHERE
+			comp_case_vm_t. STATUS IN ('2', '4', '6', '16')
+		AND comp_case_vm_t.vm_id IS NOT NULL
+		AND comp_order_t.order_id IS NOT NULL
+		AND comp_order_t. STATUS != '2'
+		AND comp_case_vm_t.vm_id NOT IN (
+			SELECT vmbak.vm_id
+			FROM   comp_case_vmbak_t vmbak
+			WHERE  vmbak.`STATUS` != '3'
+		)
+		<isNotEmpty prepend="AND" property="vmName">
+			Lower(comp_case_vm_t.vm_name) like CONCAT('%',#vmName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="appIdList">
+			comp_case_vm_t.app_id IN
+			<iterate property="appIdList" conjunction="," close=")" open="(">
+				#appIdList[]#
+			</iterate>
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="appId">
+			comp_app_t.app_id = #appId#
+		</isNotEmpty>
+		ORDER BY comp_case_vm_t.vm_id DESC
+	</select>
+	<select id="countVmList" parameterClass="VmBakInstanceInfo" resultClass="java.lang.Integer">
+		SELECT
+			COUNT(comp_case_vm_t.case_id)
+		FROM
+			comp_case_vm_t
+		LEFT JOIN comp_order_t ON comp_case_vm_t.order_id = comp_order_t.order_id
+		LEFT JOIN comp_app_t ON comp_case_vm_t.app_id = comp_app_t.app_id
+		WHERE
+			comp_case_vm_t. STATUS IN ('2', '4', '6', '16')
+		AND comp_case_vm_t.vm_id IS NOT NULL
+		AND comp_order_t.order_id IS NOT NULL
+		AND comp_order_t. STATUS != '2'
+		AND comp_case_vm_t.vm_id NOT IN (
+			SELECT vmbak.vm_id
+			FROM   comp_case_vmbak_t vmbak
+			WHERE  vmbak.`STATUS` != '3'
+		)
+		<isNotEmpty prepend="AND" property="vmName">
+			Lower(comp_case_vm_t.vm_name) like CONCAT('%',#vmName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="appIdList">
+			comp_case_vm_t.app_id IN
+			<iterate property="appIdList" conjunction="," close=")" open="(">
+				#appIdList[]#
+			</iterate>
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="appId">
+			comp_app_t.app_id = #appId#
+		</isNotEmpty>
+	</select>
+</sqlMap>

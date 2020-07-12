@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="PMFirewall">
+	<typeAlias alias="FirewallPerfPo"
+		type="com.neusoft.mid.cloong.resourcePool.businessOpt.resStat.CycReportResStatus.dao.FirewallPerfPo" />
+	<typeAlias alias="VFirewallPerfPo"
+		type="com.neusoft.mid.cloong.resourcePool.businessOpt.resStat.CycReportResStatus.dao.VFirewallPerfPo" />
+
+	<insert id="insertFirewallPerformance" parameterClass="FirewallPerfPo">
+	    INSERT INTO `comp_sta_firewall_rt_t` (
+			`FIREWALL_ID`,
+			`CPU_USED_PER`,
+			`MEM_USED_PER`,
+			`THROUGHPUT`,
+			`CREATE_TIME`,
+			`RES_POOL_ID`
+		)
+		VALUES
+			(
+				#eqpId#,
+				#cpuUsedPer#,
+				#memUsedPer#,
+				#throughput#,
+				#collectTime#,
+				#resPoolId#
+			);
+	</insert>
+	
+</sqlMap>

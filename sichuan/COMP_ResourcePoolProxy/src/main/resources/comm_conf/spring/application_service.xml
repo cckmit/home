@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
+    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+
+	<bean id="authorization" class="com.neusoft.mid.cloong.Authorization" />
+
+	<!-- id生成器 sequenceGenerator -->
+	<bean id="sequenceGenerator" class="com.neusoft.mid.cloong.common.util.SequenceGenerator" />
+
+	<bean id="transactonGen" class="com.neusoft.mid.cloong.generator.TransactionIdGenerator">
+		<property name="instanceId">
+			<value>${instanceId}</value>
+		</property>
+		<property name="templateGeneratorSql" value="${templateGeneratorSql}" />
+	</bean>
+	<bean id="timeStampgen" class="com.neusoft.mid.cloong.generator.TimeStampGenerator" />
+
+	<!-- 路由匹配类型 -->
+	<bean id="fullMatchRouteValue" class="com.neusoft.mid.grains.commons.route.matchmode.FullMatchRouteValue" />
+
+	<!--资源池信息缓存服务 -->
+	<bean id="resourcePoolCacheService" class="com.neusoft.mid.grains.commons.route.api.impl.RouteService">
+		<property name="routeList">
+			<ref bean="resourceInfoList" />
+		</property>
+		<property name="matchType">
+			<ref bean="fullMatchRouteValue" />
+		</property>
+		<property name="interval">
+			<value>${interval}</value>
+		</property>
+	</bean>
+
+	<!-- 准备资源池信息列表 -->
+	<bean id="resourceInfoList" class="com.neusoft.mid.cloong.ResourceInfoList">
+		<property name="dao" ref="ibatisDAOProxy" />
+	</bean>
+
+	<!-- 公有云接口client启动类 -->
+	<bean id="requestCommon" class="com.neusoft.mid.cloong.RequestCommon" />
+
+	<!-- 私有云接口client启动类 -->
+	<bean id="privateWebServiceClientFactory"
+		class="com.neusoft.mid.cloong.resourcePool.webservice.privateCloud.WebServiceClientFactory">
+		<property name="serviceURL">
+			<map>
+				<entry key="TemplateMgmtServicePort" value="${resourcePool.webservice.url.template}" />
+				<entry key="VMServicePort" value="${resourcePool.webservice.url.vm}" />
+				<entry key="SRVServicePort" value="${resourcePool.webservice.url.srv}" />
+				<entry key="BSServicePort" value="${resourcePool.webservice.url.ebs}" />
+				<entry key="IPServicePort" value="${resourcePool.webservice.url.ip}" />
+				<entry key="VLANServicePort" value="${resourcePool.webservice.url.vlan}" />
+				<entry key="SnapshotServicePort" value="${resourcePool.webservice.url.snapshot}" />
+				<entry key="LBServicePort" value="${resourcePool.webservice.url.lb}" />
+				<entry key="VirFwServicePort" value="${resourcePool.webservice.url.virfw}"></entry>    <!-- add by huxin -->
+			</map>
+		</property>
+	</bean>
+
+
+	<!-- 查询规格对应资源池ID -->
+	<bean id="acquireStandardResPoolId" class="com.neusoft.mid.cloong.common.AcquireStandardResPoolId"
+		scope="prototype" />
+
+	<!-- 资源池容量上报 add by liunan 2015 01-09 -->
+	<bean id="reportResourceStateContrl"
+		class="com.neusoft.mid.cloong.resourcePool.webservice.publicCloud.serverPort.ReportResourceStateContrl">
+		<property name="ibatisDao">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+</beans>

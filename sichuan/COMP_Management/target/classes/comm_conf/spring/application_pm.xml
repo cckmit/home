@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
+    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+	<!-- 物理机规格 -->
+	<!-- 物理机规格创建 -->
+	<bean id="PMStandardCreateAction"
+		class="com.neusoft.mid.cloong.web.page.product.standard.pm.action.PMStandardCreateAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="gen">
+			<ref bean="sequenceGenerator" />
+		</property>
+	</bean>
+	<!-- 物理机规格修改 -->
+	<bean id="PMStandardModifyAction"
+		class="com.neusoft.mid.cloong.web.page.product.standard.pm.action.PMStandardModifyAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="templateIsUseModify" value="${templateIsUseModify}" />
+	</bean>
+	<!-- 物理机规格删除 -->
+	<bean id="PMStandardDeleteAction"
+		class="com.neusoft.mid.cloong.web.page.product.standard.pm.action.PMStandardDeleteAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="standardSynchronizeDel">
+			<ref bean="standardSynchronizeDeleteImpl" />
+		</property>
+		<property name="templateIsUseDel" value="${templateIsUseDel}" />
+	</bean>
+	<!-- 物理机规格查询 -->
+	<bean id="PMStandardListQueryAction"
+		class="com.neusoft.mid.cloong.web.page.product.standard.pm.action.PMStandardListQueryAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<bean id="PMStandardListQueryActionJson"
+		class="com.neusoft.mid.cloong.web.page.product.standard.pm.action.PMStandardListQueryAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<!-- 查询物理机规格同步资源池 -->
+	<bean id="PMStandardResListAction"
+		class="com.neusoft.mid.cloong.web.page.product.standard.pm.action.PMStandardResListAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="querySqlId" value="queryPMStandResList" />
+	</bean>
+	<!-- 物理机资源规格查询Service -->
+	<bean id="pmStandardListService"
+		class="com.neusoft.mid.cloong.web.page.product.standard.pm.service.PMStandardListService"
+		abstract="false">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<!-- 物理机资源规格详情 -->
+	<bean id="PmStandardInfoDetailAction"
+		class="com.neusoft.mid.cloong.web.page.product.standard.pm.action.PMStandardListAction"
+		scope="prototype">
+		<property name="pmStandardListService">
+			<ref bean="pmStandardListService" />
+		</property>
+		<property name="querySqlKey" value="queryPMStandardInfoDetail">
+		</property>
+	</bean>
+	<!-- 物理机规格详情 -->
+	<bean id="PMStandardDetailAction"
+		class="com.neusoft.mid.cloong.web.page.product.standard.pm.action.PMStandardDetailAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<!-- 物理机同步接口 -->
+	<bean id="pmStandardSynchronizeImpl"
+		class="com.neusoft.mid.cloong.resourceProxy.standard.pm.impl.PMStandardSynchronizeImpl">
+		<property name="recieveTimeOut">
+			<value>${receiveTimeout}</value>
+		</property>
+		<property name="socketTimeOut">
+			<value>${httpTimeOut}</value>
+		</property>
+		<property name="url">
+			<value>${resourcePoolProxyUrlPm}</value>
+		</property>
+		<property name="senderEntry" ref="senderEntry"></property>
+	</bean>
+	<!-- 物理机规格同步资源池 -->
+	<bean id="PMSynchroResPoolAction"
+		class="com.neusoft.mid.cloong.web.page.product.standard.pm.action.PMSynchroResPoolAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="pmStandardSynchronize">
+			<ref bean="pmStandardSynchronizeImpl" />
+		</property>
+		<property name="pmSynchroResPoolService">
+			<ref bean="pmSynchroResPoolService" />
+		</property>
+	</bean>
+	<!-- 物理机规格同步资源池Service -->
+	<bean id="pmSynchroResPoolService"
+		class="com.neusoft.mid.cloong.web.page.product.standard.pm.service.PMSynchroResPoolService"
+		abstract="false">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="sequenceGenerator">
+			<ref bean="sequenceGeneratorProxy" />
+		</property>
+	</bean>
+	<!-- 物理机条目 -->
+	<!-- 物理机条目查询列表 -->
+	<bean id="pmItemQueryListAction"
+		class="com.neusoft.mid.cloong.web.page.product.item.vm.action.ItemQueryListAction"
+		scope="prototype" parent="abstractAction">
+		<property name="itemQueryListService">
+			<ref bean="itemQueryListService" />
+		</property>
+		<property name="itemType" value="1" />
+		<property name="sqlKey" value="queryItemListByItemType" />
+		<property name="itemCount" value="queryItemCountByItemType" />
+		<property name="noItemStatus" value="8" />
+	</bean>
+	<!-- 物理机服务条目创建跳转 -->
+	<bean id="pmItemCreateInfoAction"
+		class="com.neusoft.mid.cloong.web.page.product.item.vm.action.ItemCreateInfoAction"
+		scope="prototype">
+		<property name="itemCreateInfoService">
+			<ref bean="itemCreateInfoService" />
+		</property>
+		<property name="itemType" value="1" />
+	</bean>
+	<!-- 物理机条目跳转 -->
+	<bean id="pmItemInfoAction"
+		class="com.neusoft.mid.cloong.web.page.product.item.vm.action.ItemInfoAction"
+		scope="prototype">
+		<property name="itemInfoService">
+			<ref bean="itemInfoService" />
+		</property>
+		<property name="itemType" value="1" />
+	</bean>
+	<!-- 物理机条目保存 -->
+	<bean id="pmItemCreateAction"
+		class="com.neusoft.mid.cloong.web.page.product.item.vm.action.ItemCreateAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+		<property name="itemCreateService">
+			<ref bean="itemCreateService" />
+		</property>
+		<property name="itemType" value="1" />
+		<property name="statusType" value="0" />
+		<property name="itemIdType" value="PM" />
+	</bean>
+	<!-- 物理机条目保存并提交 -->
+	<bean id="pmItemCreateAndSubmitAction"
+		class="com.neusoft.mid.cloong.web.page.product.item.vm.action.ItemCreateAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+		<property name="itemCreateService">
+			<ref bean="itemCreateService" />
+		</property>
+		<property name="itemType" value="1" />
+		<property name="statusType" value="1" />
+		<property name="itemIdType" value="PM" />
+	</bean>
+	<!-- 虚拟机资源规格查询 -->
+	<bean id="PmStandardListAction"
+		class="com.neusoft.mid.cloong.web.page.product.standard.pm.action.PMStandardListAction"
+		scope="prototype">
+		<property name="pmStandardListService">
+			<ref bean="pmStandardListService" />
+		</property>
+		<property name="querySqlKey" value="queryPMStandardInfo" />
+	</bean>
+
+	<!-- 物理机条目修改并提交 -->
+	<bean id="pmItemUpdateAndSubmitAction"
+		class="com.neusoft.mid.cloong.web.page.product.item.vm.action.ItemUpdateAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+		<property name="itemUpdateService">
+			<ref bean="itemUpdateService" />
+		</property>
+		<property name="itemType" value="1" />
+		<property name="statusType" value="1" />
+	</bean>
+	<!-- 物理机条目修改 -->
+	<bean id="pmItemUpdateAction"
+		class="com.neusoft.mid.cloong.web.page.product.item.vm.action.ItemUpdateAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+		<property name="itemUpdateService">
+			<ref bean="itemUpdateService" />
+		</property>
+		<property name="itemType" value="1" />
+		<property name="statusType" value="0" />
+	</bean>
+
+	<!-- 物理机型号查询 JSON -->
+	<bean id="queryServerTypeListJsonAction"
+		class="com.neusoft.mid.cloong.web.page.product.standard.pm.action.QueryServerTypeListAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+</beans>

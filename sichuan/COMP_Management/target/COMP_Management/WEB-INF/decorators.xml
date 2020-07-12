@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<decorators defaultdir="/decorators">
+	<!-- 定义那些不使用sitemesh的模板效果 -->
+	<excludes>
+		<pattern>/logout.action*</pattern>  
+		<pattern>/login.action*</pattern>
+		<patten>/searchUser.action*</patten>
+		<!-- ajax 返回 页面 -->
+		<pattern>/WEB-INF/pages/exception/404.jsp</pattern>
+		<pattern>/WEB-INF/pages/exception/500.jsp</pattern>
+		<pattern>/index.jsp</pattern>
+		<pattern>/login.jsp</pattern>
+		<patten>/forgetPassword.jsp</patten>
+	</excludes>
+	<!-- decorator结点指定了模板的位置和文件名，通过pattern来指定哪些路径引用这个模板 -->
+	<decorator name="app" page="app.jsp">
+		<pattern>/app/*</pattern>
+	</decorator>
+	<decorator name="product" page="product.jsp">
+		<pattern>/product/*</pattern>
+	</decorator>
+	<decorator name="task" page="task.jsp">
+		<pattern>/task/*</pattern>
+	</decorator>
+	<decorator name="system" page="system.jsp">
+		<pattern>/system/*</pattern>
+	</decorator>
+	<decorator name="userCenter" page="userCenter.jsp">
+		<pattern>/userCenter/*</pattern>
+	</decorator>
+	<decorator name="meterage" page="meterage.jsp">
+		<pattern>/meterage/*</pattern>
+	</decorator>
+	<decorator name="resourceManagement_appView" page="resourceManagement_appView.jsp">
+		<pattern>/resourceManagement_appView/*</pattern>
+	</decorator>
+	<decorator name="resourceManagement_resView" page="resourceManagement_resView.jsp">
+		<pattern>/resourceManagement_resView/*</pattern>
+	</decorator>
+	<decorator name="report" page="report.jsp">
+		<pattern>/report/*</pattern>
+	</decorator>
+	<decorator name="charges" page="charges.jsp">
+		<pattern>/charges/*</pattern>
+	</decorator>
+	
+</decorators>

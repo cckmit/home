@@ -1,0 +1,1027 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+    
+<sqlMap namespace="monthPerformance">
+
+	<typeAlias alias="monthPerformanceInfo" type="com.neusoft.mid.cloong.web.page.report.monthPerformance.info.MonthPerformanceInfo"/>
+	
+	<!-- 取得物理机 CPU使用率统计数据-对应柱状图 开始-->
+	<select id="getPmCpuPerformance" parameterClass="monthPerformanceInfo" resultClass="monthPerformanceInfo">
+		SELECT
+		  rm.pm_id deviceId,
+		  rm.pm_name deviceName,
+		  ifnull(app.APP_NAME, '') appName,
+		  rm.ip ip,
+		  ifnull(IF(rm.CPU_NUM !='' ,rm.CPU_NUM * rm.NUC_NUM_PER_CPU, rm.NUC_NUM_PER_CPU), '0') cpuNum,
+		  ifnull(rm.MEMORY_SIZE, '0') memorySize,
+		  rm.SERVER_TYPE serverType,
+		  ifnull(rm.OS_TYPE, '') os,
+		  ifnull(`user`.USER_NAME, '') appContacts,
+		  ROUND(AVG(sta.CPU_PROCESSOR_UTILIZATION+0), 2) cpuProcessorUtilization,
+		  MAX(sta.CPU_PROCESSOR_UTILIZATION+0) maxCpuProcessorUtilization
+		FROM
+		comp_rm_pm_t rm
+		LEFT JOIN comp_sta_device_halfday_t sta ON sta.DEVICE_ID = rm.PM_ID
+		LEFT JOIN comp_app_t app ON sta.APP_ID = app.APP_ID
+		LEFT JOIN comp_authority_user_t USER ON app.APP_CONTACTS = `user`.USER_ID
+		WHERE
+			sta.DEVICE_TYPE = '2'
+		<dynamic>
+			<isNotEmpty prepend="AND" property="resPoolId">
+				rm.RES_POOL_ID = #resPoolId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="poolPartId">
+				rm.RES_POOL_PART_ID = #poolPartId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="dateType">
+				sta.DATETYPE = #dateType#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ sta.REPORT_DATE >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ sta.REPORT_DATE <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+		GROUP BY sta.DEVICE_ID
+		<isNotNull prepend=" " property="orderType">
+			<isEqual prepend=" " property="orderType" compareValue="0"> 
+				ORDER BY cpuProcessorUtilization DESC
+			</isEqual>
+			<isEqual prepend=" " property="orderType" compareValue="1"> 
+				ORDER BY cpuProcessorUtilization ASC
+			</isEqual>
+		</isNotNull>
+		limit 20
+	</select>
+	
+	<!-- 取得虚拟机 CPU使用率统计数据-对应柱状图 开始-->
+	<select id="getVmCpuPerformance" parameterClass="monthPerformanceInfo" resultClass="monthPerformanceInfo">
+		SELECT
+		  rm.vm_id deviceId,
+		  rm.vm_name deviceName,
+		  ifnull(app.APP_NAME, '') appName,
+		  rm.PRIVATE_IP ip,
+		  ifnull(rm.CPU_NUM, '0') cpuNum,
+		  rm.MEMORY_SIZE memorySize,
+		  ifnull(os.OS_NAME, '') os,
+		  ifnull(`user`.USER_NAME, '') appContacts,
+		  ROUND(AVG(sta.CPU_PROCESSOR_UTILIZATION+0), 3) cpuProcessorUtilization,
+		  MAX(sta.CPU_PROCESSOR_UTILIZATION+0) maxCpuProcessorUtilization
+		FROM
+			comp_rm_vm_t rm 
+			LEFT JOIN comp_sta_device_halfday_t sta ON sta.DEVICE_ID = rm.VM_ID	
+			LEFT JOIN comp_app_t app ON sta.APP_ID = app.APP_ID
+			LEFT JOIN comp_authority_user_t USER ON app.APP_CONTACTS = `user`.USER_ID
+			LEFT JOIN comp_os_t os ON rm.VM_OS = os.OS_ID
+		WHERE
+			sta.DEVICE_TYPE = '3'
+		<dynamic>
+			<isNotEmpty prepend="AND" property="resPoolId">
+				rm.RES_POOL_ID = #resPoolId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="poolPartId">
+				rm.RES_POOL_PART_ID = #poolPartId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="dateType">
+				sta.DATETYPE = #dateType#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ sta.REPORT_DATE >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ sta.REPORT_DATE <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+		GROUP BY sta.DEVICE_ID
+		<isNotNull prepend=" " property="orderType">
+			<isEqual prepend=" " property="orderType" compareValue="0"> 
+				ORDER BY cpuProcessorUtilization DESC
+			</isEqual>
+			<isEqual prepend=" " property="orderType" compareValue="1"> 
+				ORDER BY cpuProcessorUtilization ASC
+			</isEqual>
+		</isNotNull>
+		limit 20
+	</select>
+	
+	<!-- 取得物理机 内存使用率统计数据-对应柱状图 开始-->
+	<select id="getPmMemPerformance" parameterClass="monthPerformanceInfo" resultClass="monthPerformanceInfo">
+		SELECT
+		  rm.pm_id deviceId,
+		  rm.pm_name deviceName,
+		  ifnull(app.APP_NAME, '') appName,
+		  rm.ip ip,
+		  ifnull(IF(rm.CPU_NUM !='' ,rm.CPU_NUM * rm.NUC_NUM_PER_CPU, rm.NUC_NUM_PER_CPU), '0') cpuNum,
+		  ifnull(rm.MEMORY_SIZE, '0') memorySize,
+		  rm.SERVER_TYPE serverType,
+		  ifnull(rm.OS_TYPE, '') os,
+		  ifnull(`user`.USER_NAME, '') appContacts,
+		  ROUND(AVG(sta.MEM_USED_PER+0), 2) memUsedPer,
+		  MAX(sta.MEM_USED_PER+0) maxMemUsedPer
+		FROM
+		comp_rm_pm_t rm
+		LEFT JOIN comp_sta_device_halfday_t sta ON sta.DEVICE_ID = rm.PM_ID
+		LEFT JOIN comp_app_t app ON sta.APP_ID = app.APP_ID
+		LEFT JOIN comp_authority_user_t USER ON app.APP_CONTACTS = `user`.USER_ID
+		WHERE
+			sta.DEVICE_TYPE = '2'
+		<dynamic>
+			<isNotEmpty prepend="AND" property="resPoolId">
+				rm.RES_POOL_ID = #resPoolId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="poolPartId">
+				rm.RES_POOL_PART_ID = #poolPartId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="dateType">
+				sta.DATETYPE = #dateType#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ sta.REPORT_DATE >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ sta.REPORT_DATE <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+		GROUP BY sta.DEVICE_ID
+		<isNotNull prepend=" " property="orderType">
+			<isEqual prepend=" " property="orderType" compareValue="0"> 
+				ORDER BY memUsedPer DESC
+			</isEqual>
+			<isEqual prepend=" " property="orderType" compareValue="1"> 
+				ORDER BY memUsedPer ASC
+			</isEqual>
+		</isNotNull>
+		limit 20
+	</select>
+	
+	<!-- 取得虚拟机  内存使用率统计数据-对应柱状图 开始-->
+	<select id="getVmMemPerformance" parameterClass="monthPerformanceInfo" resultClass="monthPerformanceInfo">
+		SELECT
+		  rm.vm_id deviceId,
+		  rm.vm_name deviceName,
+		  ifnull(app.APP_NAME, '') appName,
+		  rm.PRIVATE_IP ip,
+		  ifnull(rm.CPU_NUM, '0') cpuNum,
+		  rm.MEMORY_SIZE memorySize,
+		ifnull(os.OS_NAME, '') os,
+		  ifnull(`user`.USER_NAME, '') appContacts,
+		  ROUND(AVG(sta.MEM_USED_PER+0), 2) memUsedPer,
+		  MAX(sta.MEM_USED_PER+0) maxMemUsedPer
+		FROM
+		comp_rm_vm_t rm
+		LEFT JOIN comp_sta_device_halfday_t sta ON sta.DEVICE_ID = rm.VM_ID
+		LEFT JOIN comp_app_t app ON sta.APP_ID = app.APP_ID
+		LEFT JOIN comp_authority_user_t USER ON app.APP_CONTACTS = `user`.USER_ID
+		LEFT JOIN	comp_os_t os ON rm.VM_OS = os.OS_ID
+		WHERE
+			sta.DEVICE_TYPE = '3'
+		<dynamic>
+			<isNotEmpty prepend="AND" property="resPoolId">
+				rm.RES_POOL_ID = #resPoolId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="poolPartId">
+				rm.RES_POOL_PART_ID = #poolPartId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="dateType">
+				sta.DATETYPE = #dateType#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ sta.REPORT_DATE >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ sta.REPORT_DATE <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+		GROUP BY sta.DEVICE_ID
+		<isNotNull prepend=" " property="orderType">
+			<isEqual prepend=" " property="orderType" compareValue="0"> 
+				ORDER BY memUsedPer DESC
+			</isEqual>
+			<isEqual prepend=" " property="orderType" compareValue="1"> 
+				ORDER BY memUsedPer ASC
+			</isEqual>
+		</isNotNull>
+		limit 20
+	</select>
+	
+	<!-- 取得物理机 PageSapce使用率统计数据-对应柱状图 开始-->
+	<select id="getPmPagePerformance" parameterClass="monthPerformanceInfo" resultClass="monthPerformanceInfo">
+		SELECT
+		  rm.pm_id deviceId,
+		  rm.pm_name deviceName,
+		  ifnull(app.APP_NAME, '') appName,
+		  rm.ip ip,
+		  ifnull(IF(rm.CPU_NUM !='' ,rm.CPU_NUM * rm.NUC_NUM_PER_CPU, rm.NUC_NUM_PER_CPU), '0') cpuNum,
+		  ifnull(rm.MEMORY_SIZE, '0') memorySize,
+		  rm.SERVER_TYPE serverType,
+		  ifnull(rm.OS_TYPE, '') os,
+		  ifnull(`user`.USER_NAME, '') appContacts,
+		  ROUND(AVG(sta.SWAP_MEM_USED_PER+0), 2) swapMemUsedPer,
+		  MAX(sta.SWAP_MEM_USED_PER+0) maxSwapMemUsedPer
+		FROM
+		comp_rm_pm_t rm 
+		LEFT JOIN comp_sta_device_halfday_t sta ON sta.DEVICE_ID = rm.PM_ID
+		LEFT JOIN comp_app_t app ON sta.APP_ID = app.APP_ID
+		LEFT JOIN comp_authority_user_t USER ON app.APP_CONTACTS = `user`.USER_ID
+		WHERE
+			sta.DEVICE_TYPE = '2'
+		<dynamic>
+			<isNotEmpty prepend="AND" property="resPoolId">
+				rm.RES_POOL_ID = #resPoolId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="poolPartId">
+				rm.RES_POOL_PART_ID = #poolPartId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="dateType">
+				sta.DATETYPE = #dateType#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ sta.REPORT_DATE >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ sta.REPORT_DATE <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+		GROUP BY sta.DEVICE_ID
+		<isNotNull prepend=" " property="orderType">
+			<isEqual prepend=" " property="orderType" compareValue="0"> 
+				ORDER BY swapMemUsedPer DESC
+			</isEqual>
+			<isEqual prepend=" " property="orderType" compareValue="1"> 
+				ORDER BY swapMemUsedPer ASC
+			</isEqual>
+		</isNotNull>
+		limit 20
+	</select>
+	
+	<!-- 取得虚拟机  PageSapce使用率统计数据-对应柱状图 开始-->
+	<select id="getVmPagePerformance" parameterClass="monthPerformanceInfo" resultClass="monthPerformanceInfo">
+		SELECT
+		  rm.vm_id deviceId,
+		  rm.vm_name deviceName,
+		  ifnull(app.APP_NAME, '') appName,
+		  rm.PRIVATE_IP ip,
+		  ifnull(rm.CPU_NUM, '0') cpuNum,
+		  rm.MEMORY_SIZE memorySize,
+		  ifnull(os.OS_NAME, '') os,
+		  ifnull(`user`.USER_NAME, '') appContacts,
+		  ROUND(AVG(sta.SWAP_MEM_USED_PER+0), 2) swapMemUsedPer,
+		  MAX(sta.SWAP_MEM_USED_PER+0) maxSwapMemUsedPer
+		FROM
+		comp_rm_vm_t rm
+		LEFT JOIN comp_sta_device_halfday_t sta ON sta.DEVICE_ID = rm.VM_ID	
+		LEFT JOIN comp_app_t app ON sta.APP_ID = app.APP_ID
+		LEFT JOIN comp_authority_user_t USER ON app.APP_CONTACTS = `user`.USER_ID
+		LEFT JOIN comp_os_t os ON rm.VM_OS = os.OS_ID
+		WHERE
+			sta.DEVICE_TYPE = '3'
+		<dynamic>
+			<isNotEmpty prepend="AND" property="resPoolId">
+				rm.RES_POOL_ID = #resPoolId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="poolPartId">
+				rm.RES_POOL_PART_ID = #poolPartId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="dateType">
+				sta.DATETYPE = #dateType#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ sta.REPORT_DATE >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ sta.REPORT_DATE <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+		GROUP BY sta.DEVICE_ID
+		<isNotNull prepend=" " property="orderType">
+			<isEqual prepend=" " property="orderType" compareValue="0"> 
+				ORDER BY swapMemUsedPer DESC
+			</isEqual>
+			<isEqual prepend=" " property="orderType" compareValue="1"> 
+				ORDER BY swapMemUsedPer ASC
+			</isEqual>
+		</isNotNull>
+		limit 20
+	</select>
+	
+	<!-- 取得物理机 磁盘IOspeed统计数据 -->
+	<select id="getPmDiskIOspeedPerformance" parameterClass="monthPerformanceInfo" resultClass="monthPerformanceInfo">
+		SELECT
+		  rm.pm_id deviceId,
+		  rm.pm_name deviceName,
+		  ifnull(app.APP_NAME, '') appName,
+		  rm.ip ip,
+		  ifnull(IF(rm.CPU_NUM !='' ,rm.CPU_NUM * rm.NUC_NUM_PER_CPU, rm.NUC_NUM_PER_CPU), '0') cpuNum,
+		  ifnull(rm.MEMORY_SIZE, '0') memorySize,
+		  rm.SERVER_TYPE serverType,
+		  ifnull(rm.OS_TYPE, '') os,
+		  ifnull(`user`.USER_NAME, '') appContacts,
+		  ROUND(AVG(sta.disk_IO_speed+0), 2) diskIOspeed,
+		  MAX(sta.disk_IO_speed+0) maxDiskIOspeed,
+		  left(rm.ONLINE_TIME,10) onlineTime
+		FROM
+		comp_rm_pm_t rm
+		LEFT JOIN comp_sta_device_halfday_t sta ON sta.DEVICE_ID = rm.PM_ID
+		LEFT JOIN comp_app_t app ON sta.APP_ID = app.APP_ID
+		LEFT JOIN comp_authority_user_t USER ON app.APP_CONTACTS = `user`.USER_ID
+		WHERE
+			sta.DEVICE_TYPE = '2'
+		<dynamic>
+			<isNotEmpty prepend="AND" property="resPoolId">
+				rm.RES_POOL_ID = #resPoolId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="poolPartId">
+				rm.RES_POOL_PART_ID = #poolPartId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="dateType">
+				sta.DATETYPE = #dateType#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ sta.REPORT_DATE >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ sta.REPORT_DATE <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+		GROUP BY sta.DEVICE_ID
+		<isNotNull prepend=" " property="orderType">
+			<isEqual prepend=" " property="orderType" compareValue="0"> 
+				ORDER BY diskIOspeed DESC
+			</isEqual>
+			<isEqual prepend=" " property="orderType" compareValue="1"> 
+				ORDER BY diskIOspeed ASC
+			</isEqual>
+		</isNotNull>
+		limit 20
+	</select>
+	
+	<!-- 取得虚拟机  磁盘IOspeed使用率统计数据 -->
+	<select id="getVmDiskIOspeedPerformance" parameterClass="monthPerformanceInfo" resultClass="monthPerformanceInfo">
+		SELECT
+		  rm.vm_id deviceId,
+		  rm.vm_name deviceName,
+		  ifnull(app.APP_NAME, '') appName,
+		  rm.PRIVATE_IP ip,
+		  ifnull(rm.CPU_NUM, '0') cpuNum,
+		  rm.MEMORY_SIZE memorySize,
+		  ifnull(os.OS_NAME, '') os,
+		  ifnull(`user`.USER_NAME, '') appContacts,
+		  ROUND(AVG(sta.disk_IO_speed+0), 2) diskIOspeed,
+		  MAX(sta.disk_IO_speed+0) maxDiskIOspeed
+		FROM
+		comp_rm_vm_t rm
+		LEFT JOIN comp_sta_device_halfday_t sta ON sta.DEVICE_ID = rm.VM_ID
+		LEFT JOIN comp_app_t app ON sta.APP_ID = app.APP_ID
+		LEFT JOIN comp_authority_user_t USER ON app.APP_CONTACTS = `user`.USER_ID
+		LEFT JOIN comp_os_t os ON rm.VM_OS = os.OS_ID
+		WHERE
+			sta.DEVICE_TYPE = '3'
+		<dynamic>
+			<isNotEmpty prepend="AND" property="resPoolId">
+				rm.RES_POOL_ID = #resPoolId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="poolPartId">
+				rm.RES_POOL_PART_ID = #poolPartId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="dateType">
+				sta.DATETYPE = #dateType#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ sta.REPORT_DATE >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ sta.REPORT_DATE <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+		GROUP BY sta.DEVICE_ID
+		<isNotNull prepend=" " property="orderType">
+			<isEqual prepend=" " property="orderType" compareValue="0"> 
+				ORDER BY diskIOspeed DESC
+			</isEqual>
+			<isEqual prepend=" " property="orderType" compareValue="1"> 
+				ORDER BY diskIOspeed ASC
+			</isEqual>
+		</isNotNull>
+		limit 20
+	</select>
+	
+	<!-- 导出使用sql  开始 -->
+	<!-- 取得物理机 各指标使用率统计数据 导出全部-->
+	<select id="getPmAllPerformance" parameterClass="monthPerformanceInfo" resultClass="monthPerformanceInfo">
+		SELECT
+		  rm.pm_id deviceId,
+		  rm.pm_name deviceName,
+		  ifnull(app.APP_NAME, '') appName,
+		  rm.ip ip,
+		  ifnull(IF(rm.CPU_NUM !='' ,rm.CPU_NUM * rm.NUC_NUM_PER_CPU, rm.NUC_NUM_PER_CPU), '0') cpuNum,
+		  ifnull(rm.MEMORY_SIZE, '0') memorySize,
+		  rm.SERVER_TYPE serverType,
+		  ifnull(rm.OS_TYPE, '') os,
+		  sta.DATETYPE dateType,
+		  ifnull(`user`.USER_NAME, '') appContacts,
+		  pool.RES_POOL_NAME resPoolName,
+      	  part.RES_POOL_PART_NAME poolPartName,
+      	  
+		  case sta.DATETYPE when '0' then ROUND(AVG(sta.CPU_PROCESSOR_UTILIZATION+0), 2) else '0' end cpuProcessorUtilization0,
+		  case sta.DATETYPE when '1' then ROUND(AVG(sta.CPU_PROCESSOR_UTILIZATION+0), 2) else '0' end cpuProcessorUtilization1,
+		  case sta.DATETYPE when '2' then ROUND(AVG(sta.CPU_PROCESSOR_UTILIZATION+0), 2) else '0' end cpuProcessorUtilization2,
+		  case sta.DATETYPE when '0' then ROUND(MAX(sta.CPU_PROCESSOR_UTILIZATION+0), 2) else '0' end maxCpuProcessorUtilization0,
+		  case sta.DATETYPE when '1' then ROUND(MAX(sta.CPU_PROCESSOR_UTILIZATION+0), 2) else '0' end maxCpuProcessorUtilization1,
+		  case sta.DATETYPE when '2' then ROUND(MAX(sta.CPU_PROCESSOR_UTILIZATION+0), 2) else '0' end maxCpuProcessorUtilization2,
+		 
+		  case sta.DATETYPE when '0' then ROUND(AVG(sta.MEM_USED_PER+0), 2) else '0' end memUsedPer0,
+		  case sta.DATETYPE when '1' then ROUND(AVG(sta.MEM_USED_PER+0), 2) else '0' end memUsedPer1,
+		  case sta.DATETYPE when '2' then ROUND(AVG(sta.MEM_USED_PER+0), 2) else '0' end memUsedPer2,
+		  case sta.DATETYPE when '0' then ROUND(MAX(sta.MEM_USED_PER+0), 2) else '0' end maxMemUsedPer0,
+		  case sta.DATETYPE when '1' then ROUND(MAX(sta.MEM_USED_PER+0), 2) else '0' end maxMemUsedPer1,
+		  case sta.DATETYPE when '2' then ROUND(MAX(sta.MEM_USED_PER+0), 2) else '0' end maxMemUsedPer2,
+		 
+		  case sta.DATETYPE when '0' then ROUND(AVG(sta.SWAP_MEM_USED_PER+0), 2) else '0' end swapMemUsedPer0,
+		  case sta.DATETYPE when '1' then ROUND(AVG(sta.SWAP_MEM_USED_PER+0), 2) else '0' end swapMemUsedPer1,
+		  case sta.DATETYPE when '2' then ROUND(AVG(sta.SWAP_MEM_USED_PER+0), 2) else '0' end swapMemUsedPer2,
+		  case sta.DATETYPE when '0' then ROUND(MAX(sta.SWAP_MEM_USED_PER+0), 2) else '0' end maxSwapMemUsedPer0,
+		  case sta.DATETYPE when '1' then ROUND(MAX(sta.SWAP_MEM_USED_PER+0), 2) else '0' end maxSwapMemUsedPer1,
+		  case sta.DATETYPE when '2' then ROUND(MAX(sta.SWAP_MEM_USED_PER+0), 2) else '0' end maxSwapMemUsedPer2,
+		 
+		  case sta.DATETYPE when '0' then ROUND(AVG(sta.disk_IO_speed+0), 2) else '0' end diskIOspeed0,
+		  case sta.DATETYPE when '1' then ROUND(AVG(sta.disk_IO_speed+0), 2) else '0' end diskIOspeed1,
+		  case sta.DATETYPE when '2' then ROUND(AVG(sta.disk_IO_speed+0), 2) else '0' end diskIOspeed2,
+		  case sta.DATETYPE when '0' then ROUND(MAX(sta.disk_IO_speed+0), 2) else '0' end maxDiskIOspeed0,
+		  case sta.DATETYPE when '1' then ROUND(MAX(sta.disk_IO_speed+0), 2) else '0' end maxDiskIOspeed1,
+		  case sta.DATETYPE when '2' then ROUND(MAX(sta.disk_IO_speed+0), 2) else '0' end maxDiskIOspeed2,
+		 
+		  DATE_FORMAT(rm.online_time,'%Y-%m-%d') onlineTime
+		FROM
+		comp_rm_pm_t rm
+		LEFT JOIN comp_sta_device_halfday_t sta ON sta.DEVICE_ID = rm.PM_ID	
+		LEFT JOIN comp_app_t app ON sta.APP_ID = app.APP_ID
+		LEFT JOIN comp_authority_user_t USER ON app.APP_CONTACTS = `user`.USER_ID
+		LEFT JOIN comp_res_pool_t pool ON rm.RES_POOL_ID = pool.RES_POOL_ID
+		LEFT JOIN comp_res_pool_part_t part ON rm.RES_POOL_PART_ID = part.RES_POOL_PART_ID
+		WHERE
+			sta.DEVICE_TYPE = '2'
+		<dynamic>
+			<isNotEmpty prepend="AND" property="resPoolId">
+				rm.RES_POOL_ID = #resPoolId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="poolPartId">
+				rm.RES_POOL_PART_ID = #poolPartId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="dateType">
+				sta.DATETYPE = #dateType#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ sta.REPORT_DATE >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ sta.REPORT_DATE <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+		GROUP BY sta.DEVICE_ID
+		<isNotNull prepend=" " property="orderType">
+			<isEqual prepend=" " property="orderType" compareValue="0"> 
+				ORDER BY cpuProcessorUtilization DESC
+			</isEqual>
+			<isEqual prepend=" " property="orderType" compareValue="1"> 
+				ORDER BY cpuProcessorUtilization ASC
+			</isEqual>
+		</isNotNull>
+	</select>
+	
+	<!-- 取得虚拟机  各指标使用率统计数据 导出全部-->
+	<select id="getVmAllPerformance" parameterClass="monthPerformanceInfo" resultClass="monthPerformanceInfo">
+		SELECT
+		  rm.vm_id deviceId,
+		  rm.vm_name deviceName,
+		  ifnull(app.APP_NAME, '') appName,
+		  rm.PRIVATE_IP ip,
+		  ifnull(rm.CPU_NUM, '0') cpuNum,
+		  rm.MEMORY_SIZE memorySize,
+		  rm.VM_OS os,
+		  sta.DATETYPE dateType,
+		  ifnull(`user`.USER_NAME, '') appContacts,
+		  pool.RES_POOL_NAME resPoolName,
+      	  part.RES_POOL_PART_NAME poolPartName,
+		  case sta.DATETYPE when '0' then ROUND(AVG(sta.CPU_PROCESSOR_UTILIZATION+0), 3) else '0' end cpuProcessorUtilization0,
+		  case sta.DATETYPE when '1' then ROUND(AVG(sta.CPU_PROCESSOR_UTILIZATION+0), 3) else '0' end cpuProcessorUtilization1,
+		  case sta.DATETYPE when '2' then ROUND(AVG(sta.CPU_PROCESSOR_UTILIZATION+0), 3) else '0' end cpuProcessorUtilization2,
+		  case sta.DATETYPE when '0' then ROUND(MAX(sta.CPU_PROCESSOR_UTILIZATION+0), 3) else '0' end maxCpuProcessorUtilization0,
+		  case sta.DATETYPE when '1' then ROUND(MAX(sta.CPU_PROCESSOR_UTILIZATION+0), 3) else '0' end maxCpuProcessorUtilization1,
+		  case sta.DATETYPE when '2' then ROUND(MAX(sta.CPU_PROCESSOR_UTILIZATION+0), 3) else '0' end maxCpuProcessorUtilization2,
+		 
+		  case sta.DATETYPE when '0' then ROUND(AVG(sta.MEM_USED_PER+0), 2) else '0' end memUsedPer0,
+		  case sta.DATETYPE when '1' then ROUND(AVG(sta.MEM_USED_PER+0), 2) else '0' end memUsedPer1,
+		  case sta.DATETYPE when '2' then ROUND(AVG(sta.MEM_USED_PER+0), 2) else '0' end memUsedPer2,
+		  case sta.DATETYPE when '0' then ROUND(MAX(sta.MEM_USED_PER+0), 2) else '0' end maxMemUsedPer0,
+		  case sta.DATETYPE when '1' then ROUND(MAX(sta.MEM_USED_PER+0), 2) else '0' end maxMemUsedPer1,
+		  case sta.DATETYPE when '2' then ROUND(MAX(sta.MEM_USED_PER+0), 2) else '0' end maxMemUsedPer2,
+		 
+		  case sta.DATETYPE when '0' then ROUND(AVG(sta.SWAP_MEM_USED_PER+0), 2) else '0' end swapMemUsedPer0,
+		  case sta.DATETYPE when '1' then ROUND(AVG(sta.SWAP_MEM_USED_PER+0), 2) else '0' end swapMemUsedPer1,
+		  case sta.DATETYPE when '2' then ROUND(AVG(sta.SWAP_MEM_USED_PER+0), 2) else '0' end swapMemUsedPer2,
+		  case sta.DATETYPE when '0' then ROUND(MAX(sta.SWAP_MEM_USED_PER+0), 2) else '0' end maxSwapMemUsedPer0,
+		  case sta.DATETYPE when '1' then ROUND(MAX(sta.SWAP_MEM_USED_PER+0), 2) else '0' end maxSwapMemUsedPer1,
+		  case sta.DATETYPE when '2' then ROUND(MAX(sta.SWAP_MEM_USED_PER+0), 2) else '0' end maxSwapMemUsedPer2,
+		 
+		  case sta.DATETYPE when '0' then ROUND(AVG(sta.disk_IO_speed+0), 2) else '0' end diskIOspeed0,
+		  case sta.DATETYPE when '1' then ROUND(AVG(sta.disk_IO_speed+0), 2) else '0' end diskIOspeed1,
+		  case sta.DATETYPE when '2' then ROUND(AVG(sta.disk_IO_speed+0), 2) else '0' end diskIOspeed2,
+		  case sta.DATETYPE when '0' then ROUND(MAX(sta.disk_IO_speed+0), 2) else '0' end maxDiskIOspeed0,
+		  case sta.DATETYPE when '1' then ROUND(MAX(sta.disk_IO_speed+0), 2) else '0' end maxDiskIOspeed1,
+		  case sta.DATETYPE when '2' then ROUND(MAX(sta.disk_IO_speed+0), 2) else '0' end maxDiskIOspeed2,
+		  DATE_FORMAT(rm.RUN_TIME,'%Y-%m-%d') onlineTime
+		FROM
+		comp_rm_vm_t rm
+		LEFT JOIN comp_sta_device_halfday_t sta ON sta.DEVICE_ID = rm.VM_ID
+		LEFT JOIN comp_app_t app ON sta.APP_ID = app.APP_ID
+		LEFT JOIN comp_authority_user_t USER ON app.APP_CONTACTS = `user`.USER_ID
+		LEFT JOIN comp_res_pool_t pool ON rm.RES_POOL_ID = pool.RES_POOL_ID
+		LEFT JOIN comp_res_pool_part_t part ON rm.RES_POOL_PART_ID = part.RES_POOL_PART_ID
+		LEFT JOIN comp_os_t os ON rm.VM_OS = os.OS_ID
+		WHERE
+			sta.DEVICE_TYPE = '3'
+		<dynamic>
+			<isNotEmpty prepend="AND" property="resPoolId">
+				rm.RES_POOL_ID = #resPoolId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="poolPartId">
+				rm.RES_POOL_PART_ID = #poolPartId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="dateType">
+				sta.DATETYPE = #dateType#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ sta.REPORT_DATE >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ sta.REPORT_DATE <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+		GROUP BY sta.DEVICE_ID
+		<isNotNull prepend=" " property="orderType">
+			<isEqual prepend=" " property="orderType" compareValue="0"> 
+				ORDER BY memUsedPer DESC
+			</isEqual>
+			<isEqual prepend=" " property="orderType" compareValue="1"> 
+				ORDER BY memUsedPer ASC
+			</isEqual>
+		</isNotNull>
+	</select>
+	
+	<!-- 取得物理机 CPU使用率统计数据 导出-->
+	<select id="getPmAllCpuPerformance" parameterClass="monthPerformanceInfo" resultClass="monthPerformanceInfo">
+		SELECT
+		  rm.pm_id deviceId,
+		  rm.pm_name deviceName,
+		  ifnull(app.APP_NAME, '') appName,
+		  rm.ip ip,
+		  ifnull(IF(rm.CPU_NUM !='' ,rm.CPU_NUM * rm.NUC_NUM_PER_CPU, rm.NUC_NUM_PER_CPU), '0') cpuNum,
+		  ifnull(rm.MEMORY_SIZE, '0') memorySize,
+		  rm.SERVER_TYPE serverType,
+		  ifnull(rm.OS_TYPE, '') os,
+		  ifnull(`user`.USER_NAME, '') appContacts,
+		  pool.RES_POOL_NAME resPoolName,
+      	  part.RES_POOL_PART_NAME poolPartName,
+		  ROUND(AVG(sta.CPU_PROCESSOR_UTILIZATION+0), 2) cpuProcessorUtilization,
+		  MAX(sta.CPU_PROCESSOR_UTILIZATION+0) maxCpuProcessorUtilization,
+		  DATE_FORMAT(rm.online_time,'%Y-%m-%d') onlineTime
+		FROM
+		comp_rm_pm_t rm
+		LEFT JOIN comp_sta_device_halfday_t sta ON sta.DEVICE_ID = rm.PM_ID
+		LEFT JOIN comp_app_t app ON sta.APP_ID = app.APP_ID
+		LEFT JOIN comp_authority_user_t USER ON app.APP_CONTACTS = `user`.USER_ID
+		LEFT JOIN comp_res_pool_t pool ON rm.RES_POOL_ID = pool.RES_POOL_ID
+		LEFT JOIN comp_res_pool_part_t part ON rm.RES_POOL_PART_ID = part.RES_POOL_PART_ID
+		WHERE
+			sta.DEVICE_TYPE = '2'
+		<dynamic>
+			<isNotEmpty prepend="AND" property="resPoolId">
+				rm.RES_POOL_ID = #resPoolId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="poolPartId">
+				rm.RES_POOL_PART_ID = #poolPartId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="dateType">
+				sta.DATETYPE = #dateType#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ sta.REPORT_DATE >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ sta.REPORT_DATE <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+		GROUP BY sta.DEVICE_ID
+		<isNotNull prepend=" " property="orderType">
+			<isEqual prepend=" " property="orderType" compareValue="0"> 
+				ORDER BY cpuProcessorUtilization DESC
+			</isEqual>
+			<isEqual prepend=" " property="orderType" compareValue="1"> 
+				ORDER BY cpuProcessorUtilization ASC
+			</isEqual>
+		</isNotNull>
+	</select>
+	
+	<!-- 取得虚拟机 CPU使用率统计数据 导出-->
+	<select id="getVmAllCpuPerformance" parameterClass="monthPerformanceInfo" resultClass="monthPerformanceInfo">
+		SELECT
+		  rm.vm_id deviceId,
+		  rm.vm_name deviceName,
+		  ifnull(app.APP_NAME, '') appName,
+		  rm.PRIVATE_IP ip,
+		  ifnull(rm.CPU_NUM, '0') cpuNum,
+		  rm.MEMORY_SIZE memorySize,
+		  os.OS_NAME os,
+		  ifnull(`user`.USER_NAME, '') appContacts,
+		  pool.RES_POOL_NAME resPoolName,
+      	  part.RES_POOL_PART_NAME poolPartName,
+		  ROUND(AVG(sta.CPU_PROCESSOR_UTILIZATION+0), 3) cpuProcessorUtilization,
+		  MAX(sta.CPU_PROCESSOR_UTILIZATION+0) maxCpuProcessorUtilization,
+
+		  DATE_FORMAT(rm.RUN_TIME,'%Y-%m-%d') onlineTime
+		  
+		FROM
+		comp_rm_vm_t rm
+		LEFT JOIN comp_sta_device_halfday_t sta ON sta.DEVICE_ID = rm.VM_ID
+		LEFT JOIN comp_app_t app ON sta.APP_ID = app.APP_ID
+		LEFT JOIN comp_authority_user_t USER ON app.APP_CONTACTS = `user`.USER_ID
+		LEFT JOIN comp_res_pool_t pool ON rm.RES_POOL_ID = pool.RES_POOL_ID
+		LEFT JOIN comp_res_pool_part_t part ON rm.RES_POOL_PART_ID = part.RES_POOL_PART_ID
+		LEFT JOIN comp_os_t os ON rm.VM_OS = os.OS_ID
+		WHERE
+			sta.DEVICE_TYPE = '3'
+		<dynamic>
+			<isNotEmpty prepend="AND" property="resPoolId">
+				rm.RES_POOL_ID = #resPoolId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="poolPartId">
+				rm.RES_POOL_PART_ID = #poolPartId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="dateType">
+				sta.DATETYPE = #dateType#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ sta.REPORT_DATE >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ sta.REPORT_DATE <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+		GROUP BY sta.DEVICE_ID
+		<isNotNull prepend=" " property="orderType">
+			<isEqual prepend=" " property="orderType" compareValue="0"> 
+				ORDER BY cpuProcessorUtilization DESC
+			</isEqual>
+			<isEqual prepend=" " property="orderType" compareValue="1"> 
+				ORDER BY cpuProcessorUtilization ASC
+			</isEqual>
+		</isNotNull>
+	</select>
+	
+	<!-- 取得物理机 内存使用率统计数据 导出-->
+	<select id="getPmAllMemPerformance" parameterClass="monthPerformanceInfo" resultClass="monthPerformanceInfo">
+		SELECT
+		  rm.pm_id deviceId,
+		  rm.pm_name deviceName,
+		  ifnull(app.APP_NAME, '') appName,
+		  rm.ip ip,
+		  ifnull(IF(rm.CPU_NUM !='' ,rm.CPU_NUM * rm.NUC_NUM_PER_CPU, rm.NUC_NUM_PER_CPU), '0') cpuNum,
+		  ifnull(rm.MEMORY_SIZE, '0') memorySize,
+		  rm.SERVER_TYPE serverType,
+		  ifnull(rm.OS_TYPE, '') os,
+		  ifnull(`user`.USER_NAME, '') appContacts,
+		  pool.RES_POOL_NAME resPoolName,
+      	  part.RES_POOL_PART_NAME poolPartName,
+		  ROUND(AVG(sta.MEM_USED_PER+0), 2) memUsedPer,
+		  MAX(sta.MEM_USED_PER+0) maxMemUsedPer,
+		  DATE_FORMAT(rm.online_time,'%Y-%m-%d') onlineTime
+		FROM
+			comp_rm_pm_t rm
+		LEFT JOIN comp_sta_device_halfday_t sta ON sta.DEVICE_ID = rm.PM_ID
+		LEFT JOIN comp_app_t app ON sta.APP_ID = app.APP_ID
+		LEFT JOIN comp_authority_user_t USER ON app.APP_CONTACTS = `user`.USER_ID
+		LEFT JOIN comp_res_pool_t pool ON rm.RES_POOL_ID = pool.RES_POOL_ID
+		LEFT JOIN comp_res_pool_part_t part ON rm.RES_POOL_PART_ID = part.RES_POOL_PART_ID
+		WHERE
+			sta.DEVICE_TYPE = '2'
+		<dynamic>
+			<isNotEmpty prepend="AND" property="resPoolId">
+				rm.RES_POOL_ID = #resPoolId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="poolPartId">
+				rm.RES_POOL_PART_ID = #poolPartId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="dateType">
+				sta.DATETYPE = #dateType#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ sta.REPORT_DATE >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ sta.REPORT_DATE <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+		GROUP BY sta.DEVICE_ID
+		<isNotNull prepend=" " property="orderType">
+			<isEqual prepend=" " property="orderType" compareValue="0"> 
+				ORDER BY memUsedPer DESC
+			</isEqual>
+			<isEqual prepend=" " property="orderType" compareValue="1"> 
+				ORDER BY memUsedPer ASC
+			</isEqual>
+		</isNotNull>
+	</select>
+	
+	<!-- 取得虚拟机  内存使用率统计数据 导出-->
+	<select id="getVmAllMemPerformance" parameterClass="monthPerformanceInfo" resultClass="monthPerformanceInfo">
+		SELECT
+		  rm.vm_id deviceId,
+		  rm.vm_name deviceName,
+		  ifnull(app.APP_NAME, '') appName,
+		  rm.PRIVATE_IP ip,
+		  ifnull(rm.CPU_NUM, '0') cpuNum,
+		  rm.MEMORY_SIZE memorySize,
+		  os.OS_NAME os,
+		  ifnull(`user`.USER_NAME, '') appContacts,
+		  pool.RES_POOL_NAME resPoolName,
+      	  part.RES_POOL_PART_NAME poolPartName,
+		  ROUND(AVG(sta.MEM_USED_PER+0), 2) memUsedPer,
+		  MAX(sta.MEM_USED_PER+0) maxMemUsedPer,
+		  DATE_FORMAT(rm.RUN_TIME,'%Y-%m-%d') onlineTime
+		  
+		FROM
+		comp_rm_vm_t rm
+		LEFT JOIN comp_sta_device_halfday_t sta ON sta.DEVICE_ID = rm.VM_ID
+		LEFT JOIN comp_app_t app ON sta.APP_ID = app.APP_ID
+		LEFT JOIN comp_authority_user_t USER ON app.APP_CONTACTS = `user`.USER_ID
+		LEFT JOIN comp_res_pool_t pool ON rm.RES_POOL_ID = pool.RES_POOL_ID
+		LEFT JOIN comp_res_pool_part_t part ON rm.RES_POOL_PART_ID = part.RES_POOL_PART_ID
+		LEFT JOIN comp_os_t os ON rm.VM_OS = os.OS_ID
+		WHERE
+			sta.DEVICE_TYPE = '3'
+		<dynamic>
+			<isNotEmpty prepend="AND" property="resPoolId">
+				rm.RES_POOL_ID = #resPoolId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="poolPartId">
+				rm.RES_POOL_PART_ID = #poolPartId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="dateType">
+				sta.DATETYPE = #dateType#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ sta.REPORT_DATE >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ sta.REPORT_DATE <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+		GROUP BY sta.DEVICE_ID
+		<isNotNull prepend=" " property="orderType">
+			<isEqual prepend=" " property="orderType" compareValue="0"> 
+				ORDER BY memUsedPer DESC
+			</isEqual>
+			<isEqual prepend=" " property="orderType" compareValue="1"> 
+				ORDER BY memUsedPer ASC
+			</isEqual>
+		</isNotNull>
+	</select>
+	
+	<!-- 取得物理机 PageSapce使用率统计数据 导出-->
+	<select id="getPmAllPagePerformance" parameterClass="monthPerformanceInfo" resultClass="monthPerformanceInfo">
+		SELECT
+		  rm.pm_id deviceId,
+		  rm.pm_name deviceName,
+		  ifnull(app.APP_NAME, '') appName,
+		  rm.ip ip,
+		  ifnull(IF(rm.CPU_NUM !='' ,rm.CPU_NUM * rm.NUC_NUM_PER_CPU, rm.NUC_NUM_PER_CPU), '0') cpuNum,
+		  ifnull(rm.MEMORY_SIZE, '0') memorySize,
+		  rm.SERVER_TYPE serverType,
+		  ifnull(rm.OS_TYPE, '') os,
+		  ifnull(`user`.USER_NAME, '') appContacts,
+		  pool.RES_POOL_NAME resPoolName,
+      	  part.RES_POOL_PART_NAME poolPartName,
+		  ROUND(AVG(sta.SWAP_MEM_USED_PER+0), 2) swapMemUsedPer,
+		  MAX(sta.SWAP_MEM_USED_PER+0) maxSwapMemUsedPer,
+		  DATE_FORMAT(rm.online_time,'%Y-%m-%d') onlineTime
+		FROM
+			comp_rm_pm_t rm
+		LEFT JOIN comp_sta_device_halfday_t sta ON sta.DEVICE_ID = rm.PM_ID
+		LEFT JOIN comp_app_t app ON sta.APP_ID = app.APP_ID
+		LEFT JOIN comp_authority_user_t USER ON app.APP_CONTACTS = `user`.USER_ID
+		LEFT JOIN comp_res_pool_t pool ON rm.RES_POOL_ID = pool.RES_POOL_ID
+		LEFT JOIN comp_res_pool_part_t part ON rm.RES_POOL_PART_ID = part.RES_POOL_PART_ID
+		WHERE
+			sta.DEVICE_TYPE = '2'
+		<dynamic>
+			<isNotEmpty prepend="AND" property="resPoolId">
+				rm.RES_POOL_ID = #resPoolId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="poolPartId">
+				rm.RES_POOL_PART_ID = #poolPartId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="dateType">
+				sta.DATETYPE = #dateType#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ sta.REPORT_DATE >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ sta.REPORT_DATE <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+		GROUP BY sta.DEVICE_ID
+		<isNotNull prepend=" " property="orderType">
+			<isEqual prepend=" " property="orderType" compareValue="0"> 
+				ORDER BY swapMemUsedPer DESC
+			</isEqual>
+			<isEqual prepend=" " property="orderType" compareValue="1"> 
+				ORDER BY swapMemUsedPer ASC
+			</isEqual>
+		</isNotNull>
+	</select>
+	
+	<!-- 取得虚拟机  PageSapce使用率统计数据 导出-->
+	<select id="getVmAllPagePerformance" parameterClass="monthPerformanceInfo" resultClass="monthPerformanceInfo">
+		SELECT
+		  rm.vm_id deviceId,
+		  rm.vm_name deviceName,
+		  ifnull(app.APP_NAME, '') appName,
+		  rm.PRIVATE_IP ip,
+		  ifnull(rm.CPU_NUM, '0') cpuNum,
+		  rm.MEMORY_SIZE memorySize,
+		  os.OS_NAME os,
+		  ifnull(`user`.USER_NAME, '') appContacts,
+		  pool.RES_POOL_NAME resPoolName,
+      	  part.RES_POOL_PART_NAME poolPartName,
+		  ROUND(AVG(sta.SWAP_MEM_USED_PER+0), 2) swapMemUsedPer,
+		  MAX(sta.SWAP_MEM_USED_PER+0) maxSwapMemUsedPer,
+		  DATE_FORMAT(rm.RUN_TIME,'%Y-%m-%d') onlineTime
+		  
+		FROM
+			comp_rm_vm_t rm
+		LEFT JOIN comp_sta_device_halfday_t sta ON sta.DEVICE_ID = rm.VM_ID
+		LEFT JOIN comp_app_t app ON sta.APP_ID = app.APP_ID
+		LEFT JOIN comp_authority_user_t USER ON app.APP_CONTACTS = `user`.USER_ID
+		LEFT JOIN comp_res_pool_t pool ON rm.RES_POOL_ID = pool.RES_POOL_ID
+		LEFT JOIN comp_res_pool_part_t part ON rm.RES_POOL_PART_ID = part.RES_POOL_PART_ID
+		LEFT JOIN comp_os_t os ON rm.VM_OS = os.OS_ID
+		WHERE
+			sta.DEVICE_TYPE = '3'
+		<dynamic>
+			<isNotEmpty prepend="AND" property="resPoolId">
+				rm.RES_POOL_ID = #resPoolId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="poolPartId">
+				rm.RES_POOL_PART_ID = #poolPartId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="dateType">
+				sta.DATETYPE = #dateType#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ sta.REPORT_DATE >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ sta.REPORT_DATE <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+		GROUP BY sta.DEVICE_ID
+		<isNotNull prepend=" " property="orderType">
+			<isEqual prepend=" " property="orderType" compareValue="0"> 
+				ORDER BY swapMemUsedPer DESC
+			</isEqual>
+			<isEqual prepend=" " property="orderType" compareValue="1"> 
+				ORDER BY swapMemUsedPer ASC
+			</isEqual>
+		</isNotNull>
+	</select>
+	<!-- 取得物理机 磁盘IOspeed统计数据 导出-->
+	<select id="getPmAllIOspeedPerformance" parameterClass="monthPerformanceInfo" resultClass="monthPerformanceInfo">
+		SELECT
+		  rm.pm_id deviceId,
+		  rm.pm_name deviceName,
+		  ifnull(app.APP_NAME, '') appName,
+		  rm.ip ip,
+		  ifnull(IF(rm.CPU_NUM !='' ,rm.CPU_NUM * rm.NUC_NUM_PER_CPU, rm.NUC_NUM_PER_CPU), '0') cpuNum,
+		  ifnull(rm.MEMORY_SIZE, '0') memorySize,
+		  rm.SERVER_TYPE serverType,
+		  ifnull(rm.OS_TYPE, '') os,
+		  ifnull(`user`.USER_NAME, '') appContacts,
+		  pool.RES_POOL_NAME resPoolName,
+      	  part.RES_POOL_PART_NAME poolPartName,
+		  ROUND(AVG(sta.disk_IO_speed+0), 2) diskIOspeed,
+		  MAX(sta.disk_IO_speed+0) maxDiskIOspeed,
+		  left(rm.ONLINE_TIME,10) onlineTime
+		FROM
+			comp_rm_pm_t rm
+		LEFT JOIN comp_sta_device_halfday_t sta ON sta.DEVICE_ID = rm.PM_ID
+		LEFT JOIN comp_app_t app ON sta.APP_ID = app.APP_ID
+		LEFT JOIN comp_authority_user_t USER ON app.APP_CONTACTS = `user`.USER_ID
+		LEFT JOIN comp_res_pool_t pool ON rm.RES_POOL_ID = pool.RES_POOL_ID
+		LEFT JOIN comp_res_pool_part_t part ON rm.RES_POOL_PART_ID = part.RES_POOL_PART_ID
+		WHERE
+			sta.DEVICE_TYPE = '2'
+		<dynamic>
+			<isNotEmpty prepend="AND" property="resPoolId">
+				rm.RES_POOL_ID = #resPoolId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="poolPartId">
+				rm.RES_POOL_PART_ID = #poolPartId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="dateType">
+				sta.DATETYPE = #dateType#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ sta.REPORT_DATE >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ sta.REPORT_DATE <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+		GROUP BY sta.DEVICE_ID
+		<isNotNull prepend=" " property="orderType">
+			<isEqual prepend=" " property="orderType" compareValue="0"> 
+				ORDER BY diskIOspeed DESC
+			</isEqual>
+			<isEqual prepend=" " property="orderType" compareValue="1"> 
+				ORDER BY diskIOspeed ASC
+			</isEqual>
+		</isNotNull>
+	</select>
+	
+	<!-- 取得虚拟机  磁盘IOspeed使用率统计数据 导出-->
+	<select id="getVmAllIOspeedPerformance" parameterClass="monthPerformanceInfo" resultClass="monthPerformanceInfo">
+		SELECT
+		  rm.vm_id deviceId,
+		  rm.vm_name deviceName,
+		  ifnull(app.APP_NAME, '') appName,
+		  rm.PRIVATE_IP ip,
+		  ifnull(rm.CPU_NUM, '0') cpuNum,
+		  rm.MEMORY_SIZE memorySize,
+		  os.OS_NAME os,
+		  ifnull(`user`.USER_NAME, '') appContacts,
+		  pool.RES_POOL_NAME resPoolName,
+      	  part.RES_POOL_PART_NAME poolPartName,
+		  ROUND(AVG(sta.disk_IO_speed+0), 2) diskIOspeed,
+		  MAX(sta.disk_IO_speed+0) maxDiskIOspeed,
+		  DATE_FORMAT(rm.RUN_TIME,'%Y-%m-%d') onlineTime
+		  
+		FROM
+			comp_rm_vm_t rm
+		LEFT JOIN comp_sta_device_halfday_t sta ON sta.DEVICE_ID = rm.VM_ID
+		LEFT JOIN comp_app_t app ON sta.APP_ID = app.APP_ID
+		LEFT JOIN comp_authority_user_t USER ON app.APP_CONTACTS = `user`.USER_ID
+		LEFT JOIN comp_res_pool_t pool ON rm.RES_POOL_ID = pool.RES_POOL_ID
+		LEFT JOIN comp_res_pool_part_t part ON rm.RES_POOL_PART_ID = part.RES_POOL_PART_ID
+		LEFT JOIN comp_os_t os ON rm.VM_OS = os.OS_ID
+		WHERE
+			sta.DEVICE_TYPE = '3'
+		<dynamic>
+			<isNotEmpty prepend="AND" property="resPoolId">
+				rm.RES_POOL_ID = #resPoolId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="poolPartId">
+				rm.RES_POOL_PART_ID = #poolPartId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="dateType">
+				sta.DATETYPE = #dateType#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ sta.REPORT_DATE >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ sta.REPORT_DATE <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+		GROUP BY sta.DEVICE_ID
+		<isNotNull prepend=" " property="orderType">
+			<isEqual prepend=" " property="orderType" compareValue="0"> 
+				ORDER BY diskIOspeed DESC
+			</isEqual>
+			<isEqual prepend=" " property="orderType" compareValue="1"> 
+				ORDER BY diskIOspeed ASC
+			</isEqual>
+		</isNotNull>
+	</select>
+	
+	<!-- 导出使用sql  结束 -->
+	
+	<!-- 取得资源池列表-->
+	<select id="queryRespools" resultClass="monthPerformanceInfo">
+	   SELECT  RES_POOL_ID resPoolId, RES_POOL_NAME resPoolName
+		 FROM  COMP_RES_POOL_T
+		WHERE  STATUS = 1
+	</select>
+	
+	<!-- 取得资源池分区列表-->
+	<select id="queryRespoolParts" parameterClass="monthPerformanceInfo" resultClass="monthPerformanceInfo">
+	   SELECT  RES_POOL_PART_ID poolPartId, RES_POOL_PART_NAME poolPartName
+		 FROM  COMP_RES_POOL_PART_T
+		WHERE  STATUS = '1'
+		  AND  RES_POOL_ID = #resPoolId#
+	</select>
+	
+</sqlMap>

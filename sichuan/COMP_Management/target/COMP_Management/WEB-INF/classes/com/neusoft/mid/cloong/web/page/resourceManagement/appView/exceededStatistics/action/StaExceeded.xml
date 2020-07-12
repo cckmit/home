@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+    
+<sqlMap namespace="AppView">
+
+	<typeAlias alias="deviceExceeded" type="com.neusoft.mid.cloong.web.page.resourceManagement.info.DeviceExceededNum"/>
+	
+	<sql id="overBody">
+		FROM  COMP_STA_DEVICE_APP_WEEK_T T
+		LEFT  JOIN COMP_APP_T A
+		ON    A.APP_ID = T.APP_ID
+		WHERE T.REPORT_DATE = DATE_FORMAT(CURDATE(),'%Y%m%d')
+		AND   T.DEVICE_TYPE = #deviceType#
+	</sql>
+	
+	<select id="getCpuOverNumByApp" resultClass="deviceExceeded" parameterClass="deviceExceeded">
+		SELECT
+			A.APP_ID AS appId,
+			A.APP_NAME AS appName,
+			T.DEVICE_NUM AS deviceNum,
+			T.CPU_OVER_NUM AS cpuOverNum,
+			T.CPU_OVER_AVE AS cpuOverAve,
+			T.CPU_NOT_OVER_NUM AS cpuNotOverNum,
+			T.CPU_NOT_OVER_AVE AS cpuNotOverAve,
+			ROUND(T.CPU_OVER_NUM / T.DEVICE_NUM * 100, 2) AS cpuOverPer,
+			ROUND(T.CPU_NOT_OVER_NUM / T.DEVICE_NUM * 100, 2) AS cpuNotOverPer,
+			T.DEVICE_NUM - T.CPU_OVER_NUM - T.CPU_NOT_OVER_NUM AS otherNum,
+			ROUND((T.DEVICE_NUM - T.CPU_OVER_NUM - T.CPU_NOT_OVER_NUM) / T.DEVICE_NUM * 100, 2) AS otherPer,
+			T.REPORT_DATE AS reportDate
+		<include refid="overBody"/>
+		GROUP BY T.APP_ID
+		ORDER BY cpuOverPer DESC, cpuOverNum + 0 DESC, A.APP_ID
+	</select>
+	
+	<select id="getCpuOverNumByAppOrderByNum" resultClass="deviceExceeded" parameterClass="deviceExceeded">
+		SELECT
+			A.APP_ID AS appId,
+			A.APP_NAME AS appName,
+			T.DEVICE_NUM AS deviceNum,
+			T.CPU_OVER_NUM AS cpuOverNum,
+			T.CPU_OVER_AVE AS cpuOverAve,
+			T.CPU_NOT_OVER_NUM AS cpuNotOverNum,
+			T.CPU_NOT_OVER_AVE AS cpuNotOverAve,
+			T.DEVICE_NUM - T.CPU_OVER_NUM - T.CPU_NOT_OVER_NUM AS otherNum,
+			T.REPORT_DATE AS reportDate
+		<include refid="overBody"/>
+		GROUP BY T.APP_ID
+		ORDER BY cpuOverNum + 0 DESC, A.APP_ID
+	</select>
+	
+	<select id="getCpuOverNumCountByApp" resultClass="java.lang.Integer" parameterClass="deviceExceeded">
+		SELECT COUNT(TMP.count)
+		FROM
+		(
+			SELECT COUNT(*) AS count
+			<include refid="overBody"/>
+			GROUP BY T.APP_ID
+		) TMP
+	</select>
+	
+	<select id="getMemOverNumByApp" resultClass="deviceExceeded" parameterClass="deviceExceeded">
+		SELECT
+			A.APP_ID AS appId,
+			A.APP_NAME AS appName,
+			T.DEVICE_NUM AS deviceNum,
+			T.MEM_OVER_NUM AS memOverNum,
+			T.MEM_OVER_AVE AS memOverAve,
+			FORMAT(T.MEM_OVER_FREE_AVE / (1024 * 1024), 2) AS memOverFreeAve,
+			T.MEM_NOT_OVER_NUM AS memNotOverNum,
+			T.MEM_NOT_OVER_AVE AS memNotOverAve,
+			FORMAT(T.MEM_NOT_OVER_FREE_AVE / (1024 * 1024), 2) AS memNotOverFreeAve,
+			ROUND(T.MEM_OVER_NUM / T.DEVICE_NUM * 100, 2) AS memOverPer,
+			ROUND(T.MEM_NOT_OVER_NUM / T.DEVICE_NUM * 100, 2) AS memNotOverPer,
+			T.DEVICE_NUM - T.MEM_OVER_NUM - T.MEM_NOT_OVER_NUM AS otherNum,
+			ROUND((T.DEVICE_NUM - T.MEM_OVER_NUM - T.MEM_NOT_OVER_NUM) / T.DEVICE_NUM * 100, 2) AS otherPer,
+			T.REPORT_DATE AS reportDate
+		<include refid="overBody"/>
+		GROUP BY T.APP_ID
+		ORDER BY memOverPer DESC, memOverNum + 0 DESC, A.APP_ID
+	</select>
+	
+	<select id="getMemOverNumByAppOrderByNum" resultClass="deviceExceeded" parameterClass="deviceExceeded">
+		SELECT
+			A.APP_ID AS appId,
+			A.APP_NAME AS appName,
+			T.DEVICE_NUM AS deviceNum,
+			T.MEM_OVER_NUM AS memOverNum,
+			T.MEM_OVER_AVE AS memOverAve,
+			FORMAT(T.MEM_OVER_FREE_AVE / (1024 * 1024), 2) AS memOverFreeAve,
+			T.MEM_NOT_OVER_NUM AS memNotOverNum,
+			T.MEM_NOT_OVER_AVE AS memNotOverAve,
+			FORMAT(T.MEM_NOT_OVER_FREE_AVE / (1024 * 1024), 2) AS memNotOverFreeAve,
+			T.DEVICE_NUM - T.MEM_OVER_NUM - T.MEM_NOT_OVER_NUM AS otherNum,
+			T.REPORT_DATE AS reportDate
+		<include refid="overBody"/>
+		GROUP BY T.APP_ID
+		ORDER BY memOverNum + 0 DESC, A.APP_ID
+	</select>
+	
+	<select id="getMemOverNumCountByApp" resultClass="java.lang.Integer" parameterClass="deviceExceeded">
+		SELECT COUNT(TMP.count)
+		FROM
+		(
+			SELECT COUNT(*) AS count
+			<include refid="overBody"/>
+			GROUP BY T.APP_ID
+		) TMP
+	</select>
+	
+	<select id="getDiskOverNumByApp" resultClass="deviceExceeded" parameterClass="deviceExceeded">
+		SELECT
+			A.APP_ID AS appId,
+			A.APP_NAME AS appName,
+			T.DEVICE_NUM AS deviceNum,
+			T.DISK_RANGEl_NUM AS diskRange1Num,
+			T.DISK_RANGE2_NUM AS diskRange2Num,
+			T.DISK_RANGE3_NUM AS diskRange3Num,
+			ROUND(T.DISK_RANGEl_NUM / T.DEVICE_NUM * 100, 2) AS diskRange1Per,
+			ROUND(T.DISK_RANGE2_NUM / T.DEVICE_NUM * 100, 2) AS diskRange2Per,
+			ROUND(T.DISK_RANGE3_NUM / T.DEVICE_NUM * 100, 2) AS diskRange3Per,
+			T.DEVICE_NUM - T.DISK_RANGEl_NUM - T.DISK_RANGE2_NUM - T.DISK_RANGE3_NUM AS otherNum,
+			ROUND((T.DEVICE_NUM - T.DISK_RANGEl_NUM - T.DISK_RANGE2_NUM - T.DISK_RANGE3_NUM) / T.DEVICE_NUM * 100, 2) AS otherPer,
+			T.REPORT_DATE AS reportDate
+		<include refid="overBody"/>
+		GROUP BY T.APP_ID
+		ORDER BY diskRange1Per DESC, diskRange2Per DESC, diskRange3Per DESC, A.APP_ID
+	</select>
+	
+	<select id="getDiskOverNumByAppOrderByNum" resultClass="deviceExceeded" parameterClass="deviceExceeded">
+		SELECT
+			A.APP_ID AS appId,
+			A.APP_NAME AS appName,
+			T.DEVICE_NUM AS deviceNum,
+			T.DISK_RANGEl_NUM AS diskRange1Num,
+			T.DISK_RANGE2_NUM AS diskRange2Num,
+			T.DISK_RANGE3_NUM AS diskRange3Num,
+			T.DEVICE_NUM - T.DISK_RANGEl_NUM - T.DISK_RANGE2_NUM - T.DISK_RANGE3_NUM AS otherNum,
+			T.REPORT_DATE AS reportDate
+		<include refid="overBody"/>
+		GROUP BY T.APP_ID
+		ORDER BY diskRange1Num + 0 DESC, diskRange2Num + 0 DESC, diskRange3Num + 0 DESC, A.APP_ID
+	</select>
+	
+	<select id="getDiskOverNumCountByApp" resultClass="java.lang.Integer" parameterClass="deviceExceeded">
+		SELECT COUNT(TMP.count)
+		FROM
+		(
+			SELECT COUNT(*) AS count
+			<include refid="overBody"/>
+			GROUP BY T.APP_ID
+		) TMP
+	</select>
+	
+	<select id="getExportList" resultClass="deviceExceeded" parameterClass="String">
+		SELECT
+			A.APP_ID AS appId,
+			A.APP_NAME AS appName,
+			T.DEVICE_NUM AS deviceNum,
+			T.CPU_OVER_NUM AS cpuOverNum,
+			T.CPU_OVER_AVE AS cpuOverAve,
+			T.CPU_NOT_OVER_NUM AS cpuNotOverNum,
+			T.CPU_NOT_OVER_AVE AS cpuNotOverAve,
+			ROUND(T.CPU_OVER_NUM / T.DEVICE_NUM * 100, 2) AS cpuOverPer,
+			ROUND(T.CPU_NOT_OVER_NUM / T.DEVICE_NUM * 100, 2) AS cpuNotOverPer,
+			T.MEM_OVER_NUM AS memOverNum,
+			T.MEM_OVER_AVE AS memOverAve,
+			FORMAT(T.MEM_OVER_FREE_AVE / (1024 * 1024), 2) AS memOverFreeAve,
+			T.MEM_NOT_OVER_NUM AS memNotOverNum,
+			T.MEM_NOT_OVER_AVE AS memNotOverAve,
+			FORMAT(T.MEM_NOT_OVER_FREE_AVE / (1024 * 1024), 2) AS memNotOverFreeAve,
+			ROUND(T.MEM_OVER_NUM / T.DEVICE_NUM * 100, 2) AS memOverPer,
+			ROUND(T.MEM_NOT_OVER_NUM / T.DEVICE_NUM * 100, 2) AS memNotOverPer,
+			T.DISK_RANGEl_NUM AS diskRange1Num,
+			T.DISK_RANGE2_NUM AS diskRange2Num,
+			T.DISK_RANGE3_NUM AS diskRange3Num,
+			ROUND(T.DISK_RANGEl_NUM / T.DEVICE_NUM * 100, 2) AS diskRange1Per,
+			ROUND(T.DISK_RANGE2_NUM / T.DEVICE_NUM * 100, 2) AS diskRange2Per,
+			ROUND(T.DISK_RANGE3_NUM / T.DEVICE_NUM * 100, 2) AS diskRange3Per,
+			T.REPORT_DATE AS reportDate
+		<include refid="overBody"/>
+		GROUP BY T.APP_ID
+		ORDER BY cpuOverPer DESC, cpuOverNum + 0 DESC,memOverPer DESC, memOverNum + 0 DESC,diskRange1Per DESC, diskRange2Per DESC, diskRange3Per DESC, A.APP_ID
+	</select>
+</sqlMap>

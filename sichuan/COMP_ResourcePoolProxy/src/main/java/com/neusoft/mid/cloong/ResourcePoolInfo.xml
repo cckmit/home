@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="VM">
+	<typeAlias alias="ResourcePoolInfo"
+		type="com.neusoft.mid.cloong.info.ResourcePoolInfo" />
+	<select id="queryResourcePoolInfo" resultClass="ResourcePoolInfo">
+		select
+		RES_POOL_ID resourcePoolId,RES_POOL_NAME resourcePoolName,RES_POOL_URL
+		resourcePoolUrl,USER_PWD
+		userPassword from COMP_RES_POOL_T where status ='1'
+	</select>
+</sqlMap>

@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="Resource">
+	<typeAlias alias="ResourceInfo"
+		type="com.neusoft.mid.cloong.web.page.system.config.info.ResourceInfo" />
+	<typeAlias alias="ResourcePartInfo"
+		type="com.neusoft.mid.cloong.web.page.system.config.info.ResourcePartInfo" />
+	<select id="queryResourceInfos" resultClass="ResourceInfo">
+		SELECT
+		RES_POOL_ID resPoolId,
+		RES_POOL_NAME resPoolName,
+		RES_POOL_ZONE resPoolZone,
+		RES_POOL_URL resPoolUrl,
+		USER_ID userCode,
+		USER_PWD userPwd,
+		STATUS status,
+		DESCRIPTION description,
+		CREATE_TIME createTime,
+		CREATE_USER createUser,
+		UPDATE_TIME updateTime,
+		UPDATE_USER updateUser
+		FROM
+		COMP_RES_POOL_T
+		WHERE
+		STATUS!='0'
+	</select>
+	<select id="queryResourceJSONInfos" resultClass="ResourceInfo">
+		SELECT
+		RES_POOL_ID resPoolId,
+		RES_POOL_NAME resPoolName,
+		RES_POOL_ZONE resPoolZone,
+		RES_POOL_URL resPoolUrl,
+		USER_ID userCode,
+		USER_PWD userPwd,
+		STATUS status,
+		DESCRIPTION description,
+		CREATE_TIME createTime,
+		CREATE_USER createUser,
+		UPDATE_TIME updateTime,
+		UPDATE_USER updateUser
+		FROM
+		COMP_RES_POOL_T
+		WHERE
+		STATUS!='0'
+		AND STATUS!='3'
+	</select>
+	<select id="queryNormalResourceInfos" resultClass="ResourceInfo">
+		SELECT
+		RES_POOL_ID resPoolId,
+		RES_POOL_NAME resPoolName,
+		RES_POOL_ZONE resPoolZone,
+		RES_POOL_URL resPoolUrl,
+		USER_ID userCode,
+		USER_PWD userPwd,
+		STATUS status,
+		DESCRIPTION description,
+		CREATE_TIME createTime,
+		CREATE_USER createUser,
+		UPDATE_TIME updateTime,
+		UPDATE_USER updateUser
+		FROM
+		COMP_RES_POOL_T
+		WHERE
+		STATUS='1'
+	</select>
+	<insert id="insertResourceInfo" parameterClass="ResourceInfo">
+		insert into COMP_RES_POOL_T 
+		(RES_POOL_ID ,
+		RES_POOL_NAME ,
+		RES_POOL_ZONE ,
+		RES_POOL_URL ,
+		USER_ID ,
+		USER_PWD ,
+		STATUS ,
+		DESCRIPTION ,
+		CREATE_TIME ,
+		CREATE_USER ,
+		UPDATE_TIME ,
+		UPDATE_USER )
+		 values 
+		 (#resPoolId#,
+		#resPoolName#,
+		#resPoolZone#,
+		#resPoolUrl#,
+		#userCode#,
+		#userPwd#,
+		#status#,
+		#description#,
+		#createTime#,
+		#createUser#,
+		#updateTime#,
+		#updateUser#
+		 )
+	</insert>
+	<update id="updateResourceInfo" parameterClass="ResourceInfo">
+		UPDATE
+		COMP_RES_POOL_T 
+		SET
+		RES_POOL_NAME=#resPoolName#,
+		RES_POOL_ZONE=#resPoolZone#,
+		RES_POOL_URL=#resPoolUrl#,
+		USER_ID=#userCode#,
+		<isNotEmpty property="userPwd">
+			USER_PWD=#userPwd#,
+		</isNotEmpty>
+		DESCRIPTION=#description#,
+		UPDATE_TIME=#updateTime#,
+		UPDATE_USER=#updateUser#
+		WHERE
+		RES_POOL_ID=#resPoolId#
+	</update>
+	<select id="queryResourceInfoByResPoolId" resultClass="ResourceInfo" parameterClass="ResourceInfo">
+		SELECT
+		RES_POOL_ID resPoolId,
+		RES_POOL_NAME resPoolName,
+		RES_POOL_ZONE resPoolZone,
+		RES_POOL_URL resPoolUrl,
+		USER_ID userCode,
+		USER_PWD userPwd,
+		STATUS status,
+		DESCRIPTION description,
+		CREATE_TIME createTime,
+		CREATE_USER createUser,
+		UPDATE_TIME updateTime,
+		UPDATE_USER updateUser
+		FROM
+		COMP_RES_POOL_T
+		WHERE
+		RES_POOL_ID=#resPoolId#
+	</select>
+	<select id="queryResourceInfoByNull" resultClass="ResourceInfo" parameterClass="ResourceInfo">
+		SELECT
+		RES_POOL_ID resPoolId,
+		RES_POOL_NAME resPoolName,
+		RES_POOL_ZONE resPoolZone,
+		RES_POOL_URL resPoolUrl,
+		USER_ID userCode,
+		USER_PWD userPwd,
+		STATUS status,
+		DESCRIPTION description,
+		CREATE_TIME createTime,
+		CREATE_USER createUser,
+		UPDATE_TIME updateTime,
+		UPDATE_USER updateUser
+		FROM
+		COMP_RES_POOL_T
+		WHERE
+		RES_POOL_ID=null
+	</select>
+	<update id="updateResourceStatus" parameterClass="ResourceInfo">
+		UPDATE
+		COMP_RES_POOL_T 
+		SET
+		STATUS=#status#,
+		UPDATE_TIME=#updateTime#,
+		UPDATE_USER=#updateUser#
+		WHERE
+		RES_POOL_ID=#resPoolId#
+	</update>
+	<update id="updateResourcePartStatus" parameterClass="ResourcePartInfo">
+		UPDATE
+		COMP_RES_POOL_PART_T 
+		SET
+		STATUS=#status#,
+		UPDATE_TIME=#updateTime#,
+		UPDATE_USER=#updateUser#
+		WHERE
+		RES_POOL_ID=#resPoolId#
+	</update>
+	<select id="queryCountResourcePartByResPoolId" parameterClass="String" resultClass="int">
+		SELECT 
+		count(*) 
+		FROM
+		COMP_RES_POOL_PART_T
+		WHERE
+		STATUS!='0'
+		AND RES_POOL_ID=#resPoolId#
+	</select>
+	
+</sqlMap>

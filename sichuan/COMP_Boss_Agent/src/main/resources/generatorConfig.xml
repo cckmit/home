@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd" >
+<generatorConfiguration >
+<classPathEntry
+		location="E:/COMP/apache-maven-3.1.1/repository_comp/mysql/mysql-connector-java/5.1.22/mysql-connector-java-5.1.22.jar" />
+  <context id="context1" >
+    <jdbcConnection driverClass="com.mysql.jdbc.Driver" connectionURL="jdbc:mysql://10.10.167.97:3306/comp_sichuan" userId="root" password="123456" />
+    <javaModelGenerator targetPackage="com.neusoft.mid.comp.boss.mybatis.bean" targetProject="COMP_Boss_Agent" />
+    <sqlMapGenerator targetPackage="com.neusoft.mid.comp.boss.mybatis.xml" targetProject="COMP_Boss_Agent" />
+    <javaClientGenerator targetPackage="com.neusoft.mid.comp.boss.mybatis.xmlmapper" targetProject="COMP_Boss_Agent" type="XMLMAPPER" />
+    <table schema="Task" tableName="comp_corporation_boss_t" >
+    </table>
+  </context>
+</generatorConfiguration>
+

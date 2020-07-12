@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="ReportResourceState">
+	<typeAlias alias="reportResourceState"
+		type="com.neusoft.mid.cloong.resourcePool.webservice.publicCloud.info.ReportResourceState" />
+	
+	<!-- 保存资源池容量信息 -->
+	<insert id="insertReportResourceStates" parameterClass="reportResourceState">
+	  INSERT INTO comp_sta_capacity_t (
+			 RES_POOL_ID,
+			 RES_POOL_PART_ID,
+			 RES_TYPE,
+			 RES_TOTAL,
+			 RES_USED,
+			 CREATE_TIME
+		   )
+	  VALUES
+		  (
+			 #resourcePoolId#,
+			 #resourcePoolPartId#,
+			 #resourceType#,
+			 #ResourceTotal#,
+			 #resourceUsed#,
+			 date_format(SYSDATE(),'%Y%m%d%H%i%s')
+		  );
+	</insert>
+</sqlMap>

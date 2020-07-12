@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
+    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+
+	<!-- ip -->
+	<bean id="ipApplyProcessor" class="com.neusoft.mid.cloong.ip.IPApplyProcessor">
+		<property name="ipApply" ref="ipApply" />
+		<property name="transactonGen" ref="transactonGen" />
+		<property name="timeStampgen" ref="timeStampgen" />
+		<property name="resourcePoolCacheService" ref="resourcePoolCacheService" />
+		<property name="acquireStandardResPoolId" ref="acquireStandardResPoolId" />
+		<property name="ibatisDAO" ref="ibatisDAOProxy" />
+	</bean>
+	<bean id="ipApply" class="com.neusoft.mid.cloong.ip.IPApply">
+		<property name="common" ref="privateWebServiceClientFactory" />
+		<property name="timeout">
+			<value>${requestTimeout}</value>
+		</property>
+	</bean>
+	<bean id="ipQueryProcessor" class="com.neusoft.mid.cloong.ip.IPQueryProcessor">
+		<property name="ipQuery" ref="ipQuery" />
+		<property name="transactonGen" ref="transactonGen" />
+		<property name="timeStampgen" ref="timeStampgen" />
+		<property name="resourcePoolCacheService" ref="resourcePoolCacheService" />
+	</bean>
+	<bean id="ipQuery" class="com.neusoft.mid.cloong.ip.IPQuery">
+		<property name="common" ref="privateWebServiceClientFactory" />
+		<property name="timeout">
+			<value>${requestTimeout}</value>
+		</property>
+	</bean>
+	<bean id="ipReleaseProcessor" class="com.neusoft.mid.cloong.ip.IPReleaseProcessor">
+		<property name="ipRelease" ref="ipRelease" />
+		<property name="transactonGen" ref="transactonGen" />
+		<property name="timeStampgen" ref="timeStampgen" />
+		<property name="resourcePoolCacheService" ref="resourcePoolCacheService" />
+	</bean>
+	<bean id="ipRelease" class="com.neusoft.mid.cloong.ip.IPRelease">
+		<property name="common" ref="privateWebServiceClientFactory" />
+		<property name="timeout">
+			<value>${requestTimeout}</value>
+		</property>
+	</bean>
+
+</beans>

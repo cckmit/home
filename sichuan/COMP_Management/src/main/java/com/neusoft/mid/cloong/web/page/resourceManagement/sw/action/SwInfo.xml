@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="SwInfo">
+	<typeAlias alias="swInfo" type="com.neusoft.mid.cloong.web.page.resourceManagement.info.SwInfo" />
+	<typeAlias alias="swIfInfo" type="com.neusoft.mid.cloong.web.page.resourceManagement.info.SwIfInfo" />
+	
+	<!-- 查询交换机列表 -->
+	<select id="querySwInfos" parameterClass="swInfo" resultClass="swInfo">
+		SELECT  P.SWITCH_ID switchId,
+				P.SWITCH_NAME switchName,
+				P.SWITCH_TYPE switchType,
+				P.VENDOR_NAME vendorName,
+				P.SWITCH_IP switchIp,
+				P.CUR_STATUS curStatus,
+				DATE_FORMAT(
+					P.UPDATE_TIME,
+					'%Y-%m-%d %H:%i:%s'
+				) updateTime
+		  FROM  COMP_RM_SWITCH_T P
+		  WHERE 1=1
+		<dynamic prepend="">
+			<isNotEmpty prepend="and" property="switchId">
+				upper(SWITCH_ID) like
+				upper(CONCAT('%',trim(#switchId#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="switchName">
+				upper(SWITCH_NAME) like
+				upper(CONCAT('%',trim(#switchName#),'%'))
+			</isNotEmpty>
+		</dynamic>
+		ORDER BY updateTime DESC
+	</select>
+	
+	<!-- 查询交换机列表 数目-->
+	<select id="countQuerySw" parameterClass="swInfo" resultClass="java.lang.Integer">
+		SELECT  count(*)
+		  FROM  COMP_RM_SWITCH_T P
+		  WHERE 1=1
+		<dynamic prepend="">
+			<isNotEmpty prepend="and" property="switchId">
+				upper(SWITCH_ID) like
+				upper(CONCAT('%',trim(#switchId#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="switchName">
+				upper(SWITCH_NAME) like
+				upper(CONCAT('%',trim(#switchName#),'%'))
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<!-- 查看交换机详情 -->
+	<select id="querySwInfo" parameterClass="swInfo" resultClass="swInfo">
+		SELECT  P.SWITCH_ID switchId,
+				P.SWITCH_NAME switchName,
+				P.SWITCH_TYPE switchType,
+				P.SW_VERSION swVersion,
+				P.VENDOR_NAME vendorName,
+				P.SWITCH_IP switchIp,
+				P.CUR_STATUS curStatus,
+				P.SWITCH_SERIALNUM switchSerialnum,
+				P.ASSET_ORIGIN_TYPE assetOriginType,
+				P.ASSET_SLA_TYPE assetSlaType,
+				P.ASSET_STATE assetState,
+				R.RES_POOL_NAME resPoolName,
+				DATE_FORMAT(
+					P.UPDATE_TIME,
+					'%Y-%m-%d %H:%i:%s'
+				) updateTime
+		 FROM  COMP_RM_SWITCH_T P
+				LEFT JOIN COMP_RES_POOL_T R ON P.RES_POOL_ID = R.RES_POOL_ID
+		  <dynamic prepend="WHERE">
+			<isNotEmpty prepend="" property="switchId">
+				P.SWITCH_ID = #switchId#
+			</isNotEmpty>
+			<isEmpty prepend="" property="switchId">
+				1=1
+				ORDER BY updateTime DESC
+			</isEmpty>
+		  </dynamic>
+	</select>
+	
+	<!-- 查询交换机端口列表 -->
+	<select id="querySwIfInfos" parameterClass="swIfInfo" resultClass="swIfInfo">
+		SELECT  P.SWITCH_IF_ID switchIfId,
+				P.SWITCH_IF_NAME switchIfName,
+				P.IF_STATUS ifStatus,
+				P.IF_TYPE ifType,
+				P.IF_SPEED ifSpeed,
+				V.SWITCH_NAME switchName,
+				DATE_FORMAT(
+					P.UPDATE_TIME,
+					'%Y-%m-%d %H:%i:%s'
+				) updateTime
+		  FROM  COMP_RM_SWITCH_IF_T P
+		  LEFT JOIN COMP_RM_SWITCH_T V ON V.SWITCH_ID = P.SWITCH_ID
+		  WHERE 1=1
+		<dynamic prepend="">
+			<isNotEmpty prepend="and" property="switchId">
+			    P.SWITCH_ID = #switchId#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="switchName">
+				upper(SWITCH_NAME) like
+				upper(CONCAT('%',trim(#switchName#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="switchIfId">
+				upper(SWITCH_IF_ID) like
+				upper(CONCAT('%',trim(#switchIfId#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="switchName">
+				upper(SWITCH_IF_NAME) like
+				upper(CONCAT('%',trim(#switchName#),'%'))
+			</isNotEmpty>
+		</dynamic>
+		ORDER BY updateTime DESC
+	</select>
+	
+	<!-- 查询交换机端口列表 数目-->
+	<select id="countQuerySwIf" parameterClass="swIfInfo" resultClass="java.lang.Integer">
+		SELECT  count(*)
+		  FROM  COMP_RM_SWITCH_IF_T P
+		  LEFT JOIN COMP_RM_SWITCH_T V ON V.SWITCH_ID = P.SWITCH_ID
+		  WHERE 1=1
+		<dynamic prepend="">
+			<isNotEmpty prepend="and" property="switchId">
+			    P.SWITCH_ID = #switchId#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="switchName">
+				upper(SWITCH_NAME) like
+				upper(CONCAT('%',trim(#switchName#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="switchIfId">
+				upper(SWITCH_IF_ID) like
+				upper(CONCAT('%',trim(#switchIfId#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="switchName">
+				upper(SWITCH_IF_NAME) like
+				upper(CONCAT('%',trim(#switchName#),'%'))
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<!-- 查看交换机端口详情 -->
+	<select id="querySwIfInfo" parameterClass="swIfInfo" resultClass="swIfInfo">
+		SELECT  P.SWITCH_IF_ID switchIfId,
+				P.SWITCH_IF_NAME switchIfName,
+				P.IF_DESCRIPTION ifDescription,
+				P.IF_STATUS ifStatus,
+				P.IF_TYPE ifType,
+				P.IF_SET_MAC_ADDR ifSetMacAddr,
+				P.IF_REAL_MAC_ADDR ifRealMacAddr,
+				P.IF_CONNECT_EQP_IP ifConnectEqpIp,
+				P.VLAN_ID vlanId,
+				P.IF_SPEED ifSpeed,
+				P.DEST_IF_ID destIfId,
+				R.RES_POOL_NAME resPoolName,
+				P.SWITCH_ID switchId,
+				V.SWITCH_NAME switchName,
+				DATE_FORMAT(
+					P.UPDATE_TIME,
+					'%Y-%m-%d %H:%i:%s'
+				) updateTime
+		 FROM  COMP_RM_SWITCH_IF_T P
+		 LEFT JOIN COMP_RES_POOL_T R ON P.RES_POOL_ID = R.RES_POOL_ID
+		 LEFT JOIN COMP_RM_SWITCH_T V ON V.SWITCH_ID = P.SWITCH_ID
+		  <dynamic prepend="WHERE">
+			<isNotEmpty prepend="" property="switchIfId">
+				P.SWITCH_IF_ID = #switchIfId#
+			</isNotEmpty>
+			<isEmpty prepend="" property="switchIfId">
+				1=1
+				ORDER BY updateTime DESC
+			</isEmpty>
+		  </dynamic>
+	</select>
+	
+</sqlMap>

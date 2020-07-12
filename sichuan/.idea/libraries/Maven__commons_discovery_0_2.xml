@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: commons:discovery:0.2">
+    <CLASSES>
+      <root url="jar://D:/repository/commons/discovery/0.2/discovery-0.2.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://D:/repository/commons/discovery/0.2/discovery-0.2-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://D:/repository/commons/discovery/0.2/discovery-0.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

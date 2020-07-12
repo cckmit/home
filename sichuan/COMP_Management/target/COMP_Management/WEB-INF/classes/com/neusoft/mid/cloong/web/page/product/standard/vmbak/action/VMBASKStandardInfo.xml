@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="VMBAKStandardInfo">
+	<typeAlias alias="VMBAKStandardInfo"
+		type="com.neusoft.mid.cloong.web.page.product.standard.vmbak.info.VMBAKStandardInfo" />
+	<typeAlias alias="StandardResListInfo"
+		type="com.neusoft.mid.cloong.web.page.product.standard.vm.info.StandardResListInfo" />
+		
+	<select id="queryVMBAKStandardCount" resultClass="java.lang.Integer"
+		parameterClass="StandardQueryPara">
+		SELECT COUNT(*)
+		FROM
+		COMP_STANDARD_VMBAK_T where status
+		='0'
+		<isNotEmpty property="standardName" prepend="and">
+			upper(standard_name)
+			like upper(CONCAT('%',trim(#standardName#),'%'))
+		</isNotEmpty>
+		<isNotEmpty property="standardId" prepend="and">
+			standard_Id = #standardId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="startTime">
+			create_time
+			>=#startTime#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="endTime">
+			create_time
+			&lt;=#endTime#
+		</isNotEmpty>
+		order by update_time desc
+	</select>
+	<select id="queryVMBAKStandardList" resultClass="VMBAKStandardInfo"
+		parameterClass="StandardQueryPara">
+		SELECT
+		standard_name standardName,
+		standard_Id
+		standardId,
+        space_size
+        spaceSize,
+		create_time
+		createTime,
+		create_user createUser
+		FROM
+		COMP_STANDARD_VMBAK_T where
+		status
+		='0'
+		<isNotEmpty property="standardName" prepend="and">
+			upper(standard_name)
+			like upper(CONCAT('%',trim(#standardName#),'%'))
+		</isNotEmpty>
+		<isNotEmpty property="standardId" prepend="and">
+			standard_Id = #standardId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="startTime">
+			create_time
+			>=#startTime#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="endTime">
+			create_time
+			&lt;=#endTime#
+		</isNotEmpty>
+		order by update_time desc
+	</select>
+	<insert id="createVMBAKStandard" parameterClass="VMBAKStandardInfo">
+		insert into
+		COMP_STANDARD_VMBAK_T
+		(STANDARD_ID ,
+		STANDARD_NAME,
+		SPACE_SIZE ,
+		DESCRIPTION ,
+		STATUS ,
+		CREATE_TIME ,
+		CREATE_USER ,
+		UPDATE_TIME ,
+		UPDATE_USER )
+		values
+		(#standardId#,
+		#standardName#,
+		#spaceSize#,
+		#description#,
+		'0',
+		#createTime#,
+		#createUser#,
+		#updateTime#,
+		#updateUser#
+		)
+	</insert>
+	<select id="queryVMBAKStandardDetail" parameterClass="java.util.HashMap"
+		resultClass="VMBAKStandardInfo">
+		select STANDARD_ID standardId,STANDARD_NAME standardName,SPACE_SIZE
+		spaceSize,DESCRIPTION description,CREATE_TIME createTime,CREATE_USER createUser from COMP_STANDARD_VMBAK_T
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="and" property="standardId">
+				STANDARD_ID=#standardId#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="status">
+				status= #status#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+	<update id="updateVMBAKStandard" parameterClass="VMBAKStandardInfo">
+		update
+		COMP_STANDARD_VMBAK_T set
+		STANDARD_NAME=#standardName#,SPACE_SIZE=#spaceSize#,DESCRIPTION=#description#,UPDATE_TIME=#updateTime#,UPDATE_USER=#updateUser#
+		where STANDARD_ID=#standardId# and STATUS='0'
+	</update>
+
+	<!-- 删除虚拟机备份规格 -->
+	<update id="deleteVMBAKStandard" parameterClass="java.lang.String">
+		update
+		COMP_STANDARD_VMBAK_T set STATUS='1' where STANDARD_ID=#standardId#
+		and STATUS='0'
+	</update>
+
+	<!-- 查询虚拟备份规格同步资源视图 -->
+	<select id="queryVMBAKStandResList" resultClass="StandardResListInfo">
+		SELECT
+		standard_id standardId,
+		standard_name standardName,
+		res_pool_id resPoolId,
+		res_pool_name resPoolName,
+		res_pool_part_id resPoolPartId,
+		res_pool_part_name resPoolPartName,
+		status status,
+		resStatus resStatus
+		FROM COMP_VMBAK_STANDARD_RES_V
+		WHERE standard_id=#standardId#
+		AND resStatus!='0'
+		ORDER BY res_pool_id,res_pool_part_id
+	</select>
+	
+	<select id="queryInsertVMBAKSynData" resultClass="StandardResListInfo">
+			SELECT
+			standard_id standardId,
+			res_pool_id resPoolId,
+			res_pool_part_id resPoolPartId
+			FROM 
+			comp_vmbak_standard_res_v 
+			WHERE 
+			standard_Id=#standardId# 
+			AND(
+			<iterate property="resourcePoolInfos" conjunction="OR">
+				(res_pool_id
+				=#resourcePoolInfos[].resourcePoolId# and res_pool_part_id=
+				#resourcePoolInfos[].resourcePoolPart#)
+			</iterate>
+			)
+			AND flage='0'
+	</select>
+	
+	<!-- 虚拟机备份条目关联规格查询 -->
+	<select id="queryVMBAKStandardInfo" resultClass="VMBAKStandardInfo"
+		parameterClass="VMBAKStandardInfo">
+		SELECT
+		standard_Id standardId,
+		standard_Name standardName,
+		space_size
+        spaceSize,
+		description description,
+		create_time createTime,
+		create_user createUser,
+		update_time updateTime,
+		update_user updateUser,
+		(select count(*) from comp_item_t b where b.standard_Id =
+		a.standard_Id) as useStatus
+		FROM
+		COMP_STANDARD_VMBAK_T a
+		WHERE
+		(SELECT
+		COUNT(*) FROM COMP_STANDARD_SYN_T c WHERE c.standard_Id=a.standard_Id
+		AND STATUS='2')>0
+		AND status = '0'
+		<isNotEmpty prepend="AND" property="spaceSize">
+			<isNotEqual compareValue="0" property="spaceSize">
+				space_size=#spaceSize#
+			</isNotEqual>
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="useStatus">
+			<isEqual compareValue="1" property="useStatus">
+				(select count(*) from
+				comp_item_t b where b.standard_Id = a.standard_Id) > 0 
+			</isEqual>
+			<isEqual compareValue="0" property="useStatus">
+				(select count(*) from
+				comp_item_t b where b.standard_Id = a.standard_Id) = 0 
+			</isEqual>
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="standardId">
+			a.standard_Id =
+			#standardId#
+		</isNotEmpty>
+		<isNotEmpty property="standardName" prepend="and">
+			standard_name like CONCAT('%',trim(#standardName#),'%')
+		</isNotEmpty>
+	</select>
+</sqlMap>

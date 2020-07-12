@@ -1,0 +1,597 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="RealTimePerformance">
+<typeAlias alias="realTime" type="com.neusoft.mid.cloong.web.page.console.host.vm.info.RealTimePerformance" />
+	<sql id="performanceBaseCol">
+		SELECT DATE_ADD( NOW(), INTERVAL -23 HOUR) TIME FROM DUAL
+		UNION ALL
+		SELECT DATE_ADD( NOW(), INTERVAL -22 HOUR) TIME FROM DUAL
+		UNION ALL
+		SELECT DATE_ADD( NOW(), INTERVAL -21 HOUR) TIME FROM DUAL
+		UNION ALL
+		SELECT DATE_ADD( NOW(), INTERVAL -20 HOUR) TIME FROM DUAL
+		UNION ALL
+		SELECT DATE_ADD( NOW(), INTERVAL -19 HOUR) TIME FROM DUAL
+		UNION ALL
+		SELECT DATE_ADD( NOW(), INTERVAL -18 HOUR) TIME FROM DUAL
+		UNION ALL
+		SELECT DATE_ADD( NOW(), INTERVAL -17 HOUR) TIME FROM DUAL
+		UNION ALL
+		SELECT DATE_ADD( NOW(), INTERVAL -16 HOUR) TIME FROM DUAL
+		UNION ALL
+		SELECT DATE_ADD( NOW(), INTERVAL -15 HOUR) TIME FROM DUAL
+		UNION ALL
+		SELECT DATE_ADD( NOW(), INTERVAL -14 HOUR) TIME FROM DUAL
+		UNION ALL
+		SELECT DATE_ADD( NOW(), INTERVAL -13 HOUR) TIME FROM DUAL
+		UNION ALL
+		SELECT DATE_ADD( NOW(), INTERVAL -12 HOUR) TIME FROM DUAL
+		UNION ALL
+		SELECT DATE_ADD( NOW(), INTERVAL -11 HOUR) TIME FROM DUAL
+		UNION ALL
+		SELECT DATE_ADD( NOW(), INTERVAL -10 HOUR) TIME FROM DUAL
+		UNION ALL
+		SELECT DATE_ADD( NOW(), INTERVAL -9 HOUR) TIME FROM DUAL
+		UNION ALL
+		SELECT DATE_ADD( NOW(), INTERVAL -8 HOUR) TIME FROM DUAL
+		UNION ALL
+		SELECT DATE_ADD( NOW(), INTERVAL -7 HOUR) TIME FROM DUAL
+		UNION ALL
+		SELECT DATE_ADD( NOW(), INTERVAL -6 HOUR) TIME FROM DUAL
+		UNION ALL
+		SELECT DATE_ADD( NOW(), INTERVAL -5 HOUR) TIME FROM DUAL
+		UNION ALL
+		SELECT DATE_ADD( NOW(), INTERVAL -4 HOUR) TIME FROM DUAL
+		UNION ALL
+		SELECT DATE_ADD( NOW(), INTERVAL -3 HOUR) TIME FROM DUAL
+		UNION ALL
+		SELECT DATE_ADD( NOW(), INTERVAL -2 HOUR) TIME FROM DUAL
+		UNION ALL
+		SELECT DATE_ADD( NOW(), INTERVAL -1 HOUR) TIME FROM DUAL
+		UNION ALL
+		SELECT NOW() TIME FROM DUAL
+	</sql>
+	
+	<!-- 虚拟机名称 -->
+	<select id="getVmName" resultClass="String">
+		 SELECT VM_NAME VMNAME
+		   FROM COMP_RM_VM_T 
+		  WHERE VM_ID = #deviceId#
+	</select>
+	
+	<!-- 物理机名称 -->
+	<select id="getPmName" resultClass="String">
+		 SELECT PM_NAME PMNAME
+		   FROM COMP_RM_PM_T 
+		  WHERE PM_ID = #deviceId#
+	</select>
+	
+	<!-- 小型机名称 -->
+	<select id="getMiniPmName" resultClass="String">
+		  SELECT MINIPM_NAME MINIPMNAME
+		   FROM COMP_RM_MINIPM_T 
+		  WHERE MINIPM_ID = #deviceId#
+	</select>
+	
+	<!-- 小型机分区名称 -->
+	<select id="getMiniPmParName" resultClass="String">
+		SELECT MINIPMPAR_NAME MINIPMNAME
+		   FROM COMP_RM_MINIPMPAR_T 
+		  WHERE MINIPMPAR_ID = #deviceId#
+	</select>
+	
+	<!-- 没有数据时，横坐标时间点 -->
+	<select id="getAllPoint" resultClass="realTime">
+	      SELECT NULL USEDPER,
+	      		DATE_FORMAT(TIME,'%Y') YEAR,
+				DATE_FORMAT(TIME,'%m') MONTH,
+				DATE_FORMAT(TIME,'%d') DAY,
+				DATE_FORMAT(TIME,'%H') HOUR,
+				'00' MINUTE,
+				'00' SECOND
+			FROM ( <include refid="performanceBaseCol"/> ) T
+		ORDER BY TIME
+	</select>
+	
+	<!-- 查询坐标起始点，结束点 -->
+	<select id="getMinMaxTime"  resultClass="realTime">
+		SELECT DATE_FORMAT(MINTIME,'%Y') MINYEAR,
+				DATE_FORMAT(MINTIME,'%m') MINMONTH,
+				DATE_FORMAT(MINTIME,'%d') MINDAY,
+				DATE_FORMAT(MINTIME,'%H') MINHOUR,
+				DATE_FORMAT(NOW(),'%Y') MAXYEAR,
+				DATE_FORMAT(NOW(),'%m') MAXMONTH,
+				DATE_FORMAT(NOW(),'%d') MAXDAY,
+				DATE_FORMAT(NOW(),'%H') MAXHOUR
+		FROM( SELECT DATE_ADD( NOW(), INTERVAL -24 HOUR) MINTIME FROM DUAL ) T;
+	</select>
+	
+	<!-- Cpu实时性能报表-->
+    <select id="getCpuUsedPerVm" resultClass="realTime">
+	      SELECT CPU_PROCESSOR_UTILIZATION USEDPER,CREATE_TIME CREATETIME,
+	      		DATE_FORMAT(CREATE_TIME,'%Y') YEAR,
+				DATE_FORMAT(CREATE_TIME,'%m') MONTH,
+				DATE_FORMAT(CREATE_TIME,'%d') DAY,
+				DATE_FORMAT(CREATE_TIME,'%H') HOUR,
+				DATE_FORMAT(CREATE_TIME,'%i') MINUTE,
+				DATE_FORMAT(CREATE_TIME,'%s') SECOND
+			FROM COMP_STA_VM_RT_T 
+		   WHERE CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+			 AND CPU_PROCESSOR_UTILIZATION !=''
+			 AND VM_ID=#deviceId#
+		ORDER BY CREATETIME
+	</select>
+	 
+	<select id="getCpuUsedPerPm" resultClass="realTime">
+	      SELECT CPU_PROCESSOR_UTILIZATION USEDPER,CREATE_TIME CREATETIME,
+	            DATE_FORMAT(CREATE_TIME,'%Y') YEAR,
+				DATE_FORMAT(CREATE_TIME,'%m') MONTH,
+				DATE_FORMAT(CREATE_TIME,'%d') DAY,
+				DATE_FORMAT(CREATE_TIME,'%H') HOUR,
+				DATE_FORMAT(CREATE_TIME,'%i') MINUTE,
+				DATE_FORMAT(CREATE_TIME,'%s') SECOND
+			FROM COMP_STA_PM_RT_T 
+		   WHERE CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+			 AND CPU_PROCESSOR_UTILIZATION !=''
+			 AND PM_ID=#deviceId#
+		ORDER BY CREATE_TIME
+	</select>
+	
+	<select id="getCpuUsedPerMiniPm" resultClass="realTime">
+	      SELECT CPU_PROCESSOR_UTILIZATION USEDPER,CREATE_TIME CREATETIME,
+	            DATE_FORMAT(CREATE_TIME,'%Y') YEAR,
+				DATE_FORMAT(CREATE_TIME,'%m') MONTH,
+				DATE_FORMAT(CREATE_TIME,'%d') DAY,
+				DATE_FORMAT(CREATE_TIME,'%H') HOUR,
+				DATE_FORMAT(CREATE_TIME,'%i') MINUTE,
+				DATE_FORMAT(CREATE_TIME,'%s') SECOND
+			FROM COMP_STA_MINIPM_RT_T 
+		   WHERE CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+			 AND CPU_PROCESSOR_UTILIZATION !=''
+			 AND MINIPM_ID=#deviceId#
+		ORDER BY CREATE_TIME
+	</select>
+	
+	<select id="getCpuUsedPerMiniPmPar" resultClass="realTime">
+	      SELECT CPU_PROCESSOR_UTILIZATION USEDPER,CREATE_TIME CREATETIME,
+	      		DATE_FORMAT(CREATE_TIME,'%Y') YEAR,
+				DATE_FORMAT(CREATE_TIME,'%m') MONTH,
+				DATE_FORMAT(CREATE_TIME,'%d') DAY,
+				DATE_FORMAT(CREATE_TIME,'%H') HOUR,
+				DATE_FORMAT(CREATE_TIME,'%i') MINUTE,
+				DATE_FORMAT(CREATE_TIME,'%s') SECOND
+			FROM COMP_STA_MINIPMPAR_RT_T 
+		   WHERE CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+			 AND CPU_PROCESSOR_UTILIZATION !=''
+			 AND MINIPMPAR_ID=#deviceId#
+		ORDER BY CREATETIME
+	</select>
+	
+	<!-- 内存实时性能报表-->
+    <select id="getMemUsedPerVm" resultClass="realTime">
+	      SELECT MEM_USED_PER USEDPER,CREATE_TIME CREATETIME,
+	            DATE_FORMAT(CREATE_TIME,'%Y') YEAR,
+				DATE_FORMAT(CREATE_TIME,'%m') MONTH,
+				DATE_FORMAT(CREATE_TIME,'%d') DAY,
+				DATE_FORMAT(CREATE_TIME,'%H') HOUR,
+				DATE_FORMAT(CREATE_TIME,'%i') MINUTE,
+				DATE_FORMAT(CREATE_TIME,'%s') SECOND
+			FROM COMP_STA_VM_RT_T 
+		   WHERE CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+			 AND MEM_USED_PER !=''
+			 AND VM_ID=#deviceId#
+		ORDER BY CREATE_TIME
+	</select>
+	
+	<select id="getMemUsedPerPm" resultClass="realTime">
+	      SELECT MEM_USED_PER USEDPER,CREATE_TIME CREATETIME,
+	            DATE_FORMAT(CREATE_TIME,'%Y') YEAR,
+				DATE_FORMAT(CREATE_TIME,'%m') MONTH,
+				DATE_FORMAT(CREATE_TIME,'%d') DAY,
+				DATE_FORMAT(CREATE_TIME,'%H') HOUR,
+				DATE_FORMAT(CREATE_TIME,'%i') MINUTE,
+				DATE_FORMAT(CREATE_TIME,'%s') SECOND
+			FROM COMP_STA_PM_RT_T 
+		   WHERE CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+			 AND MEM_USED_PER !=''
+			 AND PM_ID=#deviceId#
+		ORDER BY CREATE_TIME
+	</select>
+	
+	<select id="getMemUsedPerMiniPm" resultClass="realTime">
+	      SELECT MEM_USED_PER USEDPER,CREATE_TIME CREATETIME,
+	            DATE_FORMAT(CREATE_TIME,'%Y') YEAR,
+				DATE_FORMAT(CREATE_TIME,'%m') MONTH,
+				DATE_FORMAT(CREATE_TIME,'%d') DAY,
+				DATE_FORMAT(CREATE_TIME,'%H') HOUR,
+				DATE_FORMAT(CREATE_TIME,'%i') MINUTE,
+				DATE_FORMAT(CREATE_TIME,'%s') SECOND
+			FROM COMP_STA_MINIPM_RT_T 
+		   WHERE CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+			 AND MEM_USED_PER !=''
+			 AND MINIPM_ID=#deviceId#
+		ORDER BY CREATE_TIME
+	</select>
+	
+	 <select id="getMemUsedPerMiniPmPar" resultClass="realTime">
+	      SELECT MEM_USED_PER USEDPER,CREATE_TIME CREATETIME,
+	            DATE_FORMAT(CREATE_TIME,'%Y') YEAR,
+				DATE_FORMAT(CREATE_TIME,'%m') MONTH,
+				DATE_FORMAT(CREATE_TIME,'%d') DAY,
+				DATE_FORMAT(CREATE_TIME,'%H') HOUR,
+				DATE_FORMAT(CREATE_TIME,'%i') MINUTE,
+				DATE_FORMAT(CREATE_TIME,'%s') SECOND
+			FROM COMP_STA_MINIPMPAR_RT_T 
+		   WHERE CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+			 AND MEM_USED_PER !=''
+			 AND MINIPMPAR_ID=#deviceId#
+		ORDER BY CREATE_TIME
+	</select>
+	
+	<!-- CPU实时信息 -->
+	<select id="getCpuVm" resultClass="realTime">
+		 SELECT CPU_PROCESSOR_UTILIZATION USEDPER,
+				CPU_SYS_TIME cpuSysTime,
+				CPU_USER_TIME cpuUserTime,
+				CPU_IDLE_TIME cpuIdleTime,
+				CREATE_TIME CREATETIME,
+	            DATE_FORMAT(CREATE_TIME,'%Y') YEAR,
+				DATE_FORMAT(CREATE_TIME,'%m') MONTH,
+				DATE_FORMAT(CREATE_TIME,'%d') DAY,
+				DATE_FORMAT(CREATE_TIME,'%H') HOUR,
+				DATE_FORMAT(CREATE_TIME,'%i') MINUTE,
+				DATE_FORMAT(CREATE_TIME,'%s') SECOND
+		   FROM COMP_STA_VM_RT_T T,(SELECT MAX(CREATE_TIME) TIME 
+		   							  FROM COMP_STA_VM_RT_T 
+		   							 WHERE CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+		   							   AND CPU_PROCESSOR_UTILIZATION !=''
+									   AND VM_ID = #deviceId#) A 
+		  WHERE T.CREATE_TIME = A.TIME
+		    AND VM_ID = #deviceId#
+	</select>
+	
+	<select id="getCpuPm" resultClass="realTime">
+		 SELECT CPU_PROCESSOR_UTILIZATION USEDPER,
+				CPU_SYS_TIME cpuSysTime,
+				CPU_USER_TIME cpuUserTime,
+				CPU_IDLE_TIME cpuIdleTime,
+				CREATE_TIME CREATETIME,
+	            DATE_FORMAT(CREATE_TIME,'%Y') YEAR,
+				DATE_FORMAT(CREATE_TIME,'%m') MONTH,
+				DATE_FORMAT(CREATE_TIME,'%d') DAY,
+				DATE_FORMAT(CREATE_TIME,'%H') HOUR,
+				DATE_FORMAT(CREATE_TIME,'%i') MINUTE,
+				DATE_FORMAT(CREATE_TIME,'%s') SECOND
+		   FROM COMP_STA_PM_RT_T T,(SELECT MAX(CREATE_TIME) TIME 
+		   							  FROM COMP_STA_PM_RT_T 
+		   							 WHERE CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+		   							   AND CPU_PROCESSOR_UTILIZATION !=''
+									   AND PM_ID = #deviceId#) A 
+		  WHERE T.CREATE_TIME = A.TIME
+		    AND PM_ID = #deviceId#
+	</select>
+	
+	<select id="getCpuMiniPm" resultClass="realTime">
+		 SELECT CPU_PROCESSOR_UTILIZATION USEDPER,
+				CPU_SYS_TIME cpuSysTime,
+				CPU_USER_TIME cpuUserTime,
+				CPU_IDLE_TIME cpuIdleTime,
+				CREATE_TIME CREATETIME,
+	            DATE_FORMAT(CREATE_TIME,'%Y') YEAR,
+				DATE_FORMAT(CREATE_TIME,'%m') MONTH,
+				DATE_FORMAT(CREATE_TIME,'%d') DAY,
+				DATE_FORMAT(CREATE_TIME,'%H') HOUR,
+				DATE_FORMAT(CREATE_TIME,'%i') MINUTE,
+				DATE_FORMAT(CREATE_TIME,'%s') SECOND
+		   FROM COMP_STA_MINIPM_RT_T T,(SELECT MAX(CREATE_TIME) TIME 
+		   							  FROM COMP_STA_MINIPM_RT_T 
+		   							 WHERE CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+		   							   AND CPU_PROCESSOR_UTILIZATION !=''
+									   AND MINIPM_ID = #deviceId#) A 
+		  WHERE T.CREATE_TIME = A.TIME
+		    AND MINIPM_ID = #deviceId#
+	</select>
+	
+	<select id="getCpuMiniPmPar" resultClass="realTime">
+		 SELECT CPU_PROCESSOR_UTILIZATION USEDPER,
+				CPU_SYS_TIME cpuSysTime,
+				CPU_USER_TIME cpuUserTime,
+				CPU_IDLE_TIME cpuIdleTime,
+				CREATE_TIME CREATETIME,
+	            DATE_FORMAT(CREATE_TIME,'%Y') YEAR,
+				DATE_FORMAT(CREATE_TIME,'%m') MONTH,
+				DATE_FORMAT(CREATE_TIME,'%d') DAY,
+				DATE_FORMAT(CREATE_TIME,'%H') HOUR,
+				DATE_FORMAT(CREATE_TIME,'%i') MINUTE,
+				DATE_FORMAT(CREATE_TIME,'%s') SECOND
+		   FROM COMP_STA_MINIPMPAR_RT_T T,(SELECT MAX(CREATE_TIME) TIME 
+		   							  FROM COMP_STA_MINIPMPAR_RT_T 
+		   							 WHERE CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+		   							   AND CPU_PROCESSOR_UTILIZATION !=''
+									   AND MINIPMPAR_ID = #deviceId#) A 
+		  WHERE T.CREATE_TIME = A.TIME
+		    AND MINIPMPAR_ID = #deviceId#
+	</select>
+	
+	<!-- 内存实时信息 -->
+	<select id="getMemVm" resultClass="realTime">
+		 SELECT MEM_USED_PER USEDPER,
+				SYS_MEM_USED_PER sysMemUsedPer,
+				USER_MEM_USED_PER userMemUsedPer,
+				FORMAT(MEM_FREE/(1024*1024),2) memFree,
+				DISK_USED_PER diskUsedPer,
+				CREATE_TIME CREATETIME,
+	            DATE_FORMAT(CREATE_TIME,'%Y') YEAR,
+				DATE_FORMAT(CREATE_TIME,'%m') MONTH,
+				DATE_FORMAT(CREATE_TIME,'%d') DAY,
+				DATE_FORMAT(CREATE_TIME,'%H') HOUR,
+				DATE_FORMAT(CREATE_TIME,'%i') MINUTE,
+				DATE_FORMAT(CREATE_TIME,'%s') SECOND
+		   FROM COMP_STA_VM_RT_T T,(SELECT MAX(CREATE_TIME) TIME 
+		   							  FROM COMP_STA_VM_RT_T 
+		   							 WHERE CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+		   							   AND MEM_USED_PER !=''
+									   AND VM_ID = #deviceId#) A 
+		  WHERE T.CREATE_TIME = A.TIME
+		    AND VM_ID = #deviceId#
+	</select>
+	
+	<select id="getMemPm" resultClass="realTime">
+		 SELECT MEM_USED_PER USEDPER,
+				SYS_MEM_USED_PER sysMemUsedPer,
+				USER_MEM_USED_PER userMemUsedPer,
+				FORMAT(MEM_FREE/(1024*1024),2) memFree,
+				DISK_USED_PER diskUsedPer,
+				CREATE_TIME CREATETIME,
+	            DATE_FORMAT(CREATE_TIME,'%Y') YEAR,
+				DATE_FORMAT(CREATE_TIME,'%m') MONTH,
+				DATE_FORMAT(CREATE_TIME,'%d') DAY,
+				DATE_FORMAT(CREATE_TIME,'%H') HOUR,
+				DATE_FORMAT(CREATE_TIME,'%i') MINUTE,
+				DATE_FORMAT(CREATE_TIME,'%s') SECOND
+		   FROM COMP_STA_PM_RT_T T,(SELECT MAX(CREATE_TIME) TIME 
+		   							  FROM COMP_STA_PM_RT_T 
+		   							 WHERE CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+		   							   AND MEM_USED_PER !=''
+									   AND PM_ID = #deviceId#) A 
+		  WHERE T.CREATE_TIME = A.TIME
+		    AND PM_ID = #deviceId#
+	</select>
+	
+	<select id="getMemMiniPm" resultClass="realTime">
+		 SELECT MEM_USED_PER USEDPER,
+				SYS_MEM_USED_PER sysMemUsedPer,
+				USER_MEM_USED_PER userMemUsedPer,
+				FORMAT(MEM_FREE/(1024*1024),2) memFree,
+				DISK_USED_PER diskUsedPer,
+				CREATE_TIME CREATETIME,
+	            DATE_FORMAT(CREATE_TIME,'%Y') YEAR,
+				DATE_FORMAT(CREATE_TIME,'%m') MONTH,
+				DATE_FORMAT(CREATE_TIME,'%d') DAY,
+				DATE_FORMAT(CREATE_TIME,'%H') HOUR,
+				DATE_FORMAT(CREATE_TIME,'%i') MINUTE,
+				DATE_FORMAT(CREATE_TIME,'%s') SECOND
+		   FROM COMP_STA_MINIPM_RT_T T,(SELECT MAX(CREATE_TIME) TIME 
+		   							  FROM COMP_STA_MINIPM_RT_T 
+		   							 WHERE CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+		   							   AND MEM_USED_PER !=''
+									   AND MINIPM_ID = #deviceId#) A 
+		  WHERE T.CREATE_TIME = A.TIME
+		    AND MINIPM_ID = #deviceId#
+	</select>
+	
+	<select id="getMemMiniPmPar" resultClass="realTime">
+		 SELECT MEM_USED_PER USEDPER,
+				SYS_MEM_USED_PER sysMemUsedPer,
+				USER_MEM_USED_PER userMemUsedPer,
+				FORMAT(MEM_FREE/(1024*1024),2) memFree,
+				DISK_USED_PER diskUsedPer,
+				CREATE_TIME CREATETIME,
+	            DATE_FORMAT(CREATE_TIME,'%Y') YEAR,
+				DATE_FORMAT(CREATE_TIME,'%m') MONTH,
+				DATE_FORMAT(CREATE_TIME,'%d') DAY,
+				DATE_FORMAT(CREATE_TIME,'%H') HOUR,
+				DATE_FORMAT(CREATE_TIME,'%i') MINUTE,
+				DATE_FORMAT(CREATE_TIME,'%s') SECOND
+		   FROM COMP_STA_MINIPMPAR_RT_T T,(SELECT MAX(CREATE_TIME) TIME 
+		   							  FROM COMP_STA_MINIPMPAR_RT_T 
+		   							 WHERE CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+		   							   AND MEM_USED_PER !=''
+									   AND MINIPMPAR_ID = #deviceId#) A 
+		  WHERE T.CREATE_TIME = A.TIME
+		    AND MINIPMPAR_ID = #deviceId#
+	</select>
+	
+	<!-- 查询最大坐标  -->
+	<select id="getMaxVm" resultClass="realTime">
+		 SELECT MAX(DISK_READ+0) MAXREAD, MAX(DISK_WRITE+0) MAXWRITE
+		   FROM COMP_STA_VM_DISK_RT_T
+		  WHERE CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+		    AND VM_ID = #deviceId#
+	</select>
+	
+	<select id="getMaxPm" resultClass="realTime">
+		 SELECT MAX(DISK_READ+0) MAXREAD, MAX(DISK_WRITE+0) MAXWRITE
+		   FROM COMP_STA_PM_DISK_RT_T
+		  WHERE CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+		    AND PM_ID = #deviceId#
+	</select>
+	
+	<!-- 查询磁盘ID -->
+	<select id="getDiskIdListVm"  resultClass="realTime">
+		SELECT DISTINCT DISK_ID DISKID,DISK_NAME DISKNAME, VM_ID DEVICEID
+		FROM COMP_STA_VM_DISK_RT_T 
+	   WHERE CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+		 AND VM_ID=#deviceId#
+	</select>
+	
+	<select id="getDiskIdListPm"  resultClass="realTime">
+		SELECT DISTINCT DISK_ID DISKID,DISK_NAME DISKNAME, PM_ID DEVICEID
+		FROM COMP_STA_PM_DISK_RT_T 
+	   WHERE CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+		 AND PM_ID=#deviceId#
+	</select>
+	
+	<!-- 磁盘实时性能报表 -->
+    <select id="getDiskReadVm" resultClass="realTime">
+      SELECT DISK_READ USEDPER,CREATE_TIME CREATETIME,
+            DATE_FORMAT(CREATE_TIME,'%Y') YEAR,
+			DATE_FORMAT(CREATE_TIME,'%m') MONTH,
+			DATE_FORMAT(CREATE_TIME,'%d') DAY,
+			DATE_FORMAT(CREATE_TIME,'%H') HOUR,
+			DATE_FORMAT(CREATE_TIME,'%i') MINUTE,
+			DATE_FORMAT(CREATE_TIME,'%s') SECOND
+		FROM COMP_STA_VM_DISK_RT_T 
+	   WHERE CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+		 AND DISK_READ !=''
+		 AND VM_ID=#deviceId#
+		 AND DISK_ID = #diskId#
+		ORDER BY CREATETIME
+	</select>
+	
+	<select id="getDiskWriteVm" resultClass="realTime">
+      SELECT DISK_WRITE USEDPER,CREATE_TIME CREATETIME,
+            DATE_FORMAT(CREATE_TIME,'%Y') YEAR,
+			DATE_FORMAT(CREATE_TIME,'%m') MONTH,
+			DATE_FORMAT(CREATE_TIME,'%d') DAY,
+			DATE_FORMAT(CREATE_TIME,'%H') HOUR,
+			DATE_FORMAT(CREATE_TIME,'%i') MINUTE,
+			DATE_FORMAT(CREATE_TIME,'%s') SECOND
+		FROM COMP_STA_VM_DISK_RT_T 
+	   WHERE CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+		 AND DISK_READ !=''
+		 AND VM_ID=#deviceId#
+		 AND DISK_ID = #diskId#
+		ORDER BY CREATETIME
+	</select>
+	
+	<select id="getDiskReadPm" resultClass="realTime">
+      SELECT DISK_READ USEDPER,CREATE_TIME CREATETIME,
+            DATE_FORMAT(CREATE_TIME,'%Y') YEAR,
+			DATE_FORMAT(CREATE_TIME,'%m') MONTH,
+			DATE_FORMAT(CREATE_TIME,'%d') DAY,
+			DATE_FORMAT(CREATE_TIME,'%H') HOUR,
+			DATE_FORMAT(CREATE_TIME,'%i') MINUTE,
+			DATE_FORMAT(CREATE_TIME,'%s') SECOND
+		FROM COMP_STA_PM_DISK_RT_T 
+	   WHERE CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+		 AND DISK_READ !=''
+		 AND PM_ID=#deviceId#
+		 AND DISK_ID = #diskId#
+		ORDER BY CREATETIME
+	</select>
+	
+	<select id="getDiskWritePm" resultClass="realTime">
+      SELECT DISK_WRITE USEDPER,CREATE_TIME CREATETIME,
+            DATE_FORMAT(CREATE_TIME,'%Y') YEAR,
+			DATE_FORMAT(CREATE_TIME,'%m') MONTH,
+			DATE_FORMAT(CREATE_TIME,'%d') DAY,
+			DATE_FORMAT(CREATE_TIME,'%H') HOUR,
+			DATE_FORMAT(CREATE_TIME,'%i') MINUTE,
+			DATE_FORMAT(CREATE_TIME,'%s') SECOND
+		FROM COMP_STA_PM_DISK_RT_T 
+	   WHERE CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+		 AND DISK_READ !=''
+		 AND PM_ID=#deviceId#
+		 AND DISK_ID = #diskId#
+		ORDER BY CREATETIME
+	</select>
+	
+	<!-- 磁盘实时信息 -->
+	<select id="getMaxPerVm" resultClass="String">
+		 SELECT DISK_USED_PER USEDPER
+		   FROM COMP_STA_VM_RT_T T,(SELECT MAX(CREATE_TIME) TIME 
+		   							  FROM COMP_STA_VM_RT_T 
+		   							 WHERE CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+		   							   AND DISK_USED_PER !=''
+									   AND VM_ID = #deviceId#) A 
+		  WHERE T.CREATE_TIME = A.TIME
+		    AND VM_ID = #deviceId#
+	</select>
+	
+	<select id="getMaxPerPm" resultClass="String">
+		 SELECT DISK_USED_PER USEDPER
+		   FROM COMP_STA_PM_RT_T T,(SELECT MAX(CREATE_TIME) TIME 
+		   							  FROM COMP_STA_PM_RT_T 
+		   							 WHERE CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+		   							   AND DISK_USED_PER !=''
+									   AND PM_ID = #deviceId#) A 
+		  WHERE T.CREATE_TIME = A.TIME
+		    AND PM_ID = #deviceId#
+	</select>
+	
+	<select id="getRealTimeReadVm" resultClass="realTime">
+		 SELECT distinct
+				CREATE_TIME CREATETIME,
+	            DATE_FORMAT(CREATE_TIME,'%Y') YEAR,
+				DATE_FORMAT(CREATE_TIME,'%m') MONTH,
+				DATE_FORMAT(CREATE_TIME,'%d') DAY,
+				DATE_FORMAT(CREATE_TIME,'%H') HOUR,
+				DATE_FORMAT(CREATE_TIME,'%i') MINUTE,
+				DATE_FORMAT(CREATE_TIME,'%s') SECOND
+		   FROM COMP_STA_VM_DISK_RT_T T,(SELECT MAX(CREATE_TIME) TIME 
+		   							  FROM COMP_STA_VM_DISK_RT_T 
+		   							 WHERE CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+		   							   AND DISK_READ !=''
+									   AND VM_ID = #deviceId#) A 
+		  WHERE T.CREATE_TIME = A.TIME
+		    AND VM_ID = #deviceId#
+	</select>
+	
+	<select id="getRealTimeWriteVm" resultClass="realTime">
+		 SELECT distinct
+				CREATE_TIME CREATETIME,
+	            DATE_FORMAT(CREATE_TIME,'%Y') YEAR,
+				DATE_FORMAT(CREATE_TIME,'%m') MONTH,
+				DATE_FORMAT(CREATE_TIME,'%d') DAY,
+				DATE_FORMAT(CREATE_TIME,'%H') HOUR,
+				DATE_FORMAT(CREATE_TIME,'%i') MINUTE,
+				DATE_FORMAT(CREATE_TIME,'%s') SECOND
+		   FROM COMP_STA_VM_DISK_RT_T T,(SELECT MAX(CREATE_TIME) TIME 
+		   							  FROM COMP_STA_VM_DISK_RT_T 
+		   							 WHERE CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+		   							   AND DISK_WRITE !=''
+									   AND VM_ID = #deviceId#) A 
+		  WHERE T.CREATE_TIME = A.TIME
+		    AND VM_ID = #deviceId#
+	</select>
+	
+	<select id="getRealTimeReadPm" resultClass="realTime">
+		 SELECT distinct
+				CREATE_TIME CREATETIME,
+	            DATE_FORMAT(CREATE_TIME,'%Y') YEAR,
+				DATE_FORMAT(CREATE_TIME,'%m') MONTH,
+				DATE_FORMAT(CREATE_TIME,'%d') DAY,
+				DATE_FORMAT(CREATE_TIME,'%H') HOUR,
+				DATE_FORMAT(CREATE_TIME,'%i') MINUTE,
+				DATE_FORMAT(CREATE_TIME,'%s') SECOND
+		   FROM COMP_STA_PM_DISK_RT_T T,(SELECT MAX(CREATE_TIME) TIME 
+		   							  FROM COMP_STA_PM_DISK_RT_T 
+		   							 WHERE CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+		   							   AND DISK_READ !=''
+									   AND PM_ID = #deviceId#) A 
+		  WHERE T.CREATE_TIME = A.TIME
+		    AND PM_ID = #deviceId#
+	</select>
+	
+	<select id="getRealTimeWritePm" resultClass="realTime">
+		 SELECT distinct
+				CREATE_TIME CREATETIME,
+	            DATE_FORMAT(CREATE_TIME,'%Y') YEAR,
+				DATE_FORMAT(CREATE_TIME,'%m') MONTH,
+				DATE_FORMAT(CREATE_TIME,'%d') DAY,
+				DATE_FORMAT(CREATE_TIME,'%H') HOUR,
+				DATE_FORMAT(CREATE_TIME,'%i') MINUTE,
+				DATE_FORMAT(CREATE_TIME,'%s') SECOND
+		   FROM COMP_STA_PM_DISK_RT_T T,(SELECT MAX(CREATE_TIME) TIME 
+		   							  FROM COMP_STA_PM_DISK_RT_T 
+		   							 WHERE CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+		   							   AND DISK_WRITE !=''
+									   AND PM_ID = #deviceId#) A 
+		  WHERE T.CREATE_TIME = A.TIME
+		    AND PM_ID = #deviceId#
+	</select>
+</sqlMap>

@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="fileStore">
+	<typeAlias alias="fs"
+		type="com.neusoft.mid.cloong.web.page.console.fileStore.info.FileStoreInfo" />
+	<typeAlias alias="fsInstance"
+		type="com.neusoft.mid.cloong.web.page.fileStore.order.info.FileStoreInstanceInfo" />
+	<typeAlias alias="OrderInfo"
+		type="com.neusoft.mid.cloong.web.page.host.vm.order.info.OrderInfo" />
+	<typeAlias alias="fsCreateFail"
+		type="com.neusoft.mid.cloong.fileStore.core.FSCreateFail" />
+	<typeAlias alias="fsDelFail"
+		type="com.neusoft.mid.cloong.fileStore.core.FSDelFail" />
+
+	<!-- fileStore list -->
+	<select id="getFsList" parameterClass="fs" resultClass="fs">
+		SELECT
+		t.CASE_ID AS caseId,
+		t.FS_NAME AS fsName,
+		t.FS_ID AS fsId,
+		t.FS_QUOTASIZE AS fsQuotaSize,
+		t.FS_SHARETYPE AS fsShareType,
+		t.FS_TEMPLATE_ID AS fsTemplateId,
+		t.FS_URL AS fsUrl,
+		t.FS_ADMIN_USER AS
+		fsAdminUser,
+		t.FS_ADMIN_PASSWORD AS fsAdminPassword,
+		t.`STATUS` AS
+		STATUS,
+		t.ORDER_ID AS orderId,
+		t.APP_ID AS appId,
+		app.APP_NAME AS
+		appName,
+		t.RES_POOL_ID AS resPoolId,
+		pool.RES_POOL_NAME AS resPoolName,
+		t.RES_POOL_PART_ID AS resPoolPartId,
+		part.RES_POOL_PART_NAME AS
+		resPoolPartName,
+		t.DESCRIPTION AS description,
+		t.CREATE_TIME AS
+		createTime,
+		t.CREATE_USER AS createUser,
+		t.UPDATE_TIME AS updateTime,
+		t.UPDATE_USER AS updateUser
+		FROM
+		`comp_case_fs_t` t
+		LEFT JOIN
+		comp_app_t
+		app ON t.APP_ID = app.APP_ID
+		LEFT JOIN comp_res_pool_t pool ON
+		t.RES_POOL_ID =
+		pool.RES_POOL_ID
+		LEFT JOIN comp_res_pool_part_t part on
+		t.RES_POOL_PART_ID
+		=part.RES_POOL_PART_ID WHERE t.`STATUS` not in ('4')
+		<isNotEmpty prepend="and" property="appIdList">
+			t.APP_ID in
+			<iterate property="appIdList" conjunction="," close=")" open="(">
+				#appIdList[]#
+			</iterate>
+		</isNotEmpty>
+		ORDER BY t.CASE_ID DESC
+	</select>
+
+	<!-- fileStore数量 -->
+	<select id="getFsCount" parameterClass="fs" resultClass="java.lang.Integer">
+		SELECT
+		count(*)
+		FROM
+		`comp_case_fs_t` t
+		LEFT JOIN
+		comp_app_t app ON
+		t.APP_ID =
+		app.APP_ID
+		LEFT JOIN comp_res_pool_t pool ON t.RES_POOL_ID =
+		pool.RES_POOL_ID
+		LEFT JOIN comp_res_pool_part_t part on
+		t.RES_POOL_PART_ID
+		=part.RES_POOL_PART_ID WHERE t.`STATUS` not in ('4')
+		<isNotEmpty prepend="and" property="appIdList">
+			t.APP_ID in
+			<iterate property="appIdList" conjunction="," close=")" open="(">
+				#appIdList[]#
+			</iterate>
+		</isNotEmpty>
+	</select>
+
+	<select id="getFsDetail" parameterClass="fs" resultClass="fs">
+		SELECT
+		t.CASE_ID AS caseId,
+		t.FS_NAME AS fsName,
+		t.FS_ID AS fsId,
+		t.FS_QUOTASIZE AS fsQuotaSize,
+		t.FS_SHARETYPE AS fsShareType,
+		t.FS_TEMPLATE_ID AS fsTemplateId,
+		t.FS_URL AS fsUrl,
+		t.FS_ADMIN_USER AS
+		fsAdminUser,
+		t.FS_ADMIN_PASSWORD AS fsAdminPassword,
+		t.`STATUS` AS
+		STATUS,
+		t.ORDER_ID AS orderId,
+		t.APP_ID AS appId,
+		app.APP_NAME AS
+		appName,
+		t.RES_POOL_ID AS resPoolId,
+		pool.RES_POOL_NAME AS resPoolName,
+		t.RES_POOL_PART_ID AS resPoolPartId,
+		part.RES_POOL_PART_NAME AS
+		resPoolPartName,
+		t.DESCRIPTION AS description,
+		t.CREATE_TIME AS
+		createTime,
+		t.CREATE_USER AS createUser,
+		t.UPDATE_TIME AS updateTime,
+		t.UPDATE_USER AS updateUser
+		FROM
+		`comp_case_fs_t` t
+		LEFT JOIN
+		comp_app_t
+		app ON t.APP_ID = app.APP_ID
+		LEFT JOIN comp_res_pool_t pool ON
+		t.RES_POOL_ID =
+		pool.RES_POOL_ID
+		LEFT JOIN comp_res_pool_part_t part on
+		t.RES_POOL_PART_ID
+		=part.RES_POOL_PART_ID
+		where t.CASE_ID=#caseId#
+	</select>
+
+	<select id="getFsDetailByFsId" parameterClass="java.lang.String"
+		resultClass="fs">
+		SELECT
+		t.CASE_ID AS caseId,
+		t.FS_NAME AS fsName,
+		t.FS_ID AS
+		fsId,
+		t.FS_QUOTASIZE AS fsQuotaSize,
+		t.FS_SHARETYPE AS fsShareType,
+		t.FS_TEMPLATE_ID AS fsTemplateId,
+		t.FS_URL AS fsUrl,
+		t.FS_ADMIN_USER AS
+		fsAdminUser,
+		t.FS_ADMIN_PASSWORD AS fsAdminPassword,
+		t.`STATUS` AS
+		STATUS,
+		t.ORDER_ID AS orderId,
+		t.APP_ID AS appId,
+		app.APP_NAME AS
+		appName,
+		t.RES_POOL_ID AS resPoolId,
+		pool.RES_POOL_NAME AS resPoolName,
+		t.RES_POOL_PART_ID AS resPoolPartId,
+		part.RES_POOL_PART_NAME AS
+		resPoolPartName,
+		t.DESCRIPTION AS description,
+		t.CREATE_TIME AS
+		createTime,
+		t.CREATE_USER AS createUser,
+		t.UPDATE_TIME AS updateTime,
+		t.UPDATE_USER AS updateUser
+		FROM
+		`comp_case_fs_t` t
+		LEFT JOIN
+		comp_app_t
+		app ON t.APP_ID = app.APP_ID
+		LEFT JOIN comp_res_pool_t pool ON
+		t.RES_POOL_ID =
+		pool.RES_POOL_ID
+		LEFT JOIN comp_res_pool_part_t part on
+		t.RES_POOL_PART_ID
+		=part.RES_POOL_PART_ID
+		where t.FS_ID=#fsId#
+	</select>
+
+
+	<insert id="createFsOrder" parameterClass="OrderInfo">
+		insert into
+		COMP_ORDER_T(ORDER_ID,
+		STATUS,
+		EFFECTIVE_TIME,
+		EXPIRE_TIME,
+		LENGTH_TIME,
+		LENGTH_UNIT,
+		CREATE_TIME,
+		CREATE_USER,
+		UPDATE_TIME,
+		UPDATE_USER,
+		CASE_TYPE,
+		PARENT_ID,
+		CASE_ID,
+		APP_ID,
+		RES_POOL_ID
+		)
+		values
+		(#orderId#,#status#,#effectiveTime#,#expireTime#,#lengthTime#,#lengthUnit#,#createTime#,#createUser#,#updateTime#,#updateUser#,#caseType#,#parentId#,#caseId#,#appId#,#resPoolId#)
+	</insert>
+
+	<insert id="createFsInstanceInfo" parameterClass="fsInstance">
+		INSERT INTO
+		`comp_case_fs_t` (
+		`CASE_ID`,
+		`FS_ID`,
+		`FS_NAME`,
+		`ORDER_ID`,
+		`APP_ID`,
+		`RES_POOL_ID`,
+		`RES_POOL_PART_ID`,
+		`CREATE_TYPE`,
+		`FS_TEMPLATE_ID`,
+		`FS_QUOTASIZE`,
+		`FS_SHARETYPE`,
+		`FS_ADMIN_USER`,
+		`FS_ADMIN_PASSWORD`,
+		`FS_URL`,
+		`CREATE_TIME`,
+		`CREATE_USER`,
+		`STATUS`,
+		`DESCRIPTION`,
+		`UPDATE_TIME`,
+		`UPDATE_USER`
+		)
+		VALUES
+		(
+		#caseId#,
+		#fsId#,
+		#fsName#,
+		#orderId#,
+		#appId#,
+		#resPoolId#,
+		#resPoolPartId#,
+		#createType#,
+		#fsTemplateId#,
+		#fsQuotaSize#,
+		#fsShareType#,
+		#fsAdminUser#,
+		#fsAdminPassword#,
+		#fsUrl#,
+		#createTime#,
+		#createUser#,
+		#status#,
+		#description#,
+		#updateTime#,
+		#updateUser#
+		)
+
+	</insert>
+
+	<update id="deleteFs" parameterClass="java.lang.String">
+		update
+		comp_case_fs_t set
+		STATUS='4' where FS_ID=#fsId#
+	</update>
+
+	<insert id="insertFSCreateFail" parameterClass="fsCreateFail">
+		INSERT INTO
+		`comp_fs_create_fail_t` (
+		`FAIL_CAUSE`,
+		`FAIL_CODE`,
+		`SERIAL_NUM`,
+		`RES_POOL_ID`,
+		`RES_POOL_PART_ID`,
+		`APP_ID`,
+		`FS_NAME`,
+		`CREATE_TIME`,
+		`NUM`
+		)
+		VALUES
+		(
+		#failCause#,
+		#failCode#,
+		#serialNum#,
+		#resPoolId#,
+		#resPoolPartId#,
+		#appId#,
+		#fsName#,
+		#createTime#,
+		#num#
+		)
+	</insert>
+
+	<insert id="insertFSDelFail" parameterClass="fsDelFail">
+		INSERT INTO
+		`comp_fs_del_fail_t` (
+		`FAIL_CAUSE`,
+		`FAIL_CODE`,
+		`SERIAL_NUM`,
+		`RES_POOL_ID`,
+		`RES_POOL_PART_ID`,
+		`APP_ID`,
+		`FS_ID`,
+		`CREATE_TIME`
+		)
+		VALUES
+		(
+		#failCause#,
+		#failCode#,
+		#serialNum#,
+		#resPoolId#,
+		#resPoolPartId#,
+		#appId#,
+		#fsId#,
+		#createTime#
+		)
+	</insert>
+</sqlMap>

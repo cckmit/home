@@ -1,0 +1,2160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
+    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+	<!-- 鉴权拦截器 -->
+	<bean id="authenticateInterceptor"
+		class="com.neusoft.mid.cloong.web.authority.auth.AuthenticateInterceptor">
+		<property name="requestReferer" value="${httpReferer.value}"></property>	
+		<property name="requestHost" value="${httpHost.value}"></property>	
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<bean id="loginAction" class="com.neusoft.mid.cloong.web.login.LoginAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<bean id="dymanicCodeLoginAction" class="com.neusoft.mid.cloong.web.login.DymanicCodeLoginAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<bean id="dymanicCodeAction" class="com.neusoft.mid.cloong.web.login.DymanicCodeAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<bean id="logoutAction" class="com.neusoft.mid.cloong.web.login.LogoutAction"
+		scope="prototype">
+	</bean>
+	<bean id="registerAction" class="com.neusoft.mid.cloong.web.login.RegisterAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<!-- 注册 （密保方式）验证用户账号唯一 -->
+	<bean id="registerValidateUserIdAction"
+		class="com.neusoft.mid.cloong.web.login.RegisterValidateUserIdAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<!-- 注册 ，用户绑定业务 -->
+	<bean id="queryAppListAction"
+		class="com.neusoft.mid.cloong.web.app.action.QueryAppListAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+
+	<!-- 找回密码时验证用户名是否存在. 2015-02-28 -->
+	<bean id="findPasswordValidateUserIdAction"
+		class="com.neusoft.mid.cloong.web.login.FindPasswordValidateUserIdAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+	<!--找回密码 验证验证码是否正确 2015-02-28 -->
+	<bean id="findPasswordValidateVerifyAction"
+		class="com.neusoft.mid.cloong.web.login.FindPasswordValidateVerifyAction"
+		scope="prototype"></bean>
+
+	<!--找回密码 查询用户密保问题？ 2015-03-02 -->
+	<bean id="findPasswordQueryUserQuestionAction"
+		class="com.neusoft.mid.cloong.web.login.FindPasswordQueryUserQuestionAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+	<!-- 找回密码 修改密码信息 2015-03-02 -->
+	<bean id="ResetUserPasswordAction"
+		class="com.neusoft.mid.cloong.web.login.ResetUserPasswordAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+
+
+	<bean id="forgetPasswordAction" class="com.neusoft.mid.cloong.web.login.ForgetPasswordAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="forgetPasswordService">
+			<ref bean="forgetPasswordService" />
+		</property>
+	</bean>
+	<bean id="shortMessageConfirmAction"
+		class="com.neusoft.mid.cloong.web.login.ShortMessageConfirmAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<bean id="emailConfirmAction" class="com.neusoft.mid.cloong.web.login.EmailConfirmAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<bean id="resetPasswordAction" class="com.neusoft.mid.cloong.web.login.ResetPasswordAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<bean id="vmDetailAction"
+		class="com.neusoft.mid.cloong.web.page.console.host.vm.VMDetailInfoAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="resPoolManagementUrl" value="${resPool.management.url}"></property>
+		<property name="vncUrl" value="${vncUrl}" />
+	</bean>
+
+	<!-- 修改虚拟机配置信息 -->
+	<bean id="vmUpdateAction"
+		class="com.neusoft.mid.cloong.web.page.console.host.vm.VMUpdateAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="audit" value="${audit}">
+		</property>
+		<property name="vmModify">
+			<ref bean="vmModify" />
+		</property>
+		<property name="gen">
+			<ref bean="sequenceGenerator" />
+		</property>
+		<property name="vmStatusService">
+			<ref bean="vmStatusService" />
+		</property>
+	</bean>
+	<bean id="vmModify" class="com.neusoft.mid.cloong.host.vm.impl.VMModifyImpl">
+		<property name="receiveTimeout">
+			<value>${receiveTimeout}</value>
+		</property>
+		<property name="httpTimeOut">
+			<value>${httpTimeOut}</value>
+		</property>
+		<property name="url">
+			<value>${resourcePoolProxyModifyVMUrl}
+			</value>
+		</property>
+		<property name="senderEntry" ref="senderEntry"></property>
+	</bean>
+	<bean id="vmStateQueryAction"
+		class="com.neusoft.mid.cloong.web.page.console.host.vm.VMStateQueryAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="vmStatusService">
+			<ref bean="vmStatusService" />
+		</property>
+	</bean>
+	<bean id="vmDescUpdateAction"
+		class="com.neusoft.mid.cloong.web.page.console.host.vm.VMDescUpdateAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<bean id="vmNameUpdateAction"
+		class="com.neusoft.mid.cloong.web.page.console.host.vm.VMNameUpdateAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<bean id="exceptionIntercepor" class="com.neusoft.mid.cloong.web.ExceptionInterceporAction"
+		scope="prototype">
+	</bean>
+	<!-- 资源管理概览 虚拟机 -->
+	<bean id="vmListForOverviewAction"
+		class="com.neusoft.mid.cloong.web.page.console.host.vm.VMQueryListAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="pageFlag" value="1" />
+	</bean>
+
+	<!-- 资源管理概览 物理机 -->
+	<bean id="pmListForOverviewAction"
+		class="com.neusoft.mid.cloong.web.page.console.host.pm.PMQueryListAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="pageFlag" value="1" />
+	</bean>
+	<!-- 虚拟机浏览 -->
+	<bean id="vmQueryListAction"
+		class="com.neusoft.mid.cloong.web.page.console.host.vm.VMQueryListAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="syncFlage" value="1" />
+	</bean>
+	<bean id="vmQueryListStateAction"
+		class="com.neusoft.mid.cloong.web.page.console.host.vm.VMQueryListStateAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<bean id="vmSearchStateAction"
+		class="com.neusoft.mid.cloong.web.page.console.host.vm.VMSearchStateAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="queryVMState">
+			<ref bean="queryVMState" />
+		</property>
+		<property name="vmStatusService">
+			<ref bean="vmStatusService" />
+		</property>
+	</bean>
+	<bean id="queryVMState" class="com.neusoft.mid.cloong.host.vm.impl.QueryVMStateImpl">
+		<property name="receiveTimeout">
+			<value>${receiveTimeout}</value>
+		</property>
+		<property name="httpTimeOut">
+			<value>${httpTimeOut}</value>
+		</property>
+		<property name="queryVMStateUrl">
+			<value>${resourcePoolProxyQueryVMStateUrl}
+			</value>
+		</property>
+		<property name="senderEntry" ref="senderEntry"></property>
+	</bean>
+	<!-- 虚拟机查询 -->
+	<bean id="VmQueryJsonAction"
+		class="com.neusoft.mid.cloong.web.page.console.host.vm.VMQueryListAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy" />
+	</bean>
+
+	<!-- 物理机查询 -->
+	<bean id="PmQueryJsonAction"
+		class="com.neusoft.mid.cloong.web.page.console.host.pm.PMQueryListAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy" />
+	</bean>
+
+	<!-- 虚拟机详情 查询vlan列表 -->
+	<bean id="VlanQueryJsonAction"
+		class="com.neusoft.mid.cloong.web.page.console.vlan.VLANQueryJsonAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy" />
+	</bean>
+
+	<!-- 虚拟机详情 查询备份ID -->
+	<bean id="vmBakQueryJsonAction"
+		class="com.neusoft.mid.cloong.web.page.console.vmbak.VmBakQueryJsonAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<!-- 备份状态界面定时查询 -->
+	<bean id="vmBakQueryListStateAction"
+		class="com.neusoft.mid.cloong.web.page.console.vmbak.VmBakQueryListStateAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="vmBakStatusQuery">
+			<ref bean="vmBakStatusQuery" />
+		</property>
+	</bean>
+	<bean id="ebsQueryListStateAction"
+		class="com.neusoft.mid.cloong.web.page.console.disk.EBSQueryListStateAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<bean id="vmManager" class="com.neusoft.mid.cloong.host.vm.impl.VMManagerImpl">
+		<property name="receiveTimeout">
+			<value>${receiveTimeout}</value>
+		</property>
+		<property name="httpTimeOut">
+			<value>${httpTimeOut}</value>
+		</property>
+		<property name="url">
+			<value>${resourcePoolProxyOperatorUrl}
+			</value>
+		</property>
+		<property name="senderEntry" ref="senderEntry"></property>
+	</bean>
+
+
+	<!-- 业务视图相关逻辑类START -->
+
+
+	<bean id="businessMenuInterceptor"
+		class="com.neusoft.mid.cloong.web.page.console.business.Interceptor.BusinessMenuInterceptor">
+		<property name="service">
+			<ref bean="queryBusinessListService" />
+		</property>
+	</bean>
+	<bean id="businessBaseService"
+		class="com.neusoft.mid.cloong.web.page.console.business.service.BusinessBaseService"
+		abstract="true">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+	<bean id="queryBusinessListService"
+		class="com.neusoft.mid.cloong.web.page.console.business.service.QueryBusinessService"
+		parent="businessBaseService">
+	</bean>
+	<bean id="queryResourceListService"
+		class="com.neusoft.mid.cloong.web.page.console.business.service.QueryResourceService"
+		parent="businessBaseService">
+	</bean>
+	<bean id="businessListAction"
+		class="com.neusoft.mid.cloong.web.page.console.business.QueryBusinessListAction"
+		scope="prototype">
+		<property name="service" ref="queryBusinessListService"></property>
+	</bean>
+	<!-- 业务视图查询主机 --> <!-- 业务视图查询概况 -->
+	<bean id="queryResourcesListAction"
+		class="com.neusoft.mid.cloong.web.page.console.business.QueryResourcesListAction"
+		scope="prototype">
+		<property name="service" ref="queryResourceListService"></property>
+	</bean>
+	<bean id="queryEBSListAction"
+		class="com.neusoft.mid.cloong.web.page.console.business.QueryEBSListAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+	<bean id="queryVlanListAction"
+		class="com.neusoft.mid.cloong.web.page.console.business.QueryVlanListAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+	
+	<bean id="queryVlanListAction3Phase"
+		class="com.neusoft.mid.cloong.web.page.console.business.QueryVlanList3PhaseAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+	
+	<!-- 虚拟机性能统计-初始化数据 -->
+	<bean id="vmPerformanceList"
+		class="com.neusoft.mid.cloong.web.page.console.business.VmPerformanceListAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+		<property name="syncFlage" value="1" />
+	</bean>
+	
+	<!-- 虚拟机性能统计-查询数据 -->
+	<bean id="vmPerformanceQueryList"
+		class="com.neusoft.mid.cloong.web.page.console.business.VmPerformanceListAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+	
+	<!-- 虚拟机性能统计-导出统计数据 -->
+	<bean id="vmPerformanceReport"
+		class="com.neusoft.mid.cloong.web.page.console.business.VmPerformanceReportAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	
+	<bean id="querylbListAction"
+		class="com.neusoft.mid.cloong.web.page.console.business.QuerylbListAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+	<bean id="queryIpSegmentListAction"
+		class="com.neusoft.mid.cloong.web.page.console.business.QueryIpSegmentListAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+	<bean id="resourceApplyBusinessConsoleAction"
+		class="com.neusoft.mid.cloong.web.page.console.business.ResourceApplyAction"
+		scope="prototype">
+	</bean>
+	<bean id="diskDetailBusinessConsoleAction"
+		class="com.neusoft.mid.cloong.web.page.console.business.DiskDetailAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy" />
+	</bean>
+	<bean id="vmDetailBusinessConsoleAction"
+		class="com.neusoft.mid.cloong.web.page.console.business.VMDetailInfoAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy" />
+		<property name="resPoolManagementUrl" value="${resPool.management.url}"></property>
+		<property name="vncUrl" value="${vncUrl}" />
+	</bean>
+	<bean id="pmDetailBusinessConsoleAction"
+		class="com.neusoft.mid.cloong.web.page.console.business.PMDetailInfoAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy" />
+	</bean>
+	<bean id="vmApplyInfoBusinessConsoleAction"
+		class="com.neusoft.mid.cloong.web.page.host.vm.order.VMApplyInfoAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="sequenceGenerator">
+			<ref bean="sequenceGenerator" />
+		</property>
+		<property name="vmStatusService">
+			<ref bean="vmStatusService" />
+		</property>
+		<property name="vmCreate">
+			<ref bean="vmCreate" />
+		</property>
+		<property name="audit" value="${audit}">
+		</property>
+		<property name="powerNum" value="${powerNum}">
+		</property>
+	</bean>
+	<bean id="pmApplyInfoActionBusinessConsoleAction"
+		class="com.neusoft.mid.cloong.web.page.host.pm.order.PMApplyInfoAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="sequenceGenerator">
+			<ref bean="sequenceGenerator" />
+		</property>
+		<property name="pmStatusService">
+			<ref bean="pmStatusService" />
+		</property>
+		<property name="pmCreate">
+			<ref bean="pmCreate" />
+		</property>
+		<property name="audit" value="${audit}">
+		</property>
+		<property name="pmStatusQuery" value="${pmStatusQuery}"></property>
+	</bean>
+
+
+	<!-- 业务视图相关逻辑类END -->
+
+
+	<bean id="vmCreate" class="com.neusoft.mid.cloong.host.vm.impl.VMCreateImpl">
+		<property name="receiveTimeout">
+			<value>${receiveTimeout}</value>
+		</property>
+		<property name="httpTimeOut">
+			<value>${httpTimeOut}</value>
+		</property>
+		<property name="url">
+			<value>${resourcePoolProxyCreateVMUrl}
+			</value>
+		</property>
+		<property name="senderEntry" ref="senderEntry"></property>
+	</bean>
+
+	<bean id="senderEntry"
+		class="com.neusoft.mid.grains.modules.http.api.HttpSyncSendHelper">
+	</bean>
+	<bean id="vmDelAction"
+		class="com.neusoft.mid.cloong.web.page.console.host.vm.VMDelAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="vmDel">
+			<ref bean="vmDel" />
+		</property>
+		<property name="vmStatusService">
+			<ref bean="vmStatusService" />
+		</property>
+		<property name="gen">
+			<ref bean="sequenceGenerator" />
+		</property>
+	</bean>
+	<bean id="vmDel" class="com.neusoft.mid.cloong.host.vm.impl.VMDelImpl">
+		<property name="receiveTimeout">
+			<value>${receiveTimeout}</value>
+		</property>
+		<property name="httpTimeOut">
+			<value>${httpTimeOut}</value>
+		</property>
+		<property name="url">
+			<value>${resourcePoolProxyDeleteUrl}
+			</value>
+		</property>
+		<property name="senderEntry" ref="senderEntry"></property>
+	</bean>
+	<bean id="vmApplyInfoAction"
+		class="com.neusoft.mid.cloong.web.page.host.vm.order.VMApplyInfoAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="sequenceGenerator">
+			<ref bean="sequenceGenerator" />
+		</property>
+		<property name="vmStatusService">
+			<ref bean="vmStatusService" />
+		</property>
+		<property name="vmCreate">
+			<ref bean="vmCreate" />
+		</property>
+		<property name="audit" value="${audit}">
+		</property>
+		<property name="powerNum" value="${powerNum}">
+		</property>
+	</bean>
+
+	<!-- 云主机预订购 -->
+	<bean id="vmPreApplyAction"
+		class="com.neusoft.mid.cloong.web.page.host.vm.order.VMPreApplyAction"
+		scope="prototype">
+	</bean>
+
+	<!-- 虚拟机预订购 -->
+	<bean id="vmPreApplyInfoAction"
+		class="com.neusoft.mid.cloong.web.page.host.vm.order.VMPreApplyInfoAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<!-- 虚拟机预订购浏览 -->
+	<bean id="vmPreApplyQueryListAction"
+		class="com.neusoft.mid.cloong.web.page.console.host.vm.VMPreApplyQueryListAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<!-- 云主机预订购详情 -->
+	<bean id="vmPreApplyDetailAction"
+		class="com.neusoft.mid.cloong.web.page.console.host.vm.VMPreApplyDetailInfoAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<!-- 虚拟机预订购浏览 -->
+	<bean id="bossOrderListAction"
+		class="com.neusoft.mid.cloong.web.page.console.boss.order.BossOrderQueryListAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<!-- boss订单更新订购状态 -->
+	<bean id="bossOrderStatusUpdateAction"
+		class="com.neusoft.mid.cloong.web.page.console.boss.order.StatusUpdateAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<!-- 预订购云主机更新订购状态 -->
+	<bean id="vmPreApplyStatusUpdateAction"
+		class="com.neusoft.mid.cloong.web.page.console.host.vm.VMPreApplyStatusUpdateAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<!-- 预订购云主机列表查询 -->
+	<bean id="VmPreApplyQueryJsonAction"
+		class="com.neusoft.mid.cloong.web.page.console.host.vm.VMPreApplyQueryListAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy" />
+	</bean>
+
+	<!-- bossOrder列表查询 -->
+	<bean id="bossOrderQueryJsonAction"
+		class="com.neusoft.mid.cloong.web.page.console.boss.order.BossOrderQueryListAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy" />
+	</bean>
+
+	<!-- boss订购详情 -->
+	<bean id="bossOrderDetailAction"
+		class="com.neusoft.mid.cloong.web.page.console.boss.order.BossOrderDetailInfoAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<!-- 预订购云硬盘列表 -->
+	<bean id="queryPreApplyEBSListAction"
+		class="com.neusoft.mid.cloong.web.page.console.disk.QueryPreApplyEBSListAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+
+	<!-- 预订购云硬盘详情 -->
+	<bean id="DiskPreApplyDetailAction"
+		class="com.neusoft.mid.cloong.web.page.console.disk.DiskPreApplyDetailAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy" />
+	</bean>
+
+	<!-- 预订购云硬盘 -->
+	<bean id="ebsPreApplyAction"
+		class="com.neusoft.mid.cloong.web.page.ebs.order.EBSPreApplyAction"
+		scope="prototype">
+	</bean>
+
+	<!-- 预订购云硬盘列表查询 -->
+	<bean id="EbsPreApplyQueryJsonAction"
+		class="com.neusoft.mid.cloong.web.page.console.disk.QueryPreApplyEBSListAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy" />
+	</bean>
+
+	<!-- 预订购云硬盘更新订购状态 -->
+	<bean id="ebsPreApplyStatusUpdateAction"
+		class="com.neusoft.mid.cloong.web.page.console.disk.EbsPreApplyStatusUpdateAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<!-- 预订购云硬盘提交 -->
+	<bean id="ebsPreApplyInfoAction"
+		class="com.neusoft.mid.cloong.web.page.ebs.order.EBSPreApplyInfoAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<!-- 克隆虚拟机接口实现 -->
+	<bean id="vmGhost" class="com.neusoft.mid.cloong.host.vm.impl.VmGhostImpl">
+		<property name="receiveTimeout" value="${receiveTimeout}" />
+		<property name="httpTimeOut" value="${httpTimeOut}" />
+		<property name="url" value="${resourcePoolProxyGhostVmUrl}" />
+		<property name="senderEntry" ref="senderEntry"></property>
+	</bean>
+	<!-- 克隆虚拟机Action -->
+	<bean id="vmGhostInfoAction"
+		class="com.neusoft.mid.cloong.web.page.host.vm.order.VmGhostInfoAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="sequenceGenerator">
+			<ref bean="sequenceGenerator" />
+		</property>
+		<property name="vmStatusService">
+			<ref bean="vmStatusService" />
+		</property>
+		<property name="vmGhost">
+			<ref bean="vmGhost" />
+		</property>
+		<property name="audit" value="${audit}">
+		</property>
+	</bean>
+
+	<bean id="sequenceGenerator" class="com.neusoft.mid.cloong.common.util.SequenceGenerator">
+	</bean>
+
+	<bean id="vmOnloadResPoolAction"
+		class="com.neusoft.mid.cloong.web.page.host.vm.order.VMOnloadResPoolAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<bean id="vmOnloadResAppAction"
+		class="com.neusoft.mid.cloong.web.page.host.vm.order.VMOnloadResAppAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<bean id="vmOnloadIpsegmentAction"
+		class="com.neusoft.mid.cloong.web.page.host.vm.order.VMOnloadIpsegmentAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<bean id="vmOnloadPrivateIpAction"
+		class="com.neusoft.mid.cloong.web.page.host.vm.order.VMOnloadPrivateIpAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<bean id="vmOnloadOsAction"
+		class="com.neusoft.mid.cloong.web.page.host.vm.order.VMOnloadOsAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<bean id="vmCheckGatewayAction"
+		class="com.neusoft.mid.cloong.web.page.host.vm.order.vmCheckGatewayAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<bean id="queryLogicVlanAndIp"
+		class="com.neusoft.mid.cloong.host.vm.impl.QueryLogicVlanAndIpImpl">
+		<property name="receiveTimeout">
+			<value>${receiveTimeout}</value>
+		</property>
+		<property name="httpTimeOut">
+			<value>${httpTimeOut}</value>
+		</property>
+		<property name="queryVlanUrl">
+			<value>${resourcePoolProxyQueryLogicVlanUrl}
+			</value>
+		</property>
+		<property name="queryIpOfVlanUrl">
+			<value>${resourcePoolProxyQueryIpOfLogicVlanUrl}
+			</value>
+		</property>
+		<property name="senderEntry" ref="senderEntry"></property>
+	</bean>
+	<bean id="vmOnloadItemAction"
+		class="com.neusoft.mid.cloong.web.page.host.vm.order.VMOnloadItemAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<bean id="hostMoreAction"
+		class="com.neusoft.mid.cloong.web.page.host.vm.order.HostMoreAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<bean id="vmApplyAction"
+		class="com.neusoft.mid.cloong.web.page.host.vm.order.VMApplyAction"
+		scope="prototype">
+	</bean>
+
+	<bean id="chargesListAction"
+		class="com.neusoft.mid.cloong.web.page.host.vm.order.ChargesListAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<bean id="vmOperatorAction"
+		class="com.neusoft.mid.cloong.web.page.console.host.vm.VMOperatorAction"
+		scope="prototype">
+		<property name="vmManager">
+			<ref bean="vmManager" />
+		</property>
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="vmStatusService">
+			<ref bean="vmStatusService" />
+		</property>
+		<property name="gen">
+			<ref bean="sequenceGenerator" />
+		</property>
+	</bean>
+	<bean id="vmStatusService" class="com.neusoft.mid.cloong.service.VMStatusService"
+		init-method="init">
+		<property name="judge">
+			<ref bean="vmJudge" />
+		</property>
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<bean id="vmJudge" class="com.neusoft.mid.cloong.service.VMJudge" />
+	<bean id="ebsQueryListAction"
+		class="com.neusoft.mid.cloong.web.page.console.disk.EBSQueryListAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<!-- PM -->
+	<bean id="pmApplyAction"
+		class="com.neusoft.mid.cloong.web.page.host.pm.order.PMApplyAction"
+		scope="prototype">
+	</bean>
+
+	<bean id="pmQueryListAction"
+		class="com.neusoft.mid.cloong.web.page.console.host.pm.PMQueryListAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="syncFlage" value="1" />
+	</bean>
+
+	<bean id="pmApplyInfoAction"
+		class="com.neusoft.mid.cloong.web.page.host.pm.order.PMApplyInfoAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="sequenceGenerator">
+			<ref bean="sequenceGenerator" />
+		</property>
+		<property name="pmStatusService">
+			<ref bean="pmStatusService" />
+		</property>
+		<property name="pmCreate">
+			<ref bean="pmCreate" />
+		</property>
+		<property name="audit" value="${audit}">
+		</property>
+		<property name="pmStatusQuery" value="${pmStatusQuery}"></property>
+	</bean>
+
+	<bean id="pmStatusService" class="com.neusoft.mid.cloong.service.PMStatusService"
+		init-method="init">
+		<property name="judge">
+			<ref bean="pmJudge" />
+		</property>
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<bean id="pmJudge" class="com.neusoft.mid.cloong.service.PMJudge" />
+	<bean id="pmCreate" class="com.neusoft.mid.cloong.host.pm.impl.PMCreateImpl">
+		<property name="receiveTimeout">
+			<value>${receiveTimeout}</value>
+		</property>
+		<property name="httpTimeOut">
+			<value>${httpTimeOut}</value>
+		</property>
+		<property name="url">
+			<value>${resourcePoolProxyCreatePMUrl}
+			</value>
+		</property>
+		<property name="senderEntry" ref="senderEntry"></property>
+	</bean>
+
+	<bean id="pmQueryListStateAction"
+		class="com.neusoft.mid.cloong.web.page.console.host.pm.PMQueryListStateAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+
+	<bean id="pmOnloadResPoolAction"
+		class="com.neusoft.mid.cloong.web.page.host.pm.order.PMOnloadResPoolAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<bean id="pmOnloadItemAction"
+		class="com.neusoft.mid.cloong.web.page.host.pm.order.PMOnloadItemAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<bean id="pmDescUpdateAction"
+		class="com.neusoft.mid.cloong.web.page.console.host.pm.PMDescUpdateAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<bean id="pmNameUpdateAction"
+		class="com.neusoft.mid.cloong.web.page.console.host.pm.PMNameUpdateAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<bean id="pmDetailAction"
+		class="com.neusoft.mid.cloong.web.page.console.host.pm.PMDetailInfoAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<bean id="pmManager" class="com.neusoft.mid.cloong.host.pm.impl.PMManagerImpl">
+		<property name="receiveTimeout">
+			<value>${receiveTimeout}</value>
+		</property>
+		<property name="httpTimeOut">
+			<value>${httpTimeOut}</value>
+		</property>
+		<property name="url">
+			<value>${resourcePoolProxyOperatorPMUrl}
+			</value>
+		</property>
+		<property name="senderEntry" ref="senderEntry"></property>
+	</bean>
+
+	<bean id="pmDelAction"
+		class="com.neusoft.mid.cloong.web.page.console.host.pm.PMDelAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="pmDel">
+			<ref bean="pmDel" />
+		</property>
+		<property name="pmStatusService">
+			<ref bean="pmStatusService" />
+		</property>
+		<property name="gen">
+			<ref bean="sequenceGenerator" />
+		</property>
+	</bean>
+	<bean id="pmDel" class="com.neusoft.mid.cloong.host.pm.impl.PMDelImpl">
+		<property name="receiveTimeout">
+			<value>${receiveTimeout}</value>
+		</property>
+		<property name="httpTimeOut">
+			<value>${httpTimeOut}</value>
+		</property>
+		<property name="url">
+			<value>${resourcePoolProxyDeletePMUrl}
+			</value>
+		</property>
+		<property name="senderEntry" ref="senderEntry"></property>
+	</bean>
+
+	<bean id="pmOperatorAction"
+		class="com.neusoft.mid.cloong.web.page.console.host.pm.PMOperatorAction"
+		scope="prototype">
+		<property name="pmManager">
+			<ref bean="pmManager" />
+		</property>
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="pmStatusService">
+			<ref bean="pmStatusService" />
+		</property>
+		<property name="gen">
+			<ref bean="sequenceGenerator" />
+		</property>
+		<property name="mediacy" value="${mediacy}"></property>
+	</bean>
+
+	<bean id="pmStateQueryAction"
+		class="com.neusoft.mid.cloong.web.page.console.host.pm.PMStateQueryAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="pmStatusService">
+			<ref bean="pmStatusService" />
+		</property>
+	</bean>
+
+	<bean id="pmOnloadResAppAction"
+		class="com.neusoft.mid.cloong.web.page.host.pm.order.PMOnloadResAppAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<bean id="pmOnloadIpsegmentAction"
+		class="com.neusoft.mid.cloong.web.page.host.pm.order.PMOnloadIpsegmentAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<bean id="pmOnloadPrivateIpAction"
+		class="com.neusoft.mid.cloong.web.page.host.pm.order.PMOnloadPrivateIpAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<bean id="pmOnloadOsAction"
+		class="com.neusoft.mid.cloong.web.page.host.pm.order.PMOnloadOsAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<!-- 修改物理机配置信息 -->
+	<bean id="pmUpdateAction"
+		class="com.neusoft.mid.cloong.web.page.console.host.pm.PMUpdateAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="audit" value="${audit}">
+		</property>
+		<property name="pmModify">
+			<ref bean="pmModify" />
+		</property>
+		<property name="gen">
+			<ref bean="sequenceGenerator" />
+		</property>
+		<property name="pmStatusService">
+			<ref bean="pmStatusService" />
+		</property>
+	</bean>
+
+	<bean id="pmModify" class="com.neusoft.mid.cloong.host.pm.impl.PMModifyImpl">
+		<property name="receiveTimeout">
+			<value>${receiveTimeout}</value>
+		</property>
+		<property name="httpTimeOut">
+			<value>${httpTimeOut}</value>
+		</property>
+		<property name="url">
+			<value>${resourcePoolProxyModifyPMUrl}
+			</value>
+		</property>
+		<property name="senderEntry" ref="senderEntry"></property>
+	</bean>
+
+	<bean id="pmSearchStateAction"
+		class="com.neusoft.mid.cloong.web.page.console.host.pm.PMSearchStateAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="queryPMState">
+			<ref bean="queryPMState" />
+		</property>
+		<property name="pmStatusService">
+			<ref bean="pmStatusService" />
+		</property>
+	</bean>
+
+	<bean id="queryPMState" class="com.neusoft.mid.cloong.host.pm.impl.QueryPMStateImpl">
+		<property name="receiveTimeout">
+			<value>${receiveTimeout}</value>
+		</property>
+		<property name="httpTimeOut">
+			<value>${httpTimeOut}</value>
+		</property>
+		<property name="queryPMStateUrl">
+			<value>${resourcePoolProxyQueryPMStateUrl}
+			</value>
+		</property>
+		<property name="senderEntry" ref="senderEntry"></property>
+	</bean>
+
+	<!-- 虚拟机备份任务——开始 -->
+	<!-- 虚拟机备份任务浏览 -->
+	<bean id="vmBakQueryListAction"
+		class="com.neusoft.mid.cloong.web.page.console.vmbak.VmBakQueryListAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<!-- 跳转到虚拟机备份任务创建页面 -->
+	<bean id="vmBakApplyAction"
+		class="com.neusoft.mid.cloong.web.page.vmbak.order.VmBakApplyAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<!-- 虚拟机备份任务创建 -->
+	<bean id="vmBakApplyInfoAction"
+		class="com.neusoft.mid.cloong.web.page.vmbak.order.VmBakApplyInfoAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="vmBakCreate">
+			<ref bean="vmBakCreate" />
+		</property>
+		<property name="sequenceGenerator">
+			<ref bean="sequenceGenerator" />
+		</property>
+		<property name="audit" value="${audit}">
+		</property>
+	</bean>
+	<!-- 虚拟机备份任务删除 -->
+	<bean id="vmBakDelAction"
+		class="com.neusoft.mid.cloong.web.page.console.vmbak.VmBakDelAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="vmBakDel">
+			<ref bean="vmBakDel" />
+		</property>
+	</bean>
+	<bean id="vmBakDel" class="com.neusoft.mid.cloong.vmbak.impl.VmBakDelImpl">
+		<property name="receiveTimeout">
+			<value>${receiveTimeout}</value>
+		</property>
+		<property name="httpTimeOut">
+			<value>${httpTimeOut}</value>
+		</property>
+		<property name="url">
+			<value>${resourcePoolProxyDeleteVmBakUrl}
+			</value>
+		</property>
+		<property name="senderEntry" ref="senderEntry"></property>
+	</bean>
+
+	<!-- 虚拟机备份任务详情 -->
+	<bean id="vmBakDetailAction"
+		class="com.neusoft.mid.cloong.web.page.console.vmbak.VmBakDetailAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="vmBakStatusQuery">
+			<ref bean="vmBakStatusQuery" />
+		</property>
+		<property name="vmBakListQuery">
+			<ref bean="vmBakListQuery" />
+		</property>
+	</bean>
+
+	<!-- 虚拟机备份任务状态查询 -->
+	<bean id="vmBakStatusQuery" class="com.neusoft.mid.cloong.vmbak.impl.VmBakStatusQueryImpl">
+		<property name="receiveTimeout">
+			<value>${receiveTimeout}</value>
+		</property>
+		<property name="httpTimeOut">
+			<value>${httpTimeOut}</value>
+		</property>
+		<property name="url">
+			<value>${resourcePoolProxyQueryVmBakStatusUrl}
+			</value>
+		</property>
+		<property name="senderEntry" ref="senderEntry"></property>
+	</bean>
+
+	<!-- 虚拟机备份列表查询 -->
+	<bean id="vmBakListQuery" class="com.neusoft.mid.cloong.vmbak.impl.VmBakListQueryImpl">
+		<property name="receiveTimeout">
+			<value>${receiveTimeout}</value>
+		</property>
+		<property name="httpTimeOut">
+			<value>${httpTimeOut}</value>
+		</property>
+		<property name="url">
+			<value>${resourcePoolProxyQueryVmBakListUrl}
+			</value>
+		</property>
+		<property name="senderEntry" ref="senderEntry"></property>
+	</bean>
+
+	<!-- 虚拟机备份恢复 -->
+	<bean id="vmBakRestoreAction"
+		class="com.neusoft.mid.cloong.web.page.console.vmbak.VmBakRestoreAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="vmBakRestore">
+			<ref bean="vmBakRestore" />
+		</property>
+	</bean>
+
+	<bean id="vmBakRestore" class="com.neusoft.mid.cloong.vmbak.impl.VmBakRestoreImpl">
+		<property name="receiveTimeout">
+			<value>${receiveTimeout}</value>
+		</property>
+		<property name="httpTimeOut">
+			<value>${httpTimeOut}</value>
+		</property>
+		<property name="url">
+			<value>${resourcePoolProxyRestoreVmBakUrl}
+			</value>
+		</property>
+		<property name="senderEntry" ref="senderEntry"></property>
+	</bean>
+
+	<bean id="vmBakCreate" class="com.neusoft.mid.cloong.vmbak.impl.VmBakCreateImpl">
+		<property name="receiveTimeout">
+			<value>${receiveTimeout}</value>
+		</property>
+		<property name="httpTimeOut">
+			<value>${httpTimeOut}</value>
+		</property>
+		<property name="url">
+			<value>${resourcePoolProxyCreateVmBakUrl}
+			</value>
+		</property>
+		<property name="senderEntry" ref="senderEntry"></property>
+	</bean>
+	<!-- 虚拟机备份任务——结束 -->
+
+
+	<!-- EBS -->
+	<bean id="ebsOnloadResPoolAction"
+		class="com.neusoft.mid.cloong.web.page.ebs.order.EBSOnloadResPoolAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<bean id="ebsOnloadItemAction"
+		class="com.neusoft.mid.cloong.web.page.ebs.order.EBSOnloadItemAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<bean id="ebsApplyAction"
+		class="com.neusoft.mid.cloong.web.page.ebs.order.EBSApplyAction"
+		scope="prototype">
+	</bean>
+
+	<bean id="ebsApplyInfoAction"
+		class="com.neusoft.mid.cloong.web.page.ebs.order.EBSApplyInfoAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="sequenceGenerator">
+			<ref bean="sequenceGenerator" />
+		</property>
+		<property name="ebsCreate">
+			<ref bean="ebsCreate" />
+		</property>
+		<property name="audit" value="${audit}">
+		</property>
+		<property name="seqCen">
+			<bean class="com.neusoft.mid.cloong.common.util.CommonSequenceGenerator">
+				<property name="prefix" value="BUSI-"></property>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="ebsApplyInfoCustomAction"
+		class="com.neusoft.mid.cloong.web.page.ebs.order.EBSApplyInfoCustomAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="sequenceGenerator">
+			<ref bean="sequenceGenerator" />
+		</property>
+		<property name="ebsCreate">
+			<ref bean="ebsCreate" />
+		</property>
+		<property name="audit" value="${audit}">
+		</property>
+		<property name="seqCen">
+			<bean class="com.neusoft.mid.cloong.common.util.CommonSequenceGenerator">
+				<property name="prefix" value="BUSI-"></property>
+			</bean>
+		</property>
+		<property name="tier" value="${ebs.tier}" />
+		<property name="raid" value="${ebs.raid}" />
+		<property name="storageNet" value="${ebs.storageNet}" />
+		<property name="tierOpen" value="${ebs.tierOpen}" />
+	</bean>
+
+	<bean id="ebsApplyInfoBusinessConsoleAction"
+		class="com.neusoft.mid.cloong.web.page.ebs.order.EBSApplyInfoAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="sequenceGenerator">
+			<ref bean="sequenceGenerator" />
+		</property>
+		<property name="ebsCreate">
+			<ref bean="ebsCreate" />
+		</property>
+		<property name="audit" value="${audit}">
+		</property>
+	</bean>
+
+
+	<bean id="ebsCreate" class="com.neusoft.mid.cloong.ebs.impl.EBSCreateImpl"
+		scope="prototype">
+		<property name="receiveTimeout">
+			<value>${receiveTimeout}</value>
+		</property>
+		<property name="httpTimeOut">
+			<value>${httpTimeOut}</value>
+		</property>
+		<property name="url">
+			<value>${resourcePoolProxyCreateEBSUrl}
+			</value>
+		</property>
+		<property name="senderEntry" ref="senderEntry"></property>
+	</bean>
+
+	<bean id="ebsAttach" class="com.neusoft.mid.cloong.ebs.impl.EBSAttachImpl"
+		scope="prototype">
+		<property name="receiveTimeout">
+			<value>${receiveTimeout}</value>
+		</property>
+		<property name="httpTimeOut">
+			<value>${httpTimeOut}</value>
+		</property>
+		<property name="url">
+			<value>${resourcePoolProxyAttachEBSUrl}
+			</value>
+		</property>
+		<property name="senderEntry" ref="senderEntry"></property>
+	</bean>
+
+	<bean id="ebsDetach" class="com.neusoft.mid.cloong.ebs.impl.EBSDetachImpl"
+		scope="prototype">
+		<property name="receiveTimeout">
+			<value>${receiveTimeout}</value>
+		</property>
+		<property name="httpTimeOut">
+			<value>${httpTimeOut}</value>
+		</property>
+		<property name="url">
+			<value>${resourcePoolProxyDetachEBSUrl}
+			</value>
+		</property>
+		<property name="senderEntry" ref="senderEntry"></property>
+	</bean>
+
+	<bean id="ebsDelete" class="com.neusoft.mid.cloong.ebs.impl.EBSDeleteImpl"
+		scope="prototype">
+		<property name="receiveTimeout">
+			<value>${receiveTimeout}</value>
+		</property>
+		<property name="httpTimeOut">
+			<value>${httpTimeOut}</value>
+		</property>
+		<property name="url">
+			<value>${resourcePoolProxyDeleteEBSUrl}
+			</value>
+		</property>
+		<property name="senderEntry" ref="senderEntry"></property>
+	</bean>
+
+	<bean id="ebsModify" class="com.neusoft.mid.cloong.ebs.impl.EBSModifyImpl"
+		scope="prototype">
+		<property name="receiveTimeout">
+			<value>${receiveTimeout}</value>
+		</property>
+		<property name="httpTimeOut">
+			<value>${httpTimeOut}</value>
+		</property>
+		<property name="url">
+			<value>${resourcePoolProxyModifyEBSUrl}
+			</value>
+		</property>
+		<property name="senderEntry" ref="senderEntry"></property>
+	</bean>
+
+	<!-- vlan -->
+	<bean id="vlanQueryListAction"
+		class="com.neusoft.mid.cloong.web.page.console.vlan.VLANQueryListAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	
+	<!-- vlan 34期  -->
+	<bean id="vlanQueryList3PhaseAction"
+		class="com.neusoft.mid.cloong.web.page.console.vlan3Phase.VLANQueryList3PhaseAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<!--虚拟机批量审批结果 -->
+	<bean id="vmBatchQueryListAction"
+		class="com.neusoft.mid.cloong.web.page.console.host.vm.VMQueryListAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<!--负载均衡 -->
+	<bean id="loadBalanceAction"
+		class="com.neusoft.mid.cloong.web.page.console.host.vm.loadBalanceAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="sequenceGenerator">
+			<ref bean="sequenceGenerator" />
+		</property>
+		<property name="timeGen">
+			<ref bean="timeGen" />
+		</property>
+		<property name="tranGen">
+			<ref bean="tranGen" />
+		</property>
+		<property name="Url">
+			<value>${lbWsUrl}</value>
+		</property>
+	</bean>
+
+	<bean id="loadBalanceListAction"
+		class="com.neusoft.mid.cloong.web.page.console.host.vm.loadBalanceListAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="sequenceGenerator">
+			<ref bean="sequenceGenerator" />
+		</property>
+		<property name="timeGen">
+			<ref bean="timeGen" />
+		</property>
+		<property name="tranGen">
+			<ref bean="tranGen" />
+		</property>
+	</bean>
+
+	<bean id="lbServicePortProxy"
+		class="com.neusoft.mid.cloong.web.page.lb.v1.interfaces.LBServicePortProxy"
+		scope="prototype">
+	</bean>
+
+	<bean id="timeGen"
+		class="com.neusoft.mid.cloong.web.page.lb.generator.TimeStampGenerator"
+		scope="prototype" />
+
+	<bean id="tranGen"
+		class="com.neusoft.mid.cloong.web.page.lb.generator.TransactionIdGenerator"
+		scope="prototype">
+		<property name="instanceId">
+			<value>${instanceId}</value>
+		</property>
+		<property name="templateGeneratorSql" value="${templateGeneratorSql}" />
+	</bean>
+
+	<bean id="vlanApplyAction"
+		class="com.neusoft.mid.cloong.web.page.console.vlan.VLANApplyAction"
+		scope="prototype">
+	</bean>
+	
+	<bean id="vlanApply3PhaseAction"
+		class="com.neusoft.mid.cloong.web.page.console.vlan3Phase.VLANApply3PhaseAction"
+		scope="prototype">
+	</bean>
+
+	<bean id="vlanApplyInfoAction"
+		class="com.neusoft.mid.cloong.web.page.console.vlan.VLANApplyInfoAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="seqCen">
+			<bean class="com.neusoft.mid.cloong.common.util.CommonSequenceGenerator">
+				<property name="prefix" value="app-"></property>
+			</bean>
+		</property>
+		<property name="vlanCreate">
+			<ref bean="vlanCreate" />
+		</property>
+		<property name="audit" value="${audit}">
+		</property>
+		<property name="sequenceGenerator">
+			<ref bean="sequenceGenerator" />
+		</property>
+	</bean>
+	
+	<bean id="vlanApplyInfo3PhaseAction"
+		class="com.neusoft.mid.cloong.web.page.console.vlan3Phase.VLANApplyInfo3PhaseAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="seqCen">
+			<bean class="com.neusoft.mid.cloong.common.util.CommonSequenceGenerator">
+				<property name="prefix" value="app-"></property>
+			</bean>
+		</property>
+		<property name="vlanCreate">
+			<ref bean="vlanCreate3Phase" />
+		</property>
+		<property name="audit" value="${audit}">
+		</property>
+		<property name="sequenceGenerator">
+			<ref bean="sequenceGenerator" />
+		</property>
+	</bean>
+
+	<bean id="vlanCancelAction"
+		class="com.neusoft.mid.cloong.web.page.console.vlan.VLANCancelAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="seqCen">
+			<bean class="com.neusoft.mid.cloong.common.util.CommonSequenceGenerator">
+				<property name="prefix" value="app-"></property>
+			</bean>
+		</property>
+		<property name="vlanCancel">
+			<ref bean="vlanCancel" />
+		</property>
+	</bean>
+	
+	<bean id="VLANCancel3PhaseAction"
+		class="com.neusoft.mid.cloong.web.page.console.vlan3Phase.VLANCancel3PhaseAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="seqCen">
+			<bean class="com.neusoft.mid.cloong.common.util.CommonSequenceGenerator">
+				<property name="prefix" value="app-"></property>
+			</bean>
+		</property>
+		<property name="vlanCancel">
+			<ref bean="vlanCancel3Phase" />
+		</property>
+	</bean>
+
+	<bean id="vlanCreate" class="com.neusoft.mid.cloong.vlan.core.impl.VLANCreateImpl"
+		scope="prototype">
+		<property name="receiveTimeout">
+			<value>${receiveTimeout}</value>
+		</property>
+		<property name="httpTimeOut">
+			<value>${httpTimeOut}</value>
+		</property>
+		<property name="url">
+			<value>${resourcePoolProxyCreateVlanUrl}
+			</value>
+		</property>
+		<property name="senderEntry" ref="senderEntry"></property>
+	</bean>
+	
+	<bean id="vlanCreate3Phase" class="com.neusoft.mid.cloong.vlan3Phase.core.impl.VLANCreateImpl"
+		scope="prototype">
+		<property name="receiveTimeout">
+			<value>${receiveTimeout}</value>
+		</property>
+		<property name="httpTimeOut">
+			<value>${httpTimeOut}</value>
+		</property>
+		<property name="url">
+			<value>${resourcePoolProxyCreateVlanUrl}
+			</value>
+		</property>
+		<property name="senderEntry" ref="senderEntry"></property>
+	</bean>
+
+	<bean id="vlanCancel" class="com.neusoft.mid.cloong.vlan.core.impl.VLANCancelImpl"
+		scope="prototype">
+		<property name="receiveTimeout">
+			<value>${receiveTimeout}</value>
+		</property>
+		<property name="httpTimeOut">
+			<value>${httpTimeOut}</value>
+		</property>
+		<property name="url">
+			<value>${resourcePoolProxyCancelVlanUrl}
+			</value>
+		</property>
+		<property name="senderEntry" ref="senderEntry"></property>
+	</bean>
+	
+	<bean id="vlanCancel3Phase" class="com.neusoft.mid.cloong.vlan3Phase.core.impl.VLANCancelImpl"
+		scope="prototype">
+		<property name="receiveTimeout">
+			<value>${receiveTimeout}</value>
+		</property>
+		<property name="httpTimeOut">
+			<value>${httpTimeOut}</value>
+		</property>
+		<property name="url">
+			<value>${resourcePoolProxyCancelVlanUrl}
+			</value>
+		</property>
+		<property name="senderEntry" ref="senderEntry"></property>
+	</bean>
+
+	<bean id="vlanDetailAction"
+		class="com.neusoft.mid.cloong.web.page.console.vlan.VLANDetailAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	
+	<bean id="vlanDetail3PhaseAction"
+		class="com.neusoft.mid.cloong.web.page.console.vlan3Phase.VLANDetail3PhaseAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	
+	<bean id="vlanNameEditAction"
+		class="com.neusoft.mid.cloong.web.page.console.vlan.VLANEditNameAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	
+	<bean id="vlanNameEdit3PhaseAction"
+		class="com.neusoft.mid.cloong.web.page.console.vlan3Phase.VLANEditName3PhaseAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	
+	<!-- vlan end -->
+
+	<!-- ipSegment -->
+	<bean id="ipSegmentQuery"
+		class="com.neusoft.mid.cloong.ipSegment.core.impl.QueryIpSegmentImpl"
+		scope="prototype">
+		<property name="receiveTimeout">
+			<value>${receiveTimeout}</value>
+		</property>
+		<property name="httpTimeOut">
+			<value>${httpTimeOut}</value>
+		</property>
+		<property name="url">
+			<value>${resourcePoolProxyQueryIpSegmentUrl}
+			</value>
+		</property>
+		<property name="senderEntry" ref="senderEntry"></property>
+	</bean>
+
+	<bean id="ipSegmentApply"
+		class="com.neusoft.mid.cloong.ipSegment.core.impl.ApplyIpSegmentImpl"
+		scope="prototype">
+		<property name="receiveTimeout">
+			<value>${receiveTimeout}</value>
+		</property>
+		<property name="httpTimeOut">
+			<value>${httpTimeOut}</value>
+		</property>
+		<property name="url">
+			<value>${resourcePoolProxyApplyIpSegmentUrl}
+			</value>
+		</property>
+		<property name="senderEntry" ref="senderEntry"></property>
+	</bean>
+
+	<bean id="ipSegmentRelease"
+		class="com.neusoft.mid.cloong.ipSegment.core.impl.ReleaseIpSegmentImpl"
+		scope="prototype">
+		<property name="receiveTimeout">
+			<value>${receiveTimeout}</value>
+		</property>
+		<property name="httpTimeOut">
+			<value>${httpTimeOut}</value>
+		</property>
+		<property name="url">
+			<value>${resourcePoolProxyReleaseIpSegmentUrl}
+			</value>
+		</property>
+		<property name="senderEntry" ref="senderEntry"></property>
+	</bean>
+
+	<bean id="ipSegmentQueryListAction"
+		class="com.neusoft.mid.cloong.web.page.console.ipSegment.IpSegmentQueryList"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<bean id="createIpSegmentAction"
+		class="com.neusoft.mid.cloong.web.page.console.ipSegment.IpSegmentCreateAction"
+		scope="prototype"></bean>
+
+	<bean id="queryIpSegmentAction"
+		class="com.neusoft.mid.cloong.web.page.console.ipSegment.IpSegmentQuery4Create"
+		scope="prototype">
+		<property name="queryIpSegment">
+			<ref bean="ipSegmentQuery" />
+		</property>
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<bean id="IpSegmentCreateInfoAction"
+		class="com.neusoft.mid.cloong.web.page.console.ipSegment.IpSegmentCreateInfoAction"
+		scope="prototype">
+		<property name="applyIpSegmentImpl">
+			<ref bean="ipSegmentApply" />
+		</property>
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="seqCen">
+			<bean class="com.neusoft.mid.cloong.common.util.CommonSequenceGenerator">
+				<property name="prefix" value="app-"></property>
+			</bean>
+		</property>
+		<property name="audit" value="${audit}">
+		</property>
+		<property name="sequenceGenerator">
+			<ref bean="sequenceGenerator" />
+		</property>
+	</bean>
+
+	<bean id="ipSegmentDetailAction"
+		class="com.neusoft.mid.cloong.web.page.console.ipSegment.IpSegmentDetailAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<bean id="ipSegmentReleaseAction"
+		class="com.neusoft.mid.cloong.web.page.console.ipSegment.IpSegmentReleaseAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="seqCen">
+			<bean class="com.neusoft.mid.cloong.common.util.CommonSequenceGenerator">
+				<property name="prefix" value="app-"></property>
+			</bean>
+		</property>
+		<property name="ipSegmentRelease">
+			<ref bean="ipSegmentRelease" />
+		</property>
+	</bean>
+
+	<bean id="ipSegmentUpdateNameAction"
+		class="com.neusoft.mid.cloong.web.page.console.ipSegment.IpSegmentUpdateNameAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<!-- 订单详情 -->
+	<bean id="OrderDetailAction"
+		class="com.neusoft.mid.cloong.web.page.user.order.OrderDetailAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy" />
+	</bean>
+	<!-- 创建快照 -->
+	<bean id="snapshotCreateAction"
+		class="com.neusoft.mid.cloong.web.page.snapshots.SnapshotCreateAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy" />
+		<property name="snapshotCreate">
+			<ref bean="snapshotCreate" />
+		</property>
+	</bean>
+	<!-- 删除快照 -->
+	<bean id="snapshotDeleteAction"
+		class="com.neusoft.mid.cloong.web.page.snapshots.SnapshotDeleteAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy" />
+		<property name="snapshotDelete">
+			<ref bean="snapshotDelete" />
+		</property>
+	</bean>
+	<!--查询快照 -->
+	<bean id="snapshotQueryAction"
+		class="com.neusoft.mid.cloong.web.page.snapshots.SnapshotQueryAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy" />
+	</bean>
+	<!--恢复快照 -->
+	<bean id="snapshotRecoveryAction"
+		class="com.neusoft.mid.cloong.web.page.snapshots.SnapshotRecoveryAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy" />
+		<property name="snapshotRecovery">
+			<ref bean="snapshotRecovery" />
+		</property>
+	</bean>
+	<!-- snapshotCreate -->
+	<bean id="snapshotCreate"
+		class="com.neusoft.mid.cloong.web.page.snapshots.core.SnapshotCreateImpl"
+		scope="prototype">
+		<property name="receiveTimeout">
+			<value>${receiveTimeout}</value>
+		</property>
+		<property name="httpTimeOut">
+			<value>${httpTimeOut}</value>
+		</property>
+		<property name="url">
+			<value>${resourcePoolProxyCreateSnapshotUrl}
+			</value>
+		</property>
+		<property name="senderEntry" ref="senderEntry"></property>
+	</bean>
+
+	<!-- snapshotDelete -->
+	<bean id="snapshotDelete"
+		class="com.neusoft.mid.cloong.web.page.snapshots.core.SnapshotDeleteImpl"
+		scope="prototype">
+		<property name="receiveTimeout">
+			<value>${receiveTimeout}</value>
+		</property>
+		<property name="httpTimeOut">
+			<value>${httpTimeOut}</value>
+		</property>
+		<property name="url">
+			<value>${resourcePoolProxyDeleteSnapshotUrl}
+			</value>
+		</property>
+		<property name="senderEntry" ref="senderEntry"></property>
+	</bean>
+	<!-- snapshotRecovery -->
+	<bean id="snapshotRecovery"
+		class="com.neusoft.mid.cloong.web.page.snapshots.core.SnapshotRecoveryImpl"
+		scope="prototype">
+		<property name="receiveTimeout">
+			<value>${receiveTimeout}</value>
+		</property>
+		<property name="httpTimeOut">
+			<value>${httpTimeOut}</value>
+		</property>
+		<property name="url">
+			<value>${resourcePoolProxyRecoverySnapshotUrl}
+			</value>
+		</property>
+		<property name="senderEntry" ref="senderEntry"></property>
+	</bean>
+
+	<!-- topo -->
+	<bean id="topoAction" class="com.neusoft.mid.cloong.web.page.console.topo.TopoAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<!-- 二期 -->
+	<bean id="pzhtopoAction" class="com.neusoft.mid.cloong.web.page.console.topo.PzhtopoAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<!-- 三期 -->
+	<bean id="pzhtopoAction3" class="com.neusoft.mid.cloong.web.page.console.topo.PzhtopoAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<!-- ip地址 list -->
+	<bean id="ipListAction" class="com.neusoft.mid.cloong.web.page.console.ip.IpListAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<!-- vmlist by json -->
+	<bean id="vmListJsonAction" class="com.neusoft.mid.cloong.web.page.console.ip.VmListAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<bean id="ipDetailAction"
+		class="com.neusoft.mid.cloong.web.page.console.ip.IpDetailAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="createportmap" >
+			<ref bean="createMapPort"/>
+		</property>
+	</bean>
+	<bean id="ipApplyAction" class="com.neusoft.mid.cloong.web.page.ip.order.IpApplyAction"
+		scope="prototype">
+	</bean>
+
+	<!-- add by huxin begin -->
+	<bean id="createMapPort" class="com.neusoft.mid.cloong.portmap.impl.CreatePortMapImpi">
+		<property name="receiveTimeout">
+			<value>${receiveTimeout1}</value>
+		</property>
+		<property name="httpTimeOut">
+			<value>${httpTimeOut1}</value>
+		</property>
+		<property name="createPortMapUrl">
+			<value>${resourcePoolProxyCreatePortMapUrl}</value>
+		</property>
+		<property name="deletePortMapUrl">
+			<value>${resourcePoolProxyDeletePortMapUrl}</value>
+		</property>
+		<property name="senderEntry" ref="senderEntry"></property>
+	</bean>
+
+	<!-- add by huixn end -->
+	<bean id="IpApplyInfoAction"
+		class="com.neusoft.mid.cloong.web.page.ip.order.IpApplyInfoAction"
+		scope="prototype">
+		<!-- <property name="applyIpSegmentImpl"> <ref bean="ipSegmentApply" /> 
+			</property> -->
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="seqCen">
+			<bean class="com.neusoft.mid.cloong.common.util.CommonSequenceGenerator">
+				<property name="prefix" value="app-"></property>
+			</bean>
+		</property>
+		<property name="audit" value="${audit}">
+		</property>
+		<property name="sequenceGenerator">
+			<ref bean="sequenceGenerator" />
+		</property>
+	</bean>
+	<bean id="ipDeleteAction"
+		class="com.neusoft.mid.cloong.web.page.console.ip.IpDeleteAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy" />
+		<!-- <property name="delete" ref="ebsDelete"></property> -->
+		<property name="seqCen">
+			<bean class="com.neusoft.mid.cloong.common.util.CommonSequenceGenerator">
+				<property name="prefix" value="BUSI-"></property>
+			</bean>
+		</property>
+	</bean>
+
+
+	<!-- 文件存储 -->
+	<bean id="fileStoreListAction"
+		class="com.neusoft.mid.cloong.web.page.console.fileStore.FileStoreListAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<bean id="fileStoreApplyAction"
+		class="com.neusoft.mid.cloong.web.page.fileStore.order.FileStoreApplyAction"
+		scope="prototype">
+	</bean>
+	<bean id="fsDelete" class="com.neusoft.mid.cloong.fileStore.impl.FSDelImpl"
+		scope="prototype">
+		<property name="receiveTimeout">
+			<value>${receiveTimeout}</value>
+		</property>
+		<property name="httpTimeOut">
+			<value>${httpTimeOut}</value>
+		</property>
+		<property name="url">
+			<value>${resourcePoolProxyDeleteFSUrl}
+			</value>
+		</property>
+		<property name="senderEntry" ref="senderEntry"></property>
+	</bean>
+
+	<bean id="fileStoreDeleteAction"
+		class="com.neusoft.mid.cloong.web.page.console.fileStore.FileStoreDeleteAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy" />
+		<property name="delete" ref="fsDelete"></property>
+		<property name="seqCen">
+			<bean class="com.neusoft.mid.cloong.common.util.CommonSequenceGenerator">
+				<property name="prefix" value="BUSI-"></property>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="fileStorage" class="com.neusoft.mid.cloong.fileStore.impl.FileStorageExecuterIpml">
+		<property name="receiveTimeout"><value>${receiveTimeout}</value></property>
+		<property name="httpTimeOut"><value>${httpTimeOut}</value></property>
+		<property name="url"><value>${resourcePoolProxyCreateFileStorage}</value></property>
+		<property name="senderEntry" ref="senderEntry"></property>
+	</bean>
+
+	<bean id="fileStoreApplyInfoAction"
+		class="com.neusoft.mid.cloong.web.page.fileStore.order.FileStoreApplyInfoAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="seqCen">
+			<bean class="com.neusoft.mid.cloong.common.util.CommonSequenceGenerator">
+				<property name="prefix" value="app-"></property>
+			</bean>
+		</property>
+		<property name="audit" value="${audit}">
+		</property>
+		<property name="sequenceGenerator">
+			<ref bean="sequenceGenerator" />
+		</property>
+		<property name="fileStorage" ref="fileStorage"/>
+	</bean>
+
+	<bean id="fileStoreDetailAction"
+		class="com.neusoft.mid.cloong.web.page.console.fileStore.FileStoreDetailAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<!--虚拟防火墙 -->
+	<bean id="vFWListAction"
+		class="com.neusoft.mid.cloong.web.page.console.vFirewall.VfirewallListAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<bean id="vFWApplyAction"
+		class="com.neusoft.mid.cloong.web.page.vFirewall.order.VfwApplyAction"
+		scope="prototype">
+	</bean>
+
+	<bean id="vFWApplyInfoAction"
+		class="com.neusoft.mid.cloong.web.page.vFirewall.order.VfwApplyInfoAction"
+		scope="prototype">
+		<!-- <property name="applyIpSegmentImpl"> <ref bean="ipSegmentApply" /> 
+			</property> -->
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="seqCen">
+			<bean class="com.neusoft.mid.cloong.common.util.CommonSequenceGenerator">
+				<property name="prefix" value="app-"></property>
+			</bean>
+		</property>
+		<property name="audit" value="${audit}">
+		</property>
+		<property name="sequenceGenerator">
+			<ref bean="sequenceGenerator" />
+		</property>
+		<property name="virfwClient" ref="virfwCreate"/>
+	</bean>
+	
+	<bean id="virfwCreate" class="com.neusoft.mid.cloong.vfw.impl.CreateVirFWIpml">
+		<property name="receiveTimeout"><value>${receiveTimeout}</value></property>
+		<property name="httpTimeOut"><value>${httpTimeOut}</value></property>
+		<property name="url"><value>${resourcePoolProxyCreateVirtualFw}</value></property>
+		<property name="senderEntry" ref="senderEntry"></property>
+	</bean>
+
+	<bean id="vfwStrategyAdd" class="com.neusoft.mid.cloong.vfw.impl.VFWStrategyAddImpl">
+		<property name="receiveTimeout">
+			<value>${receiveTimeout1}</value>
+		</property>
+		<property name="httpTimeOut">
+			<value>${httpTimeOut1}</value>
+		</property>
+		<property name="url">
+			<value>${resourcePoolProxyAddvirfwStrategyUrl}</value>
+		</property>
+		<property name="senderEntry" ref="senderEntry"></property>
+	</bean>
+
+	<bean id="vFWDetailAction"
+		class="com.neusoft.mid.cloong.web.page.console.vFirewall.VfirewallDetailAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="delete" ref="vfwStrategyDelete"></property>
+		<property name="create" ref="vfwStrategyAdd"></property>
+		<property name="seqCen">
+			<bean class="com.neusoft.mid.cloong.common.util.CommonSequenceGenerator">
+				<property name="prefix" value="app-"></property>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="vfwDelete" class="com.neusoft.mid.cloong.vfw.impl.VFWDelImpl"
+		scope="prototype">
+		<property name="receiveTimeout">
+			<value>${receiveTimeout}</value>
+		</property>
+		<property name="httpTimeOut">
+			<value>${httpTimeOut}</value>
+		</property>
+		<property name="url">
+			<value>${resourcePoolProxyCancelVFWUrl}
+			</value>
+		</property>
+		<property name="senderEntry" ref="senderEntry"></property>
+	</bean>
+
+	<bean id="vfwStrategyDelete" class="com.neusoft.mid.cloong.vfw.impl.VFWStrategyDelImpl"
+		scope="prototype">
+		<property name="receiveTimeout">
+			<value>${receiveTimeout}</value>
+		</property>
+		<property name="httpTimeOut">
+			<value>${httpTimeOut}</value>
+		</property>
+		<property name="url">
+			<value>${resourcePoolProxyDelvirfwStrategyUrl}
+			</value>
+		</property>
+		<property name="senderEntry" ref="senderEntry"></property>
+	</bean>
+
+
+	<bean id="vFWDeleteAction"
+		class="com.neusoft.mid.cloong.web.page.console.vFirewall.VfirewallDeleteAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy" />
+		<property name="delete" ref="vfwDelete"></property>
+		<property name="seqCen">
+			<bean class="com.neusoft.mid.cloong.common.util.CommonSequenceGenerator">
+				<property name="prefix" value="BUSI-"></property>
+			</bean>
+		</property>
+	</bean>
+
+	<!--数据备份 -->
+	<bean id="dataBackupListAction"
+		class="com.neusoft.mid.cloong.web.page.console.dataBackup.DataBackupListAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<bean id="dataBackupDetailAction"
+		class="com.neusoft.mid.cloong.web.page.console.dataBackup.DataBackupDetailAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+</beans>

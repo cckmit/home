@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="UserBean">
+	<typeAlias alias="UserBean"
+		type="com.neusoft.mid.cloong.identity.bean.UserBean" />
+    <typeAlias alias="UserAppBean"
+		type="com.neusoft.mid.cloong.identity.bean.UserAppBean" />
+		<typeAlias alias="userApp" type="com.neusoft.mid.cloong.identity.bean.App" />
+	<insert id="registerUser" parameterClass="UserBean">
+			insert into COMP_AUTHORITY_USER_T 
+		(USER_ID ,
+		USER_NAME,
+		PASSWORD ,
+		CREATE_TIME ,
+		CREATE_USER ,
+		UPDATE_TIME ,
+		STATUS ,
+		LOGIN_FAILED_TIME ,
+		LOCK_TIME ,
+		MOBILE ,
+		EMAIL,
+		ADDRESS,
+		TELPHONE,
+		FAX,
+		DESCRIPTION,
+		DEPARTMENT_NAME,
+		SECURITY_QUESTION,
+		SECURITY_ANSWER)
+		 values 
+		(#userId#,
+		#userName#,
+		#password#,
+		#createTime#,
+		#createUserId#,
+		#updateTime#,
+		#status#,
+		'',
+		'',
+		#mobile#,
+		#email#,
+		#address#,
+		#telphone#,
+		#fax#,
+		#desc#,
+		#departmentName#,
+		#security_question#,
+		#security_answer#
+		)
+	</insert>
+	<insert id="addUserApp" parameterClass="UserAppBean">
+			insert into COMP_AUTHORITY_USER_APP_T 
+		(USER_ID ,
+	     APP_ID,
+		 APPBIND_STATUS
+		 )
+		 values 
+		(#userId#,
+		 #appId#,
+		 '1'
+		)
+	</insert>
+	
+	 
+	 
+	 <!--查询业务ID增加的序列号-->
+	 <select id="getAppReq" resultClass="String">
+	 		SELECT nextvalapp("app_name") as req
+	 </select>
+	 <insert id="insertRegisterUserApp" parameterClass="userApp">
+			INSERT INTO  COMP_APP_T 
+			(
+				APP_ID,
+			    APP_NAME,
+			    DESCRIPTION,
+			    CREATE_FLAG,
+			    APP_CONTACTS,
+			<!--     CONTACT_PHONE, -->
+			    CREATE_USER,
+			    CREATE_TIME
+			)
+			VALUES 
+			(
+				#appId#,
+				#appName#,
+				#description#,
+				'0',
+				#createUser#,
+			<!-- 	#contact_phone#, -->
+				#createUser#,
+				date_format(SYSDATE(),'%Y%m%d%H%i%s')
+			)
+		</insert>
+</sqlMap>

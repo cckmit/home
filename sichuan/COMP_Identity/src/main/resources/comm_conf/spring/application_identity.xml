@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+
+	<bean id="userService" class="com.neusoft.mid.cloong.identity.service.UserService">
+		<property name="ibatisDAO" ref="ibatisDAOProxy" />
+		<property name="mailService" ref="mailService" />
+		<property name="fromMailAddress" value="${notify.user.mail.fromMailAddress}"></property>
+	</bean>
+
+	<bean id="mailService" class="com.neusoft.mid.cloong.common.util.MailService">
+		<constructor-arg index="0" value="${smtp.ip}" />
+		<constructor-arg index="1" value="${smtp.port}" />
+		<constructor-arg index="2" value="${smtp.userName}" />
+		<constructor-arg index="3" value="${smtp.passwd}" />
+		<constructor-arg index="4" value="${smpt.enableSSL}" />
+		<constructor-arg index="5" value="${smtp.sslCert.trustStore.filepath}" />
+		<constructor-arg index="6" value="${smtp.sslCert.trustStore.password}" />
+	</bean>
+
+
+	<!-- 角色service -->
+	<bean id="roleCreateService"
+		class="com.neusoft.mid.cloong.identity.service.RoleCreateService"
+		abstract="false">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<bean id="roleDeleteService"
+		class="com.neusoft.mid.cloong.identity.service.RoleDeleteService"
+		abstract="false">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<bean id="roleOperateService"
+		class="com.neusoft.mid.cloong.identity.service.RoleOperateService"
+		abstract="false">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<bean id="roleSearchService"
+		class="com.neusoft.mid.cloong.identity.service.RoleSearchService"
+		abstract="false">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<bean id="permissionSearchService"
+		class="com.neusoft.mid.cloong.identity.service.PermissionSearchService"
+		abstract="false">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<bean id="roleAuthService" class="com.neusoft.mid.cloong.identity.service.RoleAuthService"
+		abstract="false">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<bean id="forgetPasswordService"
+		class="com.neusoft.mid.cloong.identity.service.ForgetPasswordService">
+	</bean>
+</beans>

@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="ItemInfo">
+	<typeAlias alias="ItemInfo"
+		type="com.neusoft.mid.cloong.web.page.product.item.vm.info.ItemInfo" />
+	<typeAlias alias="VMStandardInfo"
+		type="com.neusoft.mid.cloong.web.page.product.standard.vm.info.VMStandardInfo" />
+	<select id="queryItemListByItemType" parameterClass="ItemInfo" resultClass="ItemInfo">
+		SELECT
+		ITEM_ID itemId,
+		ITEM_NAME itemName,
+		ITEM_TYPE itemType,
+		STANDARD_ID standardId,
+		STANDARD_TYPE standardType,
+		CATALOG_ID catalogId,
+		recommend recommend,
+		STATUS status,
+		DESCRIPTION description,
+		CREATE_TIME createTime,
+		CREATE_USER createUser,
+		UPDATE_TIME updateTime,
+		UPDATE_USER updateUser
+		FROM
+		COMP_ITEM_T
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="and" property="itemType">
+				ITEM_TYPE=#itemType# 
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="noItemStatus">
+				status!=#noItemStatus#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="status">
+				status=#status# 
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="itemName">
+				ITEM_NAME like CONCAT('%',#itemName#,'%')
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="beginCreateTime">
+				CREATE_TIME >=#beginCreateTime# 
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="endCreateTime">
+				CREATE_TIME &lt;=#endCreateTime# 
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="recommend">
+				recommend=#recommend# 
+				<isEqual compareValue="0" property="recommend">
+					AND status!='7' 
+				</isEqual>
+			</isNotEmpty>
+			<isEqual compareValue="1" prepend="and" property="publish">
+					(status='5' OR status='7') 
+			</isEqual>
+			<isEqual compareValue="0" prepend="and" property="publish">
+					(status!='5' AND status!='7') 
+			</isEqual>
+		</dynamic>
+		ORDER BY CREATE_TIME DESC
+	</select>
+	<select id="queryItemCountByItemType" parameterClass="ItemInfo" resultClass="java.lang.Integer">
+		SELECT COUNT(*)
+		FROM
+		COMP_ITEM_T
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="and" property="itemType">
+				ITEM_TYPE=#itemType# 
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="noItemStatus">
+				status!=#noItemStatus#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="status">
+				status=#status# 
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="itemName">
+				ITEM_NAME like CONCAT('%',#itemName#,'%')
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="beginCreateTime">
+				CREATE_TIME >=#beginCreateTime# 
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="endCreateTime">
+				CREATE_TIME &lt;=#endCreateTime# 
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="recommend">
+				recommend=#recommend# 
+				<isEqual compareValue="0" property="recommend">
+					AND status!='7' 
+				</isEqual>
+			</isNotEmpty>
+			<isEqual compareValue="1" prepend="and" property="publish">
+					(status='5' OR status='7') 
+			</isEqual>
+			<isEqual compareValue="0" prepend="and" property="publish">
+					(status!='5' AND status!='7') 
+			</isEqual>
+		</dynamic>
+		ORDER BY CREATE_TIME DESC
+	</select>
+	<select id="queryItemListByAudit" parameterClass="ItemInfo" resultClass="ItemInfo">
+		SELECT
+		ITEM_ID itemId,
+		ITEM_NAME itemName,
+		ITEM_TYPE itemType,
+		STANDARD_ID standardId,
+		STANDARD_TYPE standardType,
+		CATALOG_ID catalogId,
+		recommend recommend,
+		STATUS status,
+		DESCRIPTION description,
+		CREATE_TIME createTime,
+		CREATE_USER createUser,
+		UPDATE_TIME updateTime,
+		UPDATE_USER updateUser
+		FROM
+		COMP_ITEM_T
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="and" property="noItemStatus">
+				status!=#noItemStatus#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="status">
+				status=#status# 
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="itemName">
+				ITEM_NAME like CONCAT('%',#itemName#,'%')
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="beginCreateTime">
+				UPDATE_TIME >=#beginCreateTime# 
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="endCreateTime">
+				UPDATE_TIME &lt;=#endCreateTime# 
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="recommend">
+				recommend=#recommend# 
+			</isNotEmpty>
+		</dynamic>
+		ORDER BY UPDATE_TIME DESC
+	</select>
+	<select id="queryItemCountByAudit" parameterClass="ItemInfo" resultClass="java.lang.Integer">
+		SELECT COUNT(*)
+		FROM
+		COMP_ITEM_T
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="and" property="noItemStatus">
+				status!=#noItemStatus#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="status">
+				status=#status# 
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="itemName">
+				ITEM_NAME like CONCAT('%',#itemName#,'%')
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="beginCreateTime">
+				UPDATE_TIME >=#beginCreateTime# 
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="endCreateTime">
+				UPDATE_TIME &lt;=#endCreateTime# 
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="recommend">
+				recommend=#recommend# 
+			</isNotEmpty>
+		</dynamic>
+		ORDER BY UPDATE_TIME DESC
+	</select>
+	<insert id="itemInsert" parameterClass="ItemInfo">
+		insert into COMP_ITEM_T 
+		(ITEM_ID ,
+		ITEM_NAME ,
+		ITEM_TYPE ,
+		STANDARD_ID ,
+		STANDARD_TYPE ,
+		CATALOG_ID ,
+		recommend ,
+		STATUS ,
+		DESCRIPTION ,
+		CREATE_TIME ,
+		CREATE_USER ,
+		UPDATE_TIME ,
+		UPDATE_USER )
+		 values 
+		(#itemId#,
+		#itemName#,
+		#itemType#,
+		#standardId#,
+		#standardType#,
+		#catalogId#,
+		#recommend#,
+		#status#,
+		#description#,
+		#createTime#,
+		#createUser#,
+		#updateTime#,
+		#updateUser#
+		)
+	</insert>
+	<update id="updateVMStandardUseStatusAdd" parameterClass="VMStandardInfo">
+		UPDATE
+		COMP_STANDARD_VM_T 
+		SET
+		USE_STATUS=USE_STATUS+1
+		WHERE
+		STANDARD_ID=#standardId#
+	</update>
+	<update id="updateVMStandardUseStatusSub" parameterClass="VMStandardInfo">
+		UPDATE
+		COMP_STANDARD_VM_T 
+		SET
+		USE_STATUS=USE_STATUS-1
+		WHERE
+		STANDARD_ID=#standardId#
+	</update>
+	<update id="updateItemStatusByItemId" parameterClass="java.util.Map">
+		UPDATE
+		COMP_ITEM_T 
+		SET
+		status=#status#,
+		UPDATE_TIME=#updateTime#,
+		UPDATE_USER=#updateUser#
+		WHERE
+		<isNotEmpty property="itemIds">
+			<iterate property="itemIds" open="(" close=")" conjunction="OR">
+				ITEM_ID=#itemIds[]#
+			</iterate>
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="notStatusLs">
+			<iterate property="notStatusLs" open="(" close=")" conjunction="AND">
+				status!=#notStatusLs[]#
+			</iterate>
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="statusLs">
+			<iterate property="statusLs" open="(" close=")" conjunction="OR">
+				status=#statusLs[]#
+			</iterate>
+		</isNotEmpty>
+	</update>
+	<update id="updateItemRecommendByItemId" parameterClass="ItemInfo">
+		UPDATE
+		COMP_ITEM_T 
+		SET
+		recommend=#recommend#,
+		UPDATE_TIME=#updateTime#,
+		UPDATE_USER=#updateUser#
+		WHERE
+		ITEM_ID=#itemId#
+		AND status!='8' 
+		AND status!='7'
+	</update>
+	<select id="getItemInfoByItemId" parameterClass="ItemInfo" resultClass="ItemInfo">
+		SELECT
+		ITEM_ID itemId,
+		ITEM_NAME itemName,
+		ITEM_TYPE itemType,
+		STANDARD_ID standardId,
+		STANDARD_TYPE standardType,
+		CATALOG_ID catalogId,
+		recommend recommend,
+		STATUS status,
+		DESCRIPTION description,
+		CREATE_TIME createTime,
+		CREATE_USER createUser,
+		UPDATE_TIME updateTime,
+		UPDATE_USER updateUser
+		FROM
+		COMP_ITEM_T
+		WHERE
+		ITEM_ID = #itemId#
+		AND STATUS!=8
+	</select>
+	<update id="itemUpdate" parameterClass="ItemInfo">
+		UPDATE
+		COMP_ITEM_T 
+		SET
+		ITEM_NAME=#itemName#,
+		STANDARD_ID=#standardId#,
+		CATALOG_ID=#catalogId#,
+		DESCRIPTION=#description#,
+		UPDATE_TIME=#updateTime#,
+		UPDATE_USER=#updateUser#
+		<isNotEmpty prepend="," property="status">
+			status=#status#
+		</isNotEmpty>
+		WHERE
+		ITEM_ID=#itemId#
+		AND (STATUS='0' 
+		OR STATUS='3')
+	</update>
+	<update id="auditItemStatusByItemId" parameterClass="ItemInfo">
+		UPDATE
+		COMP_ITEM_T 
+		SET
+		status=#status#,
+		UPDATE_TIME=#updateTime#,
+		UPDATE_USER=#updateUser#
+		WHERE
+		ITEM_ID=#itemId#
+	</update>
+	
+	<select id="checkItemName" parameterClass="ItemInfo" resultClass="java.lang.Integer">
+		SELECT count(ITEM_ID)
+		FROM COMP_ITEM_T 
+		WHERE STATUS != '8'
+		<dynamic prepend="">
+			<isNotEmpty prepend="and" property="itemName">
+				ITEM_NAME = #itemName#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="itemId">
+				ITEM_ID != #itemId#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+</sqlMap>

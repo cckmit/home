@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
+    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+
+	<bean id="vmStandardSynchronizeProcessor" class="com.neusoft.mid.cloong.stardard.vm.impl.VMStandardSynchronizeProcessor">
+		<property name="create" ref="vmStandardCreate"></property>
+		<property name="transactonGen" ref="transactonGen" />
+		<property name="timeStampgen" ref="timeStampgen" />
+		<property name="resourcePoolCacheService" ref="resourcePoolCacheService" />
+		<property name="ibatisDao">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<!-- 虚拟机模板创建 -->
+	<!-- 2015/02/12 修改为私有云接口(冯健) -->
+	<bean id="vmTemplateSynchronizeProcessor" class="com.neusoft.mid.cloong.stardard.vm.impl.PrivateVMTemplateSynchronizeProcessor">
+		<property name="create" ref="vmStandardCreate"></property>
+		<property name="transactonGen" ref="transactonGen" />
+		<property name="timeStampgen" ref="timeStampgen" />
+		<property name="resourcePoolCacheService" ref="resourcePoolCacheService" />
+		<property name="ibatisDao">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<!-- <property name="rpTemplateDefalutState" value="${templateDefaultStatus}" /> -->
+	</bean>
+	<!-- 2015/02/12 修改为私有云接口(冯健) -->
+	<bean id="vmStandardCreate" class="com.neusoft.mid.cloong.stardard.vm.impl.PrivarteVMStandardCreateImpl">
+		<property name="common" ref="privateWebServiceClientFactory" />
+		<property name="timeout">
+			<value>${requestTimeout}</value>
+		</property>
+	</bean>
+
+	<!-- 块存储模板创建 -->
+	<!-- 2015/02/12 修改为私有云接口(冯健) -->
+	<bean id="ebsStandardSynchronizeProcessor" class="com.neusoft.mid.cloong.stardard.ebs.impl.PrivateEBSStandardSynchronizeProcessor">
+		<property name="create" ref="ebsStandardCreate"></property>
+		<property name="transactonGen" ref="transactonGen" />
+		<property name="timeStampgen" ref="timeStampgen" />
+		<property name="resourcePoolCacheService" ref="resourcePoolCacheService" />
+		<property name="ibatisDao">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<!-- 2015/02/12 修改为私有云接口(冯健) -->
+	<bean id="ebsStandardCreate" class="com.neusoft.mid.cloong.stardard.ebs.impl.PrivateEBSStandardCreateImpl">
+		<property name="common" ref="privateWebServiceClientFactory" />
+		<property name="timeout">
+			<value>${requestTimeout}</value>
+		</property>
+	</bean>
+	
+	<!-- 物理机模板创建 -->
+	<!-- 2015/11/03 修改为私有云接口(王欣) -->
+	<bean id="pmStandardSynchronizeProcessor" class="com.neusoft.mid.cloong.stardard.pm.impl.PrivatePMTemplateSynchronizeProcessor">
+		<property name="create" ref="pmStandardCreate"></property>
+		<property name="transactonGen" ref="transactonGen" />
+		<property name="timeStampgen" ref="timeStampgen" />
+		<property name="resourcePoolCacheService" ref="resourcePoolCacheService" />
+		<property name="ibatisDao">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<!-- 2015/11/03 修改为私有云接口(王欣) -->
+	<bean id="pmStandardCreate" class="com.neusoft.mid.cloong.stardard.pm.impl.PrivatePMStandardCreateImpl">
+		<property name="common" ref="privateWebServiceClientFactory" />
+		<property name="timeout">
+			<value>${requestTimeout}</value>
+		</property>
+	</bean>
+
+
+	<!-- 规格删除 -->
+	<!-- 2015/02/12 更改为私有云接口 (fengj) -->
+	<bean id="standardSynchronizeDeleteProcessor" class="com.neusoft.mid.cloong.stardard.common.StandardSynchronizeDeleteProcessor">
+		<property name="delete" ref="standardDelete" />
+		<property name="transactonGen" ref="transactonGen" />
+		<property name="timeStampgen" ref="timeStampgen" />
+		<property name="ibatisDao" ref="ibatisDAOProxy" />
+		<property name="resourcePoolCacheService" ref="resourcePoolCacheService" />
+	</bean>
+	<bean id="standardDelete" class="com.neusoft.mid.cloong.stardard.common.PirviateStandardDeleteImpl">
+		<property name="common" ref="privateWebServiceClientFactory" />
+		<property name="timeout">
+			<value>${requestTimeout}</value>
+		</property>
+	</bean>
+
+
+</beans>

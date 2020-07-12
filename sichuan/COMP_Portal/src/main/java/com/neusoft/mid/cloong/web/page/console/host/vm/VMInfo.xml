@@ -1,0 +1,1148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="VmInfo">
+	<typeAlias alias="VMInstanceInfo"
+		type="com.neusoft.mid.cloong.web.page.console.host.vm.info.VMInstanceInfo" />
+	<typeAlias alias="RespoolInfo"
+		type="com.neusoft.mid.cloong.web.page.host.vm.order.info.RespoolInfo" />
+	<typeAlias alias="RespoolPartInfo"
+		type="com.neusoft.mid.cloong.web.page.host.vm.order.info.RespoolPartInfo" />
+	<typeAlias alias="OsInfo"
+		type="com.neusoft.mid.cloong.web.page.host.vm.order.info.OsInfo" />
+	<typeAlias alias="PmInfo"
+		type="com.neusoft.mid.cloong.web.page.host.vm.order.info.PmInfo" />
+	<typeAlias alias="StandardInfo"
+		type="com.neusoft.mid.cloong.web.page.host.vm.order.info.StandardInfo" />
+	<typeAlias alias="ItemInfo"
+		type="com.neusoft.mid.cloong.web.page.host.vm.order.info.ItemInfo" />
+	<typeAlias alias="OrderInfo"
+		type="com.neusoft.mid.cloong.web.page.host.vm.order.info.OrderInfo" />
+	<typeAlias alias="VMCreateFail"
+		type="com.neusoft.mid.cloong.host.vm.core.VMCreateFail" />
+	<typeAlias alias="VMModifyFail"
+		type="com.neusoft.mid.cloong.host.vm.core.VMModifyFail" />
+	<typeAlias alias="VMStandardInfo"
+		type="com.neusoft.mid.cloong.web.page.console.host.vm.info.VMStandardInfo" />
+	<typeAlias alias="NetInfo"
+		type="com.neusoft.mid.cloong.web.page.console.host.vm.info.NetInfo" />
+	<typeAlias alias="vmNet"
+		type="com.neusoft.mid.cloong.web.page.console.host.vm.info.vmNet" />
+	<typeAlias alias="VlanIPBind"
+		type="com.neusoft.mid.cloong.web.page.console.host.vm.info.VlanIPBind" />
+	<typeAlias alias="BatchVMInfo"
+		type="com.neusoft.mid.cloong.web.page.console.host.vm.info.BatchVMInfo" />
+	<typeAlias alias="VMPreInstanceInfo"
+		type="com.neusoft.mid.cloong.web.page.console.host.vm.info.VMPreInstanceInfo" />
+
+
+	<sql id="baseCol">
+		case1.CASE_ID caseId,
+		case1.PARAM_FLAG paramFlag,
+		case1.VM_ID vmId,
+		case1.VM_NAME vmName,
+		case1.VM_PASSWORD vmPassword,
+		case1.STANDARD_ID
+		standardId,
+		case1.UserName userName,
+		<!-- case1.STATUS status, -->
+		case1.RES_POOL_ID resPoolId,
+		case1.RES_POOL_NAME resPoolName,
+		case1.RES_POOL_PART_NAME resPoolPartName,
+		case1.RES_POOL_PART_ID
+		resPoolPartId,
+		case1.ORDER_ID orderId,
+		case1.CPU_NUM cpuNum,
+		case1.RAM_SIZE ramSize,
+		case1.DISC_SIZE discSize,
+		case1.ISO_ID isoId,
+		case1.ISO_DESCRIPTION isoDescription,
+		case1.ISO_NAME isoName,
+		case1.DESCRIPTION description,
+		case1.BAND_WIDTH bandWidth,
+		case1.NETWORK_IP networkIp,
+		app.APP_ID appId,
+		app.APP_NAME appName,
+		order1.LENGTH_TIME hours,
+		order1.EFFECTIVE_TIME createTime,
+		order1.EXPIRE_TIME expireTime,
+		item.ITEM_NAME itemName,
+		item.ITEM_ID
+		itemId,
+		case1.BOSS_ORDER_ID vmBossOrderId
+	</sql>
+
+	<select id="getVmBatchInfo" parameterClass="BatchVMInfo"
+		resultClass="BatchVMInfo">
+		SELECT
+		b.id,
+		b.vm_id vmId,
+		v.vm_name vmName,
+		r.PRIVATE_IP vmIP,
+		b.vmModifyFlag,
+		b.modifyDesc,
+		DATE_FORMAT(b.create_time ,'%Y-%m-%d  %H:%i:%S')
+		createTime
+		FROM
+		comp_batch_vm_t b
+		left join comp_case_vm_t v on
+		b.vm_id=v.VM_ID
+		left join comp_rm_vm_t r on b.vm_id=r.vm_id
+		<dynamic prepend="where ">
+			<isNotEmpty prepend="and" property="id">
+				id=#id#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="vmName">
+				v.vm_name like
+				CONCAT('%',#vmName#,'%')
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="vmModifyFlag">
+				vmModifyFlag=#vmModifyFlag#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="vmIP">
+				r.PRIVATE_IP like
+				CONCAT('%',#vmIP#,'%')
+			</isNotEmpty>
+		</dynamic>
+		ORDER BY createTime DESC
+	</select>
+
+	<select id="getVmBatchCount" resultClass="java.lang.Integer">
+		SELECT
+		count(b.id)
+		FROM
+		comp_batch_vm_t b
+		left join comp_case_vm_t v on
+		b.vm_id=v.VM_ID
+		left join comp_rm_vm_t r on b.vm_id=r.vm_id
+		<dynamic prepend="where ">
+			<isNotEmpty prepend="and" property="id">
+				id=#id#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="vmName">
+				v.vm_name like
+				CONCAT('%',#vmName#,'%')
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="vmModifyFlag">
+				vmModifyFlag=#vmModifyFlag#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="vmIP">
+				r.PRIVATE_IP like
+				CONCAT('%',#vmIP#,'%')
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+	<select id="getVmDetail" parameterClass="java.lang.String"
+		resultClass="VMInstanceInfo">
+		SELECT
+		<include refid="baseCol" />
+		FROM
+		COMP_CASE_VM_T case1
+		LEFT JOIN comp_app_t app ON case1.APP_ID =
+		app.APP_ID
+		LEFT JOIN COMP_ORDER_T order1 ON case1.ORDER_ID =
+		order1.ORDER_ID AND
+		order1. STATUS != '2'
+		LEFT JOIN COMP_ITEM_T item ON
+		case1.ITEM_ID =
+		item.ITEM_ID
+		WHERE
+		VM_ID=#vmId#
+	</select>
+	<!-- 通过备份ID查询出虚拟机实例信息 【克隆】 -->
+	<select id="getVmInstanceInfoByVmBackupId" resultClass="VMInstanceInfo"
+		parameterClass="java.lang.String">
+		SELECT
+		<include refid="baseCol" />
+		FROM
+		COMP_CASE_VM_T case1 LEFT JOIN comp_app_t app ON
+		case1.APP_ID=app.APP_ID,COMP_ORDER_T
+		order1,COMP_ITEM_T item
+		WHERE
+		VM_ID=(SELECT VM_ID FROM COMP_CASE_VMBAK_T WHERE VMBAK_ID=#vmBakId#)
+		and
+		case1.ORDER_ID=order1.ORDER_ID and
+		order1.STATUS!='2' and
+		case1.ITEM_ID
+		= item.ITEM_ID
+	</select>
+
+	<select id="getVmDetailByCaseId" parameterClass="java.lang.String"
+		resultClass="VMInstanceInfo">
+		SELECT
+		<include refid="baseCol" />
+		FROM
+		COMP_CASE_VM_T case1
+		LEFT JOIN comp_app_t app ON case1.APP_ID =
+		app.APP_ID
+		LEFT JOIN COMP_ORDER_T order1 ON case1.ORDER_ID =
+		order1.ORDER_ID AND
+		order1. STATUS != '2'
+		LEFT JOIN COMP_ITEM_T item ON
+		case1.ITEM_ID =
+		item.ITEM_ID
+		WHERE
+		case1.CASE_ID=#caseId#
+	</select>
+
+	<select id="getNetByCaseId" parameterClass="java.lang.String"
+		resultClass="NetInfo">
+		SELECT
+		eth,
+		comp_case_vm_net_t.vlan_id vlanId,
+		VLAN_NAME
+		vlanName,
+		ip,
+		IP_DEFAULT_GATEWAY gateway,
+		comp_case_ipsegment_t.START_IP
+		startIp,
+		comp_case_ipsegment_t.END_IP endIp,
+		comp_case_ipsegment_t.IPSEGMENT_ID ipSegmentId,
+		comp_case_vm_net_t.IP_TYPE ipType
+		FROM
+		comp_case_vm_net_t
+		LEFT OUTER JOIN comp_vlan_ipsegment_bind_t ON
+		comp_case_vm_net_t.VLAN_ID = comp_vlan_ipsegment_bind_t.VLAN_ID
+		AND
+		comp_vlan_ipsegment_bind_t.status != '1'
+		LEFT OUTER JOIN
+		comp_case_vlan_t ON comp_case_vm_net_t.VLAN_ID =
+		comp_case_vlan_t.VLAN_ID AND comp_case_vlan_t.CANCELED = '0'
+		LEFT OUTER
+		JOIN comp_case_ipsegment_t ON comp_case_ipsegment_t.IPSEGMENT_ID =
+		comp_vlan_ipsegment_bind_t.IPSEGMENT_ID
+		AND
+		comp_case_ipsegment_t.RELEASED='0'
+		WHERE
+		comp_case_vm_net_t.CASE_ID =
+		#caseId#
+	</select>
+
+	<select id="getNet" parameterClass="java.lang.String"
+		resultClass="NetInfo">
+		SELECT
+		eth,
+		comp_case_vm_net_t.vlan_id vlanId,
+		VLAN_NAME
+		vlanName,
+		ip,
+		IP_DEFAULT_GATEWAY gateway,
+		comp_case_ipsegment_t.START_IP
+		startIp,
+		comp_case_ipsegment_t.END_IP endIp,
+		comp_case_ipsegment_t.IPSEGMENT_ID ipSegmentId,
+		comp_case_vm_net_t.ip_type ipType
+		FROM
+		comp_case_vm_net_t
+		LEFT OUTER JOIN comp_vlan_ipsegment_bind_t ON
+		comp_case_vm_net_t.VLAN_ID = comp_vlan_ipsegment_bind_t.VLAN_ID
+		AND
+		comp_vlan_ipsegment_bind_t.status != '1'
+		LEFT OUTER JOIN
+		comp_case_vlan_t ON comp_case_vm_net_t.VLAN_ID =
+		comp_case_vlan_t.VLAN_ID AND comp_case_vlan_t.CANCELED = '0'
+		LEFT OUTER
+		JOIN comp_case_ipsegment_t ON comp_case_ipsegment_t.IPSEGMENT_ID =
+		comp_vlan_ipsegment_bind_t.IPSEGMENT_ID
+		AND
+		comp_case_ipsegment_t.RELEASED='0'
+		WHERE
+		comp_case_vm_net_t.VM_ID=#vmId#
+	</select>
+
+	<select id="getVmStatus" parameterClass="java.lang.String"
+		resultClass="com.neusoft.mid.cloong.host.vm.core.VMStatus">
+		SELECT STATUS status
+		FROM COMP_CASE_VM_T
+		WHERE
+		VM_ID=#vmId#
+	</select>
+	<select id="queryVmStatus" parameterClass="java.lang.String"
+		resultClass="VMInstanceInfo">
+		SELECT STATUS status, ORDER_ID orderId, CASE_ID caseId,
+		RES_POOL_PART_ID respoolPartId,RES_POOL_ID resPoolId,VM_ID
+		vmId,vm_name vmName
+		FROM COMP_CASE_VM_T
+		WHERE
+		VM_ID=#vmId#
+	</select>
+	<update id="updateVMStatus" parameterClass="VMInstanceInfo">
+		update
+		COMP_CASE_VM_T
+		set
+		STATUS=#status# ,
+		UPDATE_TIME=#updateTime#,
+		UPDATE_USER=#updateUser#
+		where VM_ID=#vmId#
+	</update>
+	<update id="updateVMDesc" parameterClass="VMInstanceInfo">
+		update
+		COMP_CASE_VM_T
+		set
+		DESCRIPTION=#description# ,
+		UPDATE_TIME=#updateTime#,
+		UPDATE_USER=#updateUser#
+		where VM_ID=#vmId#
+	</update>
+	<update id="updateVMSName" parameterClass="VMInstanceInfo">
+		update
+		COMP_CASE_VM_T
+		set
+		VM_NAME=#vmName# ,
+		UPDATE_TIME=#updateTime#,
+		UPDATE_USER=#updateUser#
+		where VM_ID=#vmId#
+	</update>
+
+	<update id="updateVMStatusAndOwn" parameterClass="VMInstanceInfo">
+		update
+		COMP_CASE_VM_T
+		set
+		STATUS=#status# ,
+		UPDATE_TIME=#updateTime#,
+		UPDATE_USER=#updateUser#
+		where VM_ID=#vmId#
+		AND STATUS!='3'
+	</update>
+
+	<select id="getCountVMid" parameterClass="java.lang.String"
+		resultClass="int">
+		SELECT COUNT(*) FROM
+		COMP_CASE_VM_T
+		where VM_ID=#vmId#
+	</select>
+
+	<!-- 查询是否挂载云硬盘 -->
+	<select id="getCountEbsByVMid" parameterClass="java.lang.String"
+		resultClass="int">
+		SELECT COUNT(CASE_ID)
+		FROM COMP_CASE_EBS_T
+		WHERE
+		HOST_ID=#vmId#
+	</select>
+
+	<!-- 查询是否有备份任务 -->
+	<select id="getCountVmBakByVMid" parameterClass="java.lang.String"
+		resultClass="int">
+		SELECT COUNT(CASE_ID)
+		FROM COMP_CASE_VMBAK_T
+		WHERE
+		VM_ID=#vmId#
+	</select>
+
+	<!-- 查询资源池分区磁盘、内存和CPU值总数 -->
+	<select id="queryTotalConfigByRespool" parameterClass="java.lang.String"
+		resultClass="VMInstanceInfo">
+		SELECT CPU_NUM_TOTAL cpuNumTotal, RAM_SIZE_TOTAL
+		ramSizeTotal, DISC_SIZE_TOTAL discSizeTotal
+		FROM COMP_RES_POOL_PART_T
+		WHERE RES_POOL_ID = #resPoolId#
+	</select>
+
+	<select id="queryRespoolPartsForVmApply" parameterClass="java.lang.String"
+		resultClass="RespoolPartInfo">
+		select
+		RES_POOL_PART_ID respoolPartId,
+		RES_POOL_PART_NAME
+		respoolPartName,
+		CPU_NUM_TOTAL
+		cpuNumTotal,
+		RAM_SIZE_TOTAL ramNumTotal,
+		DISC_SIZE_TOTAL
+		diskSizeNumTotal
+		from COMP_RES_POOL_PART_T
+		where
+		RES_POOL_ID
+		=#respoolId#
+	</select>
+
+	<select id="queryRespools" parameterClass="java.util.Map"
+		resultClass="RespoolInfo">
+		SELECT RES_POOL_ID respoolId,RES_POOL_NAME respoolName
+		from
+		COMP_RES_POOL_T
+		where COMP_RES_POOL_T.STATUS = 1
+		<isNotEmpty prepend="and" property="itemId">
+			COMP_RES_POOL_T.RES_POOL_ID in (select
+			COMP_STANDARD_SYN_T.RES_POOL_ID
+			from
+			COMP_STANDARD_SYN_T where
+			COMP_STANDARD_SYN_T.status='2' AND
+			COMP_STANDARD_SYN_T.STANDARD_ID in
+			(
+			select
+			COMP_ITEM_T.STANDARD_ID from
+			COMP_ITEM_T where
+			COMP_ITEM_T.ITEM_ID = #itemId#
+			))
+		</isNotEmpty>
+	</select>
+	<select id="queryRespoolParts" parameterClass="java.util.Map"
+		resultClass="RespoolPartInfo">
+		select RES_POOL_PART_ID respoolPartId,RES_POOL_PART_NAME
+		respoolPartName
+		from COMP_RES_POOL_PART_T
+
+		where STATUS = '1'
+		and
+		RES_POOL_ID =
+		#respoolId#
+		<isNotEmpty prepend="and" property="itemId">
+			RES_POOL_PART_ID in
+			(select
+			RES_POOL_PART_ID from
+			COMP_STANDARD_SYN_T where STANDARD_ID in
+			(select
+			STANDARD_ID from
+			COMP_ITEM_T where ITEM_ID = #itemId#))
+		</isNotEmpty>
+	</select>
+	<select id="queryOss" parameterClass="RespoolPartInfo"
+		resultClass="OsInfo">
+		select OS_ID osId,
+		OS_TYPE osType,
+		OS os,
+		OS_NAME osName,
+		DESCRIPTION
+		osDescription
+		from COMP_OS_T
+		where OS_ID in (select OS_ID
+		from
+		COMP_OS_RELATE_T where
+		RES_POOL_ID=#respoolId# and
+		RES_POOL_PART_ID=#respoolPartId# and resource_Type = #resourceType#
+		and status='0')
+
+	</select>
+	<!-- 查物理机usedFlag 2 作为宿主机的物理机 -->
+	<select id="queryPms" resultClass="PmInfo" parameterClass="java.util.Map">
+		SELECT PM_ID AS pmId, PM_NAME AS pmName
+		FROM `comp_rm_pm_t`
+		WHERE
+		RES_POOL_ID=#respoolId#
+		AND RES_POOL_PART_ID=#respoolPartId#
+		AND
+		USED_FLAG='2'
+	</select>
+	<select id="getOss" parameterClass="StandardInfo" resultClass="OsInfo">
+		SELECT
+		t1.OS_ID osId,
+		OS_TYPE osType,
+		OS os,
+		OS_NAME osName,
+		DESCRIPTION
+		osDescription
+		FROM
+		COMP_OS_T t1,
+		(
+		SELECT DISTINCT
+		(tt.STANDARD_ID)
+		STANDARD_ID,
+		yy.OS_ID
+		FROM
+		comp_standard_syn_t tt,
+		comp_standard_iso_t yy
+		WHERE
+		tt. STATUS = '2'
+		AND tt.standard_id = yy.standard_id
+		AND yy. STATUS
+		= '1'
+		AND tt.standard_id = #standardId#
+		and tt.TEMPLATE_ID =
+		yy.TEMPLATE_ID
+		) t2
+		WHERE
+		t1.OS_ID = t2.OS_ID
+	</select>
+
+	<select id="querySubNetworkAndUser" parameterClass="VMInstanceInfo"
+		resultClass="VMInstanceInfo">
+		select DISTINCT(SUBNETWORK) SUBNETWORK, CREATE_USER
+		createUser
+		from comp_case_vm_t
+		where SUBNETWORK is not NULL
+		and
+		CREATE_USER != #createUser#
+	</select>
+
+	<select id="queryStandards" parameterClass="RespoolPartInfo"
+		resultClass="StandardInfo">
+		SELECT
+		t.STANDARD_ID standardId,
+		CPU_NUM cpuNum,
+		RAM_SIZE/1024 ramSize,
+		DISC_SIZE discSize,
+		DESCRIPTION description,
+		CREATE_TIME createTime,
+		CREATE_USER createUser,
+		UPDATE_TIME updateTime,
+		UPDATE_USER updateUser
+		FROM
+		COMP_STANDARD_VM_t t,
+		(
+		SELECT
+		distinct STANDARD_ID
+		FROM
+		COMP_STANDARD_SYN_T
+		WHERE
+		STANDARD_TYPE = '0'
+		AND STATUS = '2'
+		<isNotEmpty prepend="and" property="respoolId">
+			RES_POOL_ID =
+			#respoolId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="respoolPartId">
+			RES_POOL_PART_ID =
+			#respoolPartId#
+		</isNotEmpty>
+		) t1
+		WHERE
+		t.standard_id = t1.STANDARD_ID
+	</select>
+
+	<!-- 推荐条目查规格 -->
+	<select id="queryRecommendStandards" parameterClass="RespoolPartInfo"
+		resultClass="StandardInfo">
+		SELECT
+		t.STANDARD_ID standardId,
+		t.CPU_NUM cpuNum,
+		ROUND(t.RAM_SIZE / 1024,0) ramSize,
+		t.DISC_SIZE discSize,
+		t.DESCRIPTION description,
+		t.CREATE_TIME createTime,
+		t.CREATE_USER createUser,
+		t.UPDATE_TIME updateTime,
+		t.UPDATE_USER updateUser,
+		t4.hour_price hourPrice,
+		t4.month_price monthPrice
+		FROM
+		COMP_STANDARD_VM_t t
+		LEFT JOIN COMP_STANDARD_SYN_T t2 ON t.STANDARD_ID = t2.STANDARD_ID
+		LEFT JOIN comp_item_t t3 ON t3.STANDARD_ID = t2.STANDARD_ID
+		LEFT JOIN comp_charges_t t4 ON t4.cpu_number = t.CPU_NUM
+		AND t4.memory_size = t.RAM_SIZE
+		WHERE
+		t3.RECOMMEND = '1'
+		AND t2.STANDARD_TYPE = '0'
+		AND t2. STATUS = '2'
+		<isNotEmpty prepend="and" property="respoolId">
+			t2.RES_POOL_ID =
+			#respoolId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="respoolPartId">
+			t2.RES_POOL_PART_ID =
+			#respoolPartId#
+		</isNotEmpty>
+	</select>
+
+	<select id="getResPoolId" parameterClass="java.lang.String"
+		resultClass="VMInstanceInfo">
+		select RES_POOL_ID resPoolId, RES_POOL_PART_ID
+		resPoolPartId
+		from COMP_RES_POOL_PART_T
+		where RES_POOL_PART_ID =
+		#respoolPartId#
+	</select>
+
+
+	<!-- 加载对应规格条目 -->
+	<select id="queryItems" parameterClass="StandardInfo"
+		resultClass="ItemInfo">
+		SELECT
+		ITEM_ID itemId,
+		ITEM_NAME itemName,
+		DESCRIPTION
+		DESCRIPTION
+		FROM
+		comp_item_t
+		WHERE
+		ITEM_TYPE = '0'
+		AND STATUS = '5'
+		AND
+		STANDARD_TYPE = '0'
+		AND STANDARD_ID =
+		#standardId#
+	</select>
+
+	<insert id="createVMInstanceInfo" parameterClass="VMInstanceInfo">
+		insert into
+		COMP_CASE_VM_T
+		(CASE_ID,Param_Flag,PM_ID,VM_ID,VM_NAME,STATUS,
+		RES_POOL_ID,RES_POOL_PART_ID,
+		ORDER_ID,CPU_NUM ,RAM_SIZE ,DISC_SIZE ,
+		ISO_ID,ISO_NAME,ISO_DESCRIPTION,DESCRIPTION ,CREATE_TIME ,
+		CREATE_USER
+		,UPDATE_TIME
+		,UPDATE_USER ,
+		RES_POOL_NAME,RES_POOL_PART_NAME ,
+		ITEM_ID,
+		STANDARD_ID,
+		VM_PASSWORD,
+		APP_ID,
+		UserName,
+		Operation_URL,
+		BOSS_ORDER_ID
+		)
+		values
+		(#caseId#,#paramFlag#,#pmId#,#vmId#,#vmName#,#status#,#resPoolId#,#resPoolPartId#,#orderId#,
+		#cpuNum#,#ramSize#,#discSize#,#isoId#,#isoName#,#isoDescription#,#description#,#createTime#,
+		#createUser#,#updateTime#,#updateUser#,#resPoolName#,#resPoolPartName#,
+		#itemId#,#standardId#,#vmPassword#,#appId#,#userName#,#operationURL#,#vmBossOrderId#)
+	</insert>
+
+	<insert id="createVMOrder" parameterClass="OrderInfo">
+		insert into
+		COMP_ORDER_T(ORDER_ID,
+		STATUS,
+		EFFECTIVE_TIME,
+		LENGTH_TIME,
+		LENGTH_UNIT,
+		CREATE_TIME,
+		CREATE_USER,
+		UPDATE_TIME,
+		UPDATE_USER,
+		CASE_TYPE,
+		PARENT_ID,
+		CASE_ID,
+		RES_POOL_ID,
+		APP_ID
+		)
+		values
+		(#orderId#,#status#,#effectiveTime#,#lengthTime#,#lengthUnit#,#createTime#,#createUser#,#updateTime#,
+		#updateUser#,#caseType#,#parentId#,#caseId#,#resPoolId#,#appId#)
+	</insert>
+
+
+	<select id="queryOsName" parameterClass="java.lang.String"
+		resultClass="OsInfo">
+		select
+		OS_NAME osName,
+		DESCRIPTION
+		osDescription
+		from
+		COMP_OS_T
+		where OS_ID =#osId#
+
+	</select>
+	<select id="queryAllStatus" resultClass="VMInstanceInfo">
+		select VM_ID vmId,STATUS
+		status from COMP_CASE_VM_T where STATUS!='3' and STATUS!='0'
+	</select>
+
+
+	<select id="getSubnetworkByUserId" parameterClass="java.lang.String"
+		resultClass="java.lang.String">
+		select SUBNETWORK from COMP_CASE_VM_T
+		where CREATE_USER =
+		#userId# and CASE_ID = (SELECT MAX(CASE_ID) FROM COMP_CASE_VM_T WHERE
+		CREATE_USER =#userId#)
+	</select>
+
+
+	<insert id="insertVMFail" parameterClass="VMCreateFail">
+		insert into
+		COMP_VM_CREATE_FAIL_T(
+		FAIL_CAUSE,
+		FAIL_CODE,
+		RES_POOL_ID,
+		RES_POOL_PART_ID,
+		STANDARD_ID,
+		OS_ID,
+		NUM,
+		CREATE_TIME)
+		values
+		(#failCause#,#failCode#,#resPoolId#,#resPoolPartId#,#standardId#,#osId#,#num#,#createTime#)
+	</insert>
+
+	<select id="queryVMStandardInfo" resultClass="VMStandardInfo"
+		parameterClass="VMStandardInfo">
+		SELECT
+		a.standard_Id standardId,
+		a.standard_Name standardName,
+		a.cpu_num
+		cpuNum,
+		a.ram_size ramSize,
+		a.disc_size discSize,
+		a.description
+		description,
+		a.create_time createTime,
+		a.create_user createUser,
+		a.update_time updateTime,
+		a.update_user updateUser,
+		d.ITEM_ID itemId,
+		d.ITEM_NAME itemName
+		FROM
+		COMP_STANDARD_VM_T a,
+		COMP_ITEM_T d
+		WHERE
+		d.STANDARD_ID=a.standard_Id
+		and d.ITEM_TYPE='0'
+		and d.STANDARD_TYPE='0'
+		and d.STATUS='5'
+		AND (SELECT
+		COUNT(*) FROM COMP_STANDARD_SYN_T c WHERE
+		c.standard_Id=a.standard_Id
+		AND STATUS='2'
+		AND RES_POOL_ID = #resPoolId#
+		AND RES_POOL_PART_ID = #resPoolPartId#
+		)>0
+		AND a.status = '0'
+		<isNotEmpty prepend="AND" property="cpuNum">
+			<isNotEqual compareValue="0" property="cpuNum">
+				cpu_num=#cpuNum#
+			</isNotEqual>
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="ramSize">
+			<isNotEqual compareValue="0" property="ramSize">
+				ram_size=#ramSize#
+			</isNotEqual>
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="discSize">
+			<isNotEqual compareValue="0" property="discSize">
+				disc_size=#discSize#
+			</isNotEqual>
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="standardId">
+			a.standard_Id =
+			#standardId#
+		</isNotEmpty>
+	</select>
+	<select id="queryVMInfo" resultClass="VMStandardInfo"
+		parameterClass="java.lang.String">
+		SELECT
+		standard_Id standardId,
+		standard_Name
+		standardName,
+		cpu_num cpuNum,
+		ram_size ramSize,
+		disc_size discSize,
+		description description,
+		create_time createTime,
+		create_user createUser,
+		update_time updateTime,
+		update_user updateUser
+		FROM
+		COMP_STANDARD_VM_T a
+		WHERE STANDARD_ID = #standardId#
+	</select>
+
+	<!-- 修改虚拟机信息到两张临时表 虚拟机修改表和虚拟机网卡修改表 -->
+	<insert id="insertVMModifyInfo" parameterClass="VMInstanceInfo">
+		insert into
+		COMP_CASE_VM_MOD_T (VM_ID, VM_NAME, CPU_NUM, RAM_SIZE, DISC_SIZE,
+		RES_POOL_ID, RES_POOL_PART_ID, TIME_STAMP)
+		values(#vmId#, #vmName#,
+		#cpuNum#, #ramSize#, #discSize#, #resPoolId#, #resPoolPartId#,
+		#timeStamp#)
+	</insert>
+
+	<insert id="insertVMModifyNetInfo" parameterClass="NetInfo">
+		insert into
+		COMP_CASE_VM_MOD_NET_T (VM_ID, PUR_POSE, ETH, IP, IP_DEFAULT_GATEWAY,
+		VLAN_ID, IP_Subnetmask, TIME_STAMP)
+		values(#vmId#, '2', #eth#, #ip#,
+		#gateway#, #vlanId#, #subNetMask#, #timeStamp#)
+	</insert>
+
+	<insert id="insertVMNetInfo" parameterClass="NetInfo">
+		insert into
+		COMP_CASE_VM_NET_T (CASE_ID, VM_ID, PUR_POSE, ETH, IP,
+		IP_DEFAULT_GATEWAY, VLAN_ID, IP_Subnetmask)
+		values(#caseId#, #vmId#,
+		'2', #eth#, #ip#, #gateway#, #vlanId#, #subNetMask#)
+	</insert>
+
+	<select id="getOrderStatus" resultClass="OrderInfo"
+		parameterClass="java.lang.String">
+		SELECT
+		STATUS status,
+		ORDER_ID orderId
+		FROM
+		COMP_ORDER_T
+		WHERE CASE_ID = #caseId#
+	</select>
+
+	<select id="queryLastEth" resultClass="java.lang.String"
+		parameterClass="java.lang.String">
+		SELECT
+		max(eth)
+		FROM
+		COMP_CASE_VM_NET_T
+		WHERE VM_ID =
+		#vmId#
+	</select>
+
+	<select id="querySubnetmaskByIpSubnet" resultClass="java.lang.String"
+		parameterClass="java.lang.String">
+		SELECT
+		IP_SUBNET
+		FROM
+		COMP_CASE_IPSEGMENT_T
+		WHERE
+		IPSEGMENT_ID = #ipSegmentId#
+	</select>
+
+	<!-- 查询vlan和ip段是否有有效的绑定关系 -->
+	<select id="countVlanIpsegmentRel" parameterClass="NetInfo"
+		resultClass="int">
+		SELECT
+		COUNT(VLAN_ID)
+		FROM
+		comp_vlan_ipsegment_bind_t
+		WHERE
+		VLAN_ID = #vlanId#
+		AND IPSEGMENT_ID=#ipSegmentId#
+		AND status = '0'
+	</select>
+
+	<!-- 未绑定的绑定在一起,状态为待生效；无效的变为待生效 -->
+	<insert id="insertVlanIpsegmentRel" parameterClass="NetInfo">
+		replace INTO
+		comp_vlan_ipsegment_bind_t (
+		VLAN_ID,
+		IPSEGMENT_ID,
+		Status,
+		CREATE_TIME,
+		CREATE_USER,
+		UPDATE_TIME,
+		UPDATE_USER
+		) VALUES
+		(#vlanId#,#ipSegmentId#,'2',#createTime#,#createUser#,#updateTime#,#updateUser#)
+	</insert>
+
+	<!-- 修改虚拟机信息 -->
+	<update id="updateVMInfo" parameterClass="VMInstanceInfo">
+		update
+		COMP_CASE_VM_T
+		set
+		<isNotEmpty prepend="" property="cpuNum">
+			CPU_NUM=#cpuNum#,
+		</isNotEmpty>
+		<isNotEmpty prepend="" property="ramSize">
+			RAM_SIZE=#ramSize#,
+		</isNotEmpty>
+		<isNotEmpty prepend="" property="discSize">
+			DISC_SIZE=#discSize#,
+		</isNotEmpty>
+		UPDATE_TIME=#updateTime#,
+		UPDATE_USER=#updateUser#
+		where VM_ID=#vmId#
+	</update>
+
+	<!-- 修改虚拟机网卡信息 -->
+	<update id="updateVMNetInfo" parameterClass="NetInfo">
+		update
+		COMP_CASE_VM_NET_T
+		set
+		ETH=#eth#,
+		IP=#ip#,
+		IP_DEFAULT_GATEWAY=#gateway#,
+		VLAN_ID=#vlanId#,
+		IP_Subnetmask = #subNetMask#
+		where VM_ID=#vmId#
+	</update>
+
+	<!-- 修改虚拟机时更新订单 -->
+	<update id="updateOrderStatus" parameterClass="OrderInfo">
+		update
+		COMP_ORDER_T
+		set
+		STATUS=#status#,
+		<isNotEmpty property="vmModifyBatchId">
+			vmModifyBatchId=#vmModifyBatchId#,
+		</isNotEmpty>
+		UPDATE_TIME=#updateTime#,
+		UPDATE_USER=#updateUser#
+		where
+		ORDER_ID=#orderId#
+	</update>
+
+	<insert id="insertVMModifyFail" parameterClass="VMModifyFail">
+		insert into
+		COMP_VM_MODIFY_FAIL_T(
+		FAIL_CAUSE,
+		FAIL_CODE,
+		RES_POOL_ID,
+		RES_POOL_PART_ID,
+		VM_ID,
+		CPU_NUM,
+		RAM_SIZE,
+		DISC_SIZE_ADD,
+		CREATE_TIME)
+		values
+		(#failCause#,#failCode#,#resPoolId#,#resPoolPartId#,#vmId#,#cpuNum#,#ramSize#,#discSize#,#createTime#)
+	</insert>
+
+	<!-- 修改虚拟机时更新订单 -->
+	<update id="updateOrderInfo" parameterClass="OrderInfo">
+		update
+		COMP_ORDER_T
+		set
+		UPDATE_TIME=#updateTime#,
+		UPDATE_USER=#updateUser#
+		where
+		ORDER_ID=#orderId#
+	</update>
+
+
+	<select id="getAllNet" parameterClass="java.lang.String"
+		resultClass="NetInfo">
+		SELECT
+		vn.vlan_id vlanId,
+		vn.ip ip,
+		vn.IP_DEFAULT_GATEWAY
+		gateway
+		FROM
+		comp_case_vm_net_t vn
+		LEFT JOIN comp_order_t o ON vn.CASE_ID
+		= o.CASE_ID
+		LEFT JOIN
+		comp_case_vm_t v ON vn.CASE_ID = v.CASE_ID
+		WHERE
+		o.`STATUS` != '2'
+		AND v.`STATUS` != '3'
+		AND vn.vlan_id = #vlanId#
+	</select>
+
+	<select id="getALLnetforLB" parameterClass="java.lang.String"
+		resultClass="NetInfo">
+		SELECT
+		vn.VlanId vlanId,
+		vn.LBIP ip
+		FROM
+		comp_load_balance_service_tab vn
+		LEFT JOIN comp_order_t o ON vn.LBID
+		=
+		o.CASE_ID
+		WHERE
+		o.`STATUS` != '2'
+		AND vn.VlanId = #vlanId#
+	</select>
+
+	<select id="getALLnetforLBobj" parameterClass="java.lang.String"
+		resultClass="NetInfo">
+		SELECT
+		vn.VlanId vlanId,
+		vn.HOST_IP ip
+		FROM
+		comp_load_balance_host_tab vn
+		WHERE
+		vn.VlanId = #vlanId#
+	</select>
+	<select id="getAllNetForVmMod" parameterClass="java.lang.String"
+		resultClass="NetInfo">
+		SELECT
+		v.vlan_id vlanId,
+		v.ip ip,
+		v.IP_DEFAULT_GATEWAY
+		gateway
+		FROM
+		comp_case_vm_mod_net_t v LEFT JOIN comp_case_vm_t m ON
+		v.VM_ID=m.VM_ID LEFT JOIN comp_order_t o ON m.CASE_ID=o.CASE_ID
+		WHERE
+		o.`STATUS`!='2' AND m.`STATUS` != '3' and v.vlan_id=#vlanId# AND
+		v.TIME_STAMP in (
+		SELECT
+		MAX(v.TIME_STAMP)
+		FROM
+		comp_case_vm_mod_net_t v
+		LEFT JOIN comp_case_vm_t m ON v.VM_ID=m.VM_ID LEFT JOIN
+		comp_order_t o
+		ON m.CASE_ID=o.CASE_ID
+		WHERE
+		o.`STATUS`!='2' AND
+		m.`STATUS` != '3' and
+		v.vlan_id=#vlanId#
+		GROUP BY o.CASE_ID
+		)
+	</select>
+
+	<insert id="insertVmNet" parameterClass="vmNet">
+		INSERT INTO
+		comp_case_vm_net_t (
+		CASE_ID,
+		VM_ID,
+		PUR_POSE,
+		ETH,
+		IP,
+		IP_DEFAULT_GATEWAY,
+		VLAN_ID,
+		IP_Subnetmask,
+		IP_TYPE
+		) VALUES
+		(#caseId#,#vmId#,#purPose#,#eth#,#ip#,#gateway#,#vlanId#,#subnetmask#,#ipType#)
+	</insert>
+
+	<update id="updateVmNet" parameterClass="vmNet">
+		update
+		comp_case_vm_net_t
+		set
+		VM_ID=#vmId#
+		where
+		CASE_ID=#caseId#
+	</update>
+
+
+	<select id="getVlanIPBind" parameterClass="VlanIPBind"
+		resultClass="VlanIPBind">
+		SELECT
+		VLAN_ID vlanId,
+		IPSEGMENT_ID ipSegment,
+		Status status
+		FROM
+		comp_vlan_ipsegment_bind_t
+		Where
+		VLAN_ID=#vlanId# and
+		IPSEGMENT_ID=#ipSegment# and Status=#status#
+	</select>
+
+	<insert id="insertVlanIPBind" parameterClass="VlanIPBind">
+		replace INTO
+		comp_vlan_ipsegment_bind_t (
+		VLAN_ID,
+		IPSEGMENT_ID,
+		Status,
+		CREATE_TIME,
+		CREATE_USER,
+		UPDATE_TIME,
+		UPDATE_USER
+		) VALUES
+		(#vlanId#,#ipSegment#,#status#,#createTime#,#createUser#,#updateTime#,#updateUser#)
+	</insert>
+
+	<select id="getPublicIpByIp" parameterClass="java.util.List"
+		resultClass="java.lang.String">
+		SELECT DISTINCT
+		network_ip AS publicIp
+		FROM
+		comp_ip_publicip_bind_t
+		WHERE
+		ip IN
+		<iterate conjunction="," open="(" close=")">
+			#ipList[]#
+		</iterate>
+	</select>
+	
+	<insert id="insertPreApplyVm" parameterClass="VMPreInstanceInfo">
+		insert INTO
+		comp_pre_apply_vm_t (
+		CASE_ID,
+		VM_NAME,
+		APP_ID,
+		STATUS,
+		RES_POOL_ID,
+		RES_POOL_NAME,
+		RES_POOL_PART_ID,
+		RES_POOL_PART_NAME,
+		CPU_NUM,
+		RAM_SIZE,
+		DISC_SIZE,
+		ISO_ID,
+		ISO_NAME,
+		CHARGE_TYPE,
+		CHARGE_TIME,
+		NUM,
+		CREATE_TIME,
+		CREATE_USER,
+		DESCRIPTION,
+		IP_TYPE
+		) VALUES
+		(#caseId#,#vmName#,#appId#,#status#,#resPoolId#,#resPoolName#,#resPoolPartId#,#resPoolPartName#,#cpuNum#,#ramSize#,#discSize#,#isoId#,#isoName#,#chargeType#,#chargeTime#,#num#,#createTime#,#createUser#,#description#,#ipType#)
+	</insert>
+
+	<select id="queryVmPreApplyUserListAll" parameterClass="VMPreInstanceInfo"
+		resultClass="VMPreInstanceInfo">
+		SELECT
+		CASE_ID caseId,
+		VM_NAME vmName,
+		vm.APP_ID appId,
+		app.APP_NAME appName,
+		STATUS status,
+		RES_POOL_ID resPoolId,
+		RES_POOL_NAME resPoolName,
+		RES_POOL_PART_ID resPoolPartId,
+		RES_POOL_PART_NAME resPoolPartName,
+		CPU_NUM cpuNum,
+		RAM_SIZE ramSize,
+		DISC_SIZE discSize,
+		ISO_ID isoId,
+		ISO_NAME isoName,
+		CHARGE_TYPE chargeType,
+		CHARGE_TIME chargeTime,
+		NUM num,
+		vm.CREATE_TIME createTime,
+		vm.CREATE_USER createUser,
+		vm.UPDATE_TIME updateTime,
+		vm.UPDATE_USER updateUser,
+		vm.DESCRIPTION description
+		FROM
+		comp_pre_apply_vm_t vm, comp_app_t app
+		where vm.APP_ID = app.APP_ID
+		<isNotEmpty prepend="and" property="vmName">
+			vm.VM_NAME like
+				CONCAT('%',#vmName#,'%')
+		</isNotEmpty>
+		order by
+		vm.create_time desc
+	</select>
+	
+	<select id="queryVmPreApplyUser" parameterClass="java.lang.String"
+		resultClass="VMPreInstanceInfo">
+		SELECT
+		CASE_ID caseId,
+		VM_NAME vmName,
+		vm.APP_ID appId,
+		app.APP_NAME appName,
+		STATUS status,
+		RES_POOL_ID resPoolId,
+		RES_POOL_NAME resPoolName,
+		RES_POOL_PART_ID resPoolPartId,
+		RES_POOL_PART_NAME resPoolPartName,
+		CPU_NUM cpuNum,
+		RAM_SIZE ramSize,
+		DISC_SIZE discSize,
+		ISO_ID isoId,
+		ISO_NAME isoName,
+		CHARGE_TYPE chargeType,
+		CHARGE_TIME chargeTime,
+		NUM num,
+		vm.CREATE_TIME createTime,
+		vm.CREATE_USER createUser,
+		vm.UPDATE_TIME updateTime,
+		vm.UPDATE_USER updateUser,
+		vm.DESCRIPTION description,
+		vm.IP_TYPE ipType
+		FROM
+		comp_pre_apply_vm_t vm, comp_app_t app
+		where vm.APP_ID = app.APP_ID
+		and vm.CASE_ID = #caseId#
+	</select>
+	
+	<select id="countVmPreApplyUserListAll" parameterClass="VMPreInstanceInfo"
+		resultClass="int">
+		SELECT
+		count(*)
+		FROM
+		comp_pre_apply_vm_t vm, comp_app_t app
+		where vm.APP_ID = app.APP_ID
+		<isNotEmpty prepend="and" property="vmName">
+			vm.VM_NAME like
+				CONCAT('%',#vmName#,'%')
+		</isNotEmpty>
+		order by
+		vm.create_time desc
+	</select>
+	
+	<update id="updateVMPreApplyStatus" parameterClass="VMPreInstanceInfo">
+		update
+		comp_pre_apply_vm_t
+		set
+		STATUS=#status# ,
+		UPDATE_TIME=#updateTime#,
+		UPDATE_USER=#updateUser#
+		where CASE_ID=#caseId#
+	</update>
+</sqlMap>

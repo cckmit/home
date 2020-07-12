@@ -1,0 +1,56 @@
+@charset "utf-8";
+/* CSS Document */
+
+/* 列表显示IP图标 */
+.ico-ip{
+	background:url(../images/ico_ip.png) no-repeat center;
+}
+
+/*绑定主机字体样式*/
+.pnip-span-host{
+	font-size: 14px;
+	float:left;
+}
+.pnip-span-host a{
+	display:block;
+	color:#0078c8;
+	line-height:20px;
+	text-decoration:none;
+}
+
+/* 详细高度 */
+.pnip-info-h{
+	height:318px;
+}
+/* 变更 解绑 按钮 样式 */
+.host-btn{
+	float:left;
+	padding-left: 20px;
+}
+.host-btn li{
+	line-height:20px;
+	width:70px;
+	float:left;
+	background-color:#3cb4f0;
+	border:1px solid #359dd1;
+	color:#FFF;
+	/*圆角*/
+	-moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius:3px;
+	margin-right: 10px;
+}
+.host-btn a{
+	display:block;
+	color:#FFF;
+	line-height:20px;
+	text-align:center;
+	text-decoration:none;
+}
+
+/* ip申请 右侧头下面详细 名称类型宽度*/
+.apply-detail-r-status span.pnip-r-det-span-name{
+	float:left;
+	width:60px;
+	font-size:14px;
+}

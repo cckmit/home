@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="COMP_Boss_Agent:war">
+    <output-path>$PROJECT_DIR$/COMP_Boss_Agent/target</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <module>COMP_Boss_Agent</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="archive" name="COMP_Boss_Agent-0.0.1-SNAPSHOT.war">
+      <element id="artifact" artifact-name="COMP_Boss_Agent:war exploded" />
+    </root>
+  </artifact>
+</component>

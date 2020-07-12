@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+
+	<!-- Quartz 触发器  -->
+ 	<!-- <bean id="quartzFactory"  class="org.springframework.scheduling.quartz.SchedulerFactoryBean"> 
+	     <property name="triggers"> 
+	         <ref bean="billingTrigger"/>
+	     </property>
+ 	</bean> -->
+	
+	<!-- 操作系统 -->
+	<!-- <bean id="billingTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		 <property name="jobDetail"> 
+		 	<ref bean="monitorBillingTask" />
+		 </property>
+		  <property name="cronExpression"> 
+            <value>${uploadBillingMonitorTime}</value> 
+        </property> 
+	</bean> -->
+
+	<!-- <bean id="monitorBillingTask" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		 调用的类
+        <property name="targetObject"> 
+            <ref bean="billingService" />             
+        </property> 
+        调用类中的方法
+        <property name="targetMethod"> 
+            <value>synchBillingToSFTP</value> 
+        </property> 
+        是否并行运行
+		<property name="concurrent" value="false"/>
+	</bean> -->
+</beans>

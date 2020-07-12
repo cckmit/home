@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="VMStandardInfo">
+
+	<typeAlias alias="VMStandardInfo" type="com.neusoft.mid.cloong.web.page.product.standard.vm.info.VMStandardInfo" />
+	<typeAlias alias="StandardResListInfo" type="com.neusoft.mid.cloong.web.page.product.standard.vm.info.StandardResListInfo" />
+	<typeAlias alias="StandardSynInfo" type="com.neusoft.mid.cloong.web.page.product.standard.vm.info.StandardSynInfo" />
+	<typeAlias alias="StandardQueryPara" type="com.neusoft.mid.cloong.web.page.product.standard.vm.info.StandardQueryPara" />
+	
+	<select id="queryVMStandardInfo" resultClass="VMStandardInfo"
+		parameterClass="VMStandardInfo">
+		SELECT
+		standard_Id standardId,
+		standard_Name standardName,
+		cpu_num cpuNum,
+		ram_size ramSize,
+		disc_size discSize,
+		description description,
+		create_time createTime,
+		create_user createUser,
+		update_time updateTime,
+		update_user updateUser,
+		(select count(*) from comp_item_t b where b.standard_Id =
+		a.standard_Id AND b.status not in ('3','6','7','8')) as useStatus
+		FROM
+		COMP_STANDARD_VM_T a
+		WHERE
+		(SELECT
+		COUNT(*) FROM COMP_STANDARD_SYN_T c WHERE c.standard_Id=a.standard_Id
+		AND STATUS='2')>0
+		AND status = '0'
+		<isNotEmpty prepend="AND" property="cpuNum">
+			<isNotEqual compareValue="0" property="cpuNum">
+				cpu_num=#cpuNum#
+			</isNotEqual>
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="ramSize">
+			<isNotEqual compareValue="0" property="ramSize">
+				ram_size=#ramSize#
+			</isNotEqual>
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="discSize">
+			<isNotEqual compareValue="0" property="discSize">
+				disc_size=#discSize#
+			</isNotEqual>
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="useStatus">
+			<isEqual compareValue="1" property="useStatus">
+				(select count(*) from
+				comp_item_t b where b.standard_Id = a.standard_Id AND b.status not in ('3','6','7','8')) > 0 
+			</isEqual>
+			<isEqual compareValue="0" property="useStatus">
+				(select count(*) from
+				comp_item_t b where b.standard_Id = a.standard_Id AND b.status not in ('3','6','7','8')) = 0 
+			</isEqual>
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="standardId">
+			a.standard_Id =
+			#standardId#
+		</isNotEmpty>
+	</select>
+	<select id="queryVMStandardInfoDetail" resultClass="VMStandardInfo"
+		parameterClass="VMStandardInfo">
+		SELECT
+		standard_Id standardId,
+		standard_Name standardName,
+		cpu_num cpuNum,
+		ram_size ramSize,
+		disc_size discSize,
+		description description,
+		create_time createTime,
+		create_user createUser,
+		update_time updateTime,
+		update_user updateUser,
+		(select count(*) from comp_item_t b where b.standard_Id =
+		a.standard_Id) as useStatus
+		FROM
+		COMP_STANDARD_VM_T a
+		WHERE
+		status = '0'
+		<isNotEmpty prepend="AND" property="standardId">
+			a.standard_Id =
+			#standardId#
+		</isNotEmpty>
+	</select>
+	<select id="queryVMStandardList" resultClass="VMStandardInfo"
+		parameterClass="StandardQueryPara">
+		SELECT
+		standard_name standardName,
+		standard_Id
+		standardId,
+		create_time
+		createTime,
+		create_user createUser
+		FROM
+		COMP_STANDARD_VM_T where status
+		='0'
+		<isNotEmpty property="standardName" prepend="and">
+			standard_name like CONCAT('%',#standardName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="startTime">
+			create_time
+			>=#startTime# 
+			</isNotEmpty>
+		<isNotEmpty prepend="and" property="endTime">
+			create_time &lt;=#endTime# 
+			</isNotEmpty>
+			order by update_time desc
+		</select>
+		<select id="queryVMStandardCount"  resultClass="java.lang.Integer"
+		parameterClass="StandardQueryPara">
+			SELECT COUNT(*)
+			FROM
+			COMP_STANDARD_VM_T where status
+			='0'
+		<isNotEmpty property="standardName" prepend="and">
+			standard_name like CONCAT('%',#standardName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="startTime">
+			create_time
+			>=#startTime# 
+			</isNotEmpty>
+		<isNotEmpty prepend="and" property="endTime">
+			create_time &lt;=#endTime# 
+			</isNotEmpty>
+		</select>
+		<select id="queryVMStandardDetail" parameterClass="java.lang.String" resultClass="VMStandardInfo">
+			select STANDARD_ID standardId,STANDARD_NAME standardName,CPU_NUM cpuNum,RAM_SIZE ramSize,DISC_SIZE discSize,DESCRIPTION description from COMP_STANDARD_VM_T where STANDARD_ID=#standardId# and status
+		='0'
+		</select>
+		<insert id="createVMStandard" parameterClass="VMStandardInfo">
+			insert into COMP_STANDARD_VM_T 
+		(STANDARD_ID ,
+		STANDARD_NAME,
+		CPU_NUM ,
+		RAM_SIZE ,
+		DISC_SIZE ,
+		DESCRIPTION ,
+		STATUS ,
+		CREATE_TIME ,
+		CREATE_USER ,
+		UPDATE_TIME ,
+		UPDATE_USER )
+		 values 
+		(#standardId#,
+		#standardName#,
+		#cpuNum#,
+		#ramSize#,
+		#discSize#,
+		#description#,
+		'0',
+		#createTime#,
+		#createUser#,
+		#updateTime#,
+		#updateUser#
+		)
+		</insert>
+		<update id="updateVMStandard" parameterClass="VMStandardInfo">
+			update COMP_STANDARD_VM_T set STANDARD_NAME=#standardName#,CPU_NUM=#cpuNum#,RAM_SIZE=#ramSize#,DISC_SIZE=#discSize#,DESCRIPTION=#description#,UPDATE_TIME=#updateTime#,UPDATE_USER=#updateUser# where STANDARD_ID=#standardId# and STATUS='0'
+		</update>
+		<select id="selectItembystandardId" parameterClass="java.lang.String" resultClass="int">
+			select count(*) from COMP_ITEM_T where STANDARD_ID=#standardId# and STATUS!='8'
+		</select>
+		<update id="deleteVmStandard" parameterClass="java.lang.String">
+			update COMP_STANDARD_VM_T set STATUS='1' where STANDARD_ID=#standardId# and STATUS='0'
+		</update>
+		<!-- 查询虚拟机规格列表（适用模板） -->
+		<select id="queryVmStandResList" resultClass="StandardResListInfo">
+			SELECT 
+			standard_id standardId,
+			standard_name standardName,
+			res_pool_id resPoolId,
+			res_pool_name resPoolName,
+			res_pool_part_id resPoolPartId,
+			res_pool_part_name resPoolPartName,
+			status status,
+			resStatus resStatus,
+			os_id osId,
+			os_name osName,
+			roolPartStatus
+			FROM comp_vm_template_res_v  
+			WHERE standard_id=#standardId# 
+			AND resStatus!='0'
+			ORDER BY res_pool_id,res_pool_part_id
+		</select>
+		
+		<select id="queryVmStandInfo" resultClass="VMStandardInfo">
+			SELECT 
+			standard_name standardName,
+			standard_id standardId,
+			cpu_num cpuNum,
+			ram_size ramSize,
+			disc_size discSize,
+			description description,
+			create_user createUser,
+			create_time createTime
+			FROM
+			comp_standard_vm_t
+			WHERE
+			standard_id=#standardId#
+		</select>
+		<select id="queryInsertVmSynData" resultClass="StandardResListInfo">
+			SELECT
+			standard_id standardId,
+			res_pool_id resPoolId,
+			res_pool_part_id resPoolPartId
+			FROM 
+			comp_vm_standard_res_v 
+			WHERE 
+			standard_Id=#standardId# 
+			AND(
+			<iterate property="resourcePoolInfos" conjunction="OR">
+				(res_pool_id
+				=#resourcePoolInfos[].resourcePoolId# and res_pool_part_id=
+				#resourcePoolInfos[].resourcePoolPart#)
+			</iterate>
+			)
+			AND flage='0'
+		</select>
+		<insert id="insertSyn" parameterClass="StandardSynInfo">
+			insert into comp_standard_syn_t 
+			(
+			STANDARD_ID,
+			RES_POOL_PART_ID,
+			RES_POOL_ID,
+			STANDARD_TYPE,
+			TEMPLATE_ID,
+			STATUS,
+			SYN_TIME,
+			SYN_USER
+			)
+			values 
+			(
+			#standardId#,
+			#resPoolPartId#,
+			#resPoolId#,
+			#standardType#,
+			#templateId#,
+			'1',
+			#synTime#,
+			#synUser#
+			)
+		</insert>
+		<update id="updateStandardSynSuccess" parameterClass="map">
+			update comp_standard_syn_t 
+			set status='0'
+			where
+			standard_Id=#standardId# 
+			<isNotEmpty property="VMStandardSynchronizeResult">
+				AND (
+				<iterate property="VMStandardSynchronizeResult" conjunction="OR">
+					( RES_POOL_ID=#VMStandardSynchronizeResult[].resourcePool.resourcePoolId# AND RES_POOL_PART_ID=#VMStandardSynchronizeResult[].resourcePool.resourcePoolPart# )
+				</iterate>
+				)
+			</isNotEmpty>
+		</update>
+		
+		<update id="updateStandardSynFail" parameterClass="map">
+			update comp_standard_syn_t 
+			set status='1'
+			where
+			(status = '1' OR status = '' OR status is null) AND
+			standard_Id=#standardId# 
+			<isNotEmpty property="VMStandardSynchronizeResult">
+				AND (
+				<iterate property="VMStandardSynchronizeResult" conjunction="OR">
+					( RES_POOL_ID=#VMStandardSynchronizeResult[].resourcePool.resourcePoolId# AND RES_POOL_PART_ID=#VMStandardSynchronizeResult[].resourcePool.resourcePoolPart# )
+				</iterate>
+				)
+			</isNotEmpty>
+		</update>
+		
+<!-- 2016/05/04 将判断条件status = '3' OR status = '5'修改为 status = '3' OR status = '1' -->
+		<update id="updateStandardModifySynFail" parameterClass="map">
+			update comp_standard_syn_t 
+			set status='5'
+			where
+			(status = '3' OR status = '1') AND
+			standard_Id=#standardId# 
+			<isNotEmpty property="VMStandardSynchronizeResult">
+				AND (
+				<iterate property="VMStandardSynchronizeResult" conjunction="OR">
+					( RES_POOL_ID=#VMStandardSynchronizeResult[].resourcePool.resourcePoolId# AND RES_POOL_PART_ID=#VMStandardSynchronizeResult[].resourcePool.resourcePoolPart# )
+				</iterate>
+				)
+			</isNotEmpty>
+		</update>
+		
+		<update id="updateAllStandardSynFail" parameterClass="map">
+			update comp_standard_syn_t 
+			set status='1'
+			where
+			(status = '1' OR status = '' OR status is null) AND
+			standard_Id=#standardId# 
+			<isNotEmpty property="VMStandardSynchronizeResult">
+				AND (
+				<iterate property="VMStandardSynchronizeResult" conjunction="OR">
+					( RES_POOL_ID=#VMStandardSynchronizeResult[].resourcePoolId# AND RES_POOL_PART_ID=#VMStandardSynchronizeResult[].resourcePoolPart# )
+				</iterate>
+				)
+			</isNotEmpty>
+		</update>
+		
+<!-- 2016/05/04 将判断条件status = '3' OR status = '5'修改为 status = '3' OR status = '1' -->
+		<update id="updateAllStandardModifySynFail" parameterClass="map">
+			update comp_standard_syn_t 
+			set status='5'
+			where
+			(status = '3' OR status = '1') AND
+			standard_Id=#standardId# 
+			<isNotEmpty property="VMStandardSynchronizeResult">
+				AND (
+				<iterate property="VMStandardSynchronizeResult" conjunction="OR">
+					( RES_POOL_ID=#VMStandardSynchronizeResult[].resourcePoolId# AND RES_POOL_PART_ID=#VMStandardSynchronizeResult[].resourcePoolPart# )
+				</iterate>
+				)
+			</isNotEmpty>
+		</update>
+		
+</sqlMap>

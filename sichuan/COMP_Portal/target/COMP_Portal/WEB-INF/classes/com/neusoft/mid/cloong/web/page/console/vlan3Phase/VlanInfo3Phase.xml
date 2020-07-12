@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="vlan3Phase">
+
+	<typeAlias alias="vlanInfo3Phase"
+		type="com.neusoft.mid.cloong.web.page.console.vlan3Phase.info.VlanInfo" />
+	<typeAlias alias="vlanIpRel3Phase"
+		type="com.neusoft.mid.cloong.web.page.console.vlan3Phase.info.VlanIpSegmentRel" />
+	<typeAlias alias="IpSegment3Phase"
+		type="com.neusoft.mid.cloong.web.page.console.vlan3Phase.info.IpSegment" />
+	<typeAlias alias="resourceInfo3Phase"
+		type="com.neusoft.mid.cloong.web.page.console.business.info.ResourceInfo" />
+	<typeAlias alias="lbinfo3Phase"
+		type="com.neusoft.mid.cloong.web.page.console.host.vm.info.LoadBalanceInfo" />
+	<typeAlias alias="orderinfo3Phase"
+		type="com.neusoft.mid.cloong.web.page.host.vm.order.info.OrderInfo" />
+
+	<!-- 查询vlanList -->
+	<select id="getVlanList3Phase" resultClass="vlanInfo3Phase" parameterClass="vlanInfo3Phase">
+      SELECT
+	    v.CASE_ID AS caseId,
+	    v.RANGE_ID AS vlanId,
+	    v.VLAN_NAME AS vlanName,
+	    v.APP_ID AS appId,
+	    v.RES_POOL_ID AS resPoolId,
+	    v.RES_POOL_PART_ID AS resPoolPartId,
+	    v.CREATE_TIME AS createTime,
+	    v.CREATE_USER AS createUser,
+	    v.CANCELED AS STATUS,
+	    a.app_name AS appName,
+	    v.START_ID AS startId,
+	    v.END_ID AS endId,
+	    v.ALLOCATED AS allocated,
+	    o.`STATUS` AS orderStatus,
+	    up.VLAN_NAME AS newName,
+        up.START_ID AS newStartId,
+        up.END_ID AS newEndId
+      FROM
+	    comp_case_vlan_sdn_t v
+      LEFT JOIN comp_app_t a ON v.app_id = a.app_id
+      LEFT JOIN comp_order_t o ON v.ORDER_ID = o.ORDER_ID
+      LEFT JOIN comp_case_vlan_sdn_update_t up ON up.CASE_ID = v.CASE_ID
+      WHERE
+	    v.CANCELED IN 
+	  <iterate property="canceled" open="(" conjunction="," close=")">
+	     #canceled[]#
+	  </iterate>
+	  <isNotEmpty prepend="and" property="businessList">
+	     v.APP_ID IN	  
+	     <iterate property="businessList" conjunction="," open="(" close=")">
+			#businessList[]#
+	     </iterate>
+	  </isNotEmpty>	  
+	  ORDER BY
+	    createTime DESC 	    
+	</select>
+
+	<select id="getVlanCount3Phase" resultClass="java.lang.Integer"
+		parameterClass="vlanInfo3Phase">
+      SELECT
+	    count(v.CASE_ID)
+      FROM
+	    comp_case_vlan_sdn_t v
+      LEFT JOIN comp_app_t a ON v.app_id = a.app_id
+      LEFT JOIN comp_order_t o ON v.ORDER_ID = o.ORDER_ID
+      LEFT JOIN comp_case_vlan_sdn_update_t up ON up.CASE_ID = v.CASE_ID
+	  WHERE
+		v.CANCELED IN
+		<iterate property="canceled" open="(" conjunction="," close=")">
+			#canceled[]#
+		</iterate>
+		<isNotEmpty prepend="and" property="businessList">
+			v.APP_ID IN
+			<iterate property="businessList" conjunction="," open="("
+				close=")">
+				#businessList[]#
+			</iterate>
+		</isNotEmpty>
+	</select>
+
+	<!-- 虚拟机查询vlanList，VLAN_SDN暂时未用-->
+	<select id="getVlansForVm3Phase" resultClass="vlanInfo3Phase"
+		parameterClass="vlanInfo3Phase">
+		SELECT
+		v.CASE_ID AS caseId,
+		v.VLAN_ID AS vlanId,
+		v.VLAN_NAME AS vlanName,
+		v.APP_ID AS appId,
+		v.RES_POOL_ID AS resPoolId,
+		v.RES_POOL_PART_ID AS
+		resPoolPartId,
+		v.ZONE_TYPE AS zoneType,
+		v.VLAN_TYPE AS vlanType,
+		v.CREATE_TIME AS createTime,
+		v.CREATE_USER AS createUser,
+		v.CANCELED AS
+		STATUS,
+		v.CANCEL_TIME AS cancelTime,
+		v.CANCEL_USER AS cancelUser,
+		a.app_name AS appName,
+		ip.start_ip AS startIp,
+		ip.end_ip AS endIp,
+		ip.ipsegment_id ipsegmentId
+		FROM
+		comp_case_vlan_t v
+		LEFT JOIN comp_app_t
+		a ON v.app_id = a.app_id
+		LEFT JOIN
+		comp_vlan_ipsegment_bind_t b ON
+		v.vlan_id = b.vlan_id
+		LEFT JOIN comp_case_ipsegment_t ip ON
+		b.IPSEGMENT_ID = ip.IPSEGMENT_ID AND ip.RELEASED = '0'
+		WHERE (b. STATUS
+		= '0' or b. STATUS is null)
+		AND v.canceled in
+		<iterate property="canceled" open="(" conjunction="," close=")">
+			#canceled[]#
+		</iterate>
+		<isNotEmpty prepend="and" property="businessList">
+			v.app_id in
+			<iterate property="businessList" conjunction="," open="("
+				close=")">
+				#businessList[]#
+			</iterate>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="vlanId">
+			v.vlan_id = #vlanId#
+		</isNotEmpty>
+	</select>
+
+	<insert id="createVLANInstanceInfo3Phase" parameterClass="vlanInfo3Phase">
+		INSERT INTO
+		`comp_case_vlan_sdn_t`
+		VALUES
+		(#caseId#,#vlanId#,#vlanName#,#orderId#,#appId#,
+		#resPoolId#,#resPoolPartId#,#createTime#,#createUser#,
+		<iterate property="canceled">
+			#canceled[0]#,
+		</iterate>
+		#cancelTime#,#cancelUser#,#updateTime#,#updateUser#,#startId#,#endId#,#allocated#);
+	</insert>
+
+	<update id="cancelVlan3Phase" parameterClass="vlanInfo3Phase">
+		UPDATE `comp_case_vlan_3phase_t`
+		SET
+		CANCELED = '1',
+		CANCEL_TIME = #cancelTime#,
+		CANCEL_USER =
+		#cancelUser#
+		WHERE
+		VLAN_ID = #vlanId#
+	</update>
+
+   <!-- 详情     -->
+	<select id="vlanDetail3Phase" resultClass="vlanInfo3Phase" parameterClass="vlanInfo3Phase">
+SELECT
+	v.CASE_ID AS caseId,
+	v.RANGE_ID AS vlanId,
+	v.VLAN_NAME AS vlanName,
+	v.ORDER_ID AS orderId,
+	v.APP_ID AS appId,
+	app.APP_NAME AS appName,
+	v.RES_POOL_ID AS resPoolId,
+	pool.RES_POOL_NAME AS resPoolName,
+	v.CREATE_TIME AS createTime,
+	v.CREATE_USER AS createUser,
+	v.CANCELED AS STATUS,
+	v.CANCEL_TIME AS cancelTime,
+	v.CANCEL_USER AS cancelUser,
+	v.UPDATE_TIME AS updateTime,
+	v.UPDATE_USER AS updateUser,
+	v.START_ID AS startId,
+	v.END_ID AS endId,
+	v.ALLOCATED AS allocated
+FROM
+	comp_case_vlan_sdn_t v
+LEFT JOIN comp_app_t app ON v.APP_ID = app.APP_ID
+LEFT JOIN comp_res_pool_t pool ON v.RES_POOL_ID = pool.RES_POOL_ID
+WHERE
+v.CASE_ID = #caseId#
+<!--         <dynamic prepend="WHERE"> -->
+<!-- 			<isNotEmpty prepend="AND" property="caseId"> -->
+<!-- 				v.CASE_ID = #caseId# -->
+<!-- 			</isNotEmpty> -->
+<!-- 		</dynamic> -->
+	</select>
+	
+	<!-- 查询VLAN_SDN实例表的vlan范围 -->
+    <select id="vlanRange3Phase" resultClass="vlanInfo3Phase" parameterClass="vlanInfo3Phase">
+       SELECT 
+         v.START_ID AS startId,
+         v.END_ID AS endId
+       FROM
+         comp_case_vlan_sdn_t v
+       WHERE
+         CANCELED IN(0,2)
+	</select>
+	
+	<!-- 查询VLAN_SDN实例表的vlan范围 -->
+    <select id="vlanRangeUpdate" resultClass="vlanInfo3Phase" parameterClass="vlanInfo3Phase">
+      SELECT
+        v.START_ID AS startId,
+        v.END_ID AS endId
+        FROM
+        comp_case_vlan_sdn_update_t v
+	</select>
+	
+	<!-- 查询caseId所属vlan范围信息 -->
+	<select id="getVlanRangeInfo" parameterClass="vlanInfo3Phase"
+		resultClass="vlanInfo3Phase">
+      SELECT
+	    v.CASE_ID AS caseId,
+	    v.ORDER_ID AS orderId,
+	    v.RANGE_ID AS vlanId,
+	    v.START_ID AS startId,
+	    v.END_ID AS endId
+      FROM
+	    comp_case_vlan_sdn_t v
+	    <dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="caseId">
+				v.CASE_ID = #caseId#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+    <!-- 查询vlan范围所属订单表信息 -->
+	<select id="getVlanRangeOrderInfo" parameterClass="vlanInfo3Phase"
+		resultClass="orderinfo3Phase">
+      SELECT
+        o.CASE_ID AS caseId,
+        o.ORDER_ID AS orderId,
+        o.`STATUS` AS status
+      FROM
+        comp_order_t o
+	    <dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="orderId">
+				o.ORDER_ID = #orderId#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<!-- 删除VLAN_SDN，重置订单表对应订单状态 -->
+    <update id="cancelVlanRange3Phase" parameterClass="orderinfo3Phase">
+		UPDATE comp_order_t
+		SET STATUS = #status#
+		WHERE ORDER_ID =#orderId#
+	</update>
+	
+	<!-- 修改VLAN_SDN，将新信息存入update表 -->
+	<insert id="createVlanSdnUpdateInfo" parameterClass="vlanInfo3Phase">
+	   INSERT INTO 
+       comp_case_vlan_sdn_update_t
+       VALUES
+	   (
+		  #caseId#,#vlanId#,#vlanName#,#orderId#,#startId#,#endId#
+	   );
+	</insert>
+	
+	<!-- 修改VLAN_SDN，重置订单表对应订单状态 -->
+    <update id="editVlanSdnOrderInfo" parameterClass="orderinfo3Phase">
+		UPDATE comp_order_t
+		SET STATUS = #status#
+		WHERE ORDER_ID =#orderId#
+	</update>
+	
+	<!-- 修改VLAN_SDN，设置VLAN_SDN实例表状态值 -->
+    <update id="editVlanSdnCaseInfo" parameterClass="orderinfo3Phase">
+		UPDATE comp_case_vlan_sdn_t
+		SET CANCELED = '2'
+		WHERE ORDER_ID =#orderId#
+	</update>
+	
+	<select id="getVlanSdnByBusinessId" resultClass="resourceInfo3Phase"
+		parameterClass="java.util.Map">
+		SELECT
+		v.CASE_ID AS resourceId,
+		v.VLAN_NAME AS `name`,
+		v.APP_ID AS appId,
+		v.CANCELED AS `status`,
+		'3' AS `type`
+		FROM
+		comp_case_vlan_sdn_t v
+		LEFT JOIN comp_app_t a ON v.app_id = a.app_id
+		WHERE
+		v.APP_ID = #businessId#
+		AND v.CANCELED IN ('0','2')
+		ORDER BY
+		v.create_time DESC
+	</select>
+	
+	<!-- 申请待审批修改，新数据入case表 -->
+    <update id="editVlanSdnCase" parameterClass="vlanInfo3Phase">
+		UPDATE comp_case_vlan_sdn_t
+		SET START_ID = #startId#,
+		END_ID = #endId#,
+		VLAN_NAME = #vlanName#
+        <dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="caseId">
+				CASE_ID = #caseId#
+			</isNotEmpty>
+		</dynamic>
+	</update>
+	
+    <!-- 查caseId所属订单在临时表中的数据 -->
+	<select id="getVlanUpdateByCaseId" resultClass="vlanInfo3Phase" parameterClass="vlanInfo3Phase">
+      SELECT
+        v.START_ID AS startId,
+        v.END_ID AS endId
+      FROM
+        comp_case_vlan_sdn_update_t v
+        <dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="caseId">
+				v.CASE_ID = #caseId#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<!-- 修改待审订单修改，新数据入update表 -->
+    <update id="editVlanSdnUpdate" parameterClass="vlanInfo3Phase">
+		UPDATE comp_case_vlan_sdn_update_t
+		SET START_ID = #startId#,
+		END_ID = #endId#,
+		VLAN_NAME = #vlanName#
+        <dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="caseId">
+				CASE_ID = #caseId#
+			</isNotEmpty>
+		</dynamic>
+	</update>
+	
+</sqlMap>

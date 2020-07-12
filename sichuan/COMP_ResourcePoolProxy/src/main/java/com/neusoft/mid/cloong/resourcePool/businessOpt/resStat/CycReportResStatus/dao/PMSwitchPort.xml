@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="PMSwitchPort">
+	<typeAlias alias="SwitchPortPerfPo"
+		type="com.neusoft.mid.cloong.resourcePool.businessOpt.resStat.CycReportResStatus.dao.SwitchPortPerfPo" />
+
+	<insert id="insertSwitchPortPerformance" parameterClass="SwitchPortPerfPo">
+		INSERT INTO `comp_sta_switch_port_rt_t` (
+			`SWITCH_PORT_ID`,
+			`SWITCH_ID`,
+			`IF_IN_NUCAST_PKTS`,
+			`IF_OUT_NUCAST_PKTS`,
+			`IF_IN_MULTICAST_PKTS`,
+			`IF_IN_BROADCAST_PKTS`,
+			`IF_OUT_MULTICAST_PKTS`,
+			`IF_OUT_BROADCAST_PKTS`,
+			`IF_IN_DISCARDS`,
+			`IF_OUT_DISCARDS`,
+			`IF_IN_OCTETS`,
+			`IF_OUT_OCTETS`,
+			`CREATE_TIME`,
+			`RES_POOL_ID`
+		)
+		VALUES
+			(
+				#eqpId#,
+				#parentId#,
+				#ifInUcastPkts#,
+				#ifOutUcastPkts#,
+				#ifInMulticastPkts#,
+				#ifInBroadcastPkts#,
+				#ifOutMulticastPkts#,
+				#ifOutBroadcastPkts#,
+				#ifInDiscards#,
+				#ifOutDiscards#,
+				#ifInOctets#,
+				#ifOutOctets#,
+				#collectTime#,
+				#resPoolId#
+			);
+		
+	</insert>
+	
+</sqlMap>

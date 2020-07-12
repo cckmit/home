@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+	<bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiName" value="java:comp/env/comm_datasource" />
+		<property name="resourceRef" value="false" />
+	</bean>
+
+	<!--
+		<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close"> <property name="driverClassName"
+		value="${database.driver}" /> <property name="url"
+		value="${ms.db.url}" /> <property name="username"
+		value="${ms.db.user}" /> <property name="password"
+		value="${ms.db.passwd}" /> </bean>
+	-->
+	<bean id="sqlMapClient" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+		<property name="dataSource">
+			<ref local="dataSource" />
+		</property>
+		<property name="configLocation">
+			<value>classpath:comm_conf/mybatis/sqlmapconfig.xml</value>
+		</property>
+	</bean>
+
+
+
+	<!-- dao-->
+	<bean id="ibatisDAO" class="com.neusoft.mid.cloong.common.mybatis.SqlMapIbatisDAO">
+		<property name="dataSource">
+			<ref local="dataSource" />
+		</property>
+		<property name="sqlMapClient">
+			<ref local="sqlMapClient" />
+		</property>
+	</bean>
+
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource">
+			<ref local="dataSource" />
+		</property>
+	</bean>
+	<bean id="ibatisDAOProxy"
+		class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager">
+			<ref bean="transactionManager" />
+		</property>
+		<property name="target">
+			<ref local="ibatisDAO" />
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="insert*">PROPAGATION_REQUIRED,-Exception
+				</prop>
+				<prop key="update*">PROPAGATION_REQUIRED,-Exception
+				</prop>
+				<prop key="delete*">PROPAGATION_REQUIRED,-Exception
+				</prop>
+				<prop key="*">PROPAGATION_REQUIRED,readOnly
+				</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="ibatisService" class="com.neusoft.mid.cloong.common.mybatis.IbatisService"
+		abstract="false">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<bean id="abstractAction" abstract="true">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+</beans>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE validators PUBLIC 
+  		"-//Apache Struts//XWork Validator 1.0.2//EN"
+  		"http://struts.apache.org/dtds/xwork-validator-1.0.2.dtd">
+<validators>
+	<field name="standardName">
+		<field-validator type="requiredstring">
+			<param name="trim">true</param>
+			<message>规格名称不能为空，请重新输入</message>
+		</field-validator>
+		<field-validator type="stringlength">
+			<param name="maxLength">50</param>
+			<message>规格名称最大长度为50</message>
+		</field-validator>
+	</field>
+	<field name="serverType">
+		<field-validator type="requiredstring">
+			<param name="trim">true</param>
+			<message>物理机型号不能为空，请重新输入</message>
+		</field-validator>
+			<field-validator type="stringlength">
+			<param name="maxLength">64</param>
+			<message>物理机型号最大长度为64</message>
+		</field-validator>
+	</field>
+	<field name="description">
+		<field-validator type="stringlength">
+			<param name="maxLength">100</param>
+			<message>描述信息最大长度为100</message>
+		</field-validator>
+	</field>
+</validators>

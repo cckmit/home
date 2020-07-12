@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.1//EN"
+    "http://struts.apache.org/dtds/struts-2.1.dtd">
+<struts>
+	<!-- 这只浏览器时候缓存静态内容，默认值为true(生产环境下使用),开发阶段最好关闭 -->
+	<constant name="struts.serve.static.vrowserCache" value="true"></constant>
+	<!-- 当struts的配置文件修改后，系统是否自动重新加载该文件，默认为false(生产环境下使用),开发阶段最好打开 -->
+	<constant name="struts.serve.static.vrowserCache" value="false"></constant>
+	<constant name="struts.ui.theme" value="simple"></constant>
+	<!-- 资源视图 -->
+	<package name="com.neusoft.mid.cloong.report"
+		namespace="/report" extends="struts-default">
+		<interceptors>
+			<interceptor name="authenticate" class="authenticateInterceptor" />
+			<interceptor name="turnPageInter" class="turnPageInterceptor" />
+			<interceptor-stack name="authStack">
+				<interceptor-ref name="authenticate" />
+				<interceptor-ref name="defaultStack" />
+				<interceptor-ref name="turnPageInter" />
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="authStack" />
+		<global-results>
+			<result name="LOGIN" type="redirectAction">logout</result>
+			<result name="error" type="chain">exceptionIntercepor
+			</result>
+		</global-results>
+		<global-exception-mappings>
+			<exception-mapping exception="java.lang.Exception"
+				result="error" />
+		</global-exception-mappings>
+		<action name="exceptionIntercepor" class="exceptionIntercepor">
+			<result name="success">/WEB-INF/pages/exception/error.jsp
+			</result>
+		</action>
+
+        <!-- 业务性能统计-CPU使用率统计-图表 -->
+		<action name="cpuHistoryPerformanceAction" class="cpuHistoryPerformanceAction">
+			<result name="success">/WEB-INF/pages/report/historyPerformance/cpuHistoryPerformanceReport.jsp
+			</result>
+		</action>
+		
+		<!-- 业务性能统计-CPU使用率超标设备统计-图表 -->
+		<action name="cpuHistoryPerformanceOverAction" class="cpuHistoryPerformanceOverAction">
+			<result name="success">/WEB-INF/pages/report/historyPerformance/cpuHistoryPerformanceOverReport.jsp
+			</result>
+		</action>
+		
+		<!-- 业务性能统计-内存使用率统计-图表 -->
+		<action name="memHistoryPerformanceAction" class="memHistoryPerformanceAction">
+			<result name="success">/WEB-INF/pages/report/historyPerformance/memHistoryPerformanceReport.jsp
+			</result>
+		</action>
+		
+		<!-- 业务性能统计-内存使用率超标设备统计-图表 -->
+		<action name="memHistoryPerformanceOverAction" class="memHistoryPerformanceOverAction">
+			<result name="success">/WEB-INF/pages/report/historyPerformance/memHistoryPerformanceOverReport.jsp
+			</result>
+		</action>
+		
+		<!-- 业务性能统计-磁盘使用率统计-图表 -->
+		<action name="diskHistoryPerformanceAction" class="diskHistoryPerformanceAction">
+			<result name="success">/WEB-INF/pages/report/historyPerformance/diskHistoryPerformanceReport.jsp
+			</result>
+		</action>
+		
+		<!-- 业务性能统计-磁盘使用率超标设备统计-图表 -->
+		<action name="diskHistoryPerformanceOverAction" class="diskHistoryPerformanceOverAction">
+			<result name="success">/WEB-INF/pages/report/historyPerformance/diskHistoryPerformanceOverReport.jsp
+			</result>
+		</action>
+		
+		<!-- 业务性能统计-导出 -->
+		<action name="exportHistoryReportAction" class="exportHistoryReportAction">
+			<result name="error">/WEB-INF/pages/report/historyPerformance/cpuHistoryPerformanceReport.jsp
+			</result>
+		</action>
+		
+		<!-- 设备性能统计-CPUTop10统计-图表 -->
+		<action name="cpuDeviceTop10PerformanceAction" class="cpuDeviceTop10PerformanceAction">
+			<result name="success">/WEB-INF/pages/report/devicePerformance/cpuDevicePerformanceReport.jsp
+			</result>
+		</action>
+		
+		<!-- 设备性能统计-内存TOP10统计-图表 -->
+		<action name="memDeviceTop10PerformanceAction" class="memDeviceTop10PerformanceAction">
+			<result name="success">/WEB-INF/pages/report/devicePerformance/memDevicePerformanceReport.jsp
+			</result>
+		</action>
+		
+		<!-- 设备性能统计-吞吐量TOP10统计-图表 -->
+		<action name="hstDeviceTop10PerformanceAction" class="hstDeviceTop10PerformanceAction">
+			<result name="success">/WEB-INF/pages/report/devicePerformance/hstDevicePerformanceReport.jsp
+			</result>
+		</action>
+		
+		<!-- 设备性能统计-性能统计查询-查询条件 -->
+		<action name="performanceSearchAction" class="performanceSearchAction">
+			<result name="success">/WEB-INF/pages/report/devicePerformance/performanceSearch.jsp
+			</result>
+		</action>
+		
+		<!-- 设备性能统计-导出 -->
+		<action name="exportDeviceReportAction" class="exportDeviceReportAction">
+			<result name="error">/WEB-INF/pages/report/devicePerformance/cpuDevicePerformanceReport.jsp
+			</result>
+		</action>
+		
+		<!-- 月度性能统计-导出 -->
+		<action name="exportMonthReportAction" class="exportMonthReportAction">
+			<result name="success">/WEB-INF/pages/report/devicePerformance/cpuDevicePerformanceReport.jsp
+			</result>
+		</action>
+		
+		<!-- 月度性能统计-CPU统计-图表 -->
+		<action name="cpuDevicePerformanceAction" class="cpuDevicePerformanceAction">
+			<result name="success">/WEB-INF/pages/report/monthPerformance/cpuDevicePerformanceMonthlyReport.jsp
+			</result>
+		</action>
+		
+		<!-- 月度性能统计-内存统计-图表 -->
+		<action name="memDevicePerformanceAction" class="memDevicePerformanceAction">
+			<result name="success">/WEB-INF/pages/report/monthPerformance/memDevicePerformanceMonthlyReport.jsp
+			</result>
+		</action>
+		
+		<!-- 月度性能统计-page space统计-图表 -->
+		<action name="pageSpaceDevicePerformanceAction" class="pageDevicePerformanceAction">
+			<result name="success">/WEB-INF/pages/report/monthPerformance/pageSpaceDevicePerformanceMonthlyReport.jsp
+			</result>
+		</action>
+		
+		<!-- 月度性能统计-io 统计-图表 -->
+		<action name="ioDevicePerformanceAction" class="ioDevicePerformanceAction">
+			<result name="success">/WEB-INF/pages/report/monthPerformance/ioDevicePerformanceMonthlyReport.jsp
+			</result>
+		</action>
+		
+	</package>
+	<package name="com.neusoft.mid.cloong.report.json"
+		namespace="/report" extends="json-default">
+		<interceptors>
+			<interceptor name="authenticate" class="authenticateInterceptor" />
+			<interceptor name="turnPageInter" class="turnPageInterceptor" />
+			<interceptor-stack name="authStack">
+				<interceptor-ref name="authenticate" />
+				<interceptor-ref name="jsonValidationWorkflowStack" />
+				<interceptor-ref name="defaultStack" />
+				<interceptor-ref name="turnPageInter" />
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="authStack" />
+		<global-results>
+			<result name="LOGIN" type="redirectAction">logout</result>
+			<result name="error" type="chain">exceptionIntercepor
+			</result>
+		</global-results>
+		<global-exception-mappings>
+			<exception-mapping exception="java.lang.Exception"
+				result="error" />
+		</global-exception-mappings>
+		<action name="exceptionIntercepor" class="exceptionIntercepor">
+			<result name="success">/WEB-INF/pages/exception/error.jsp
+			</result>
+		</action>
+		
+		<!-- 业务性能统计-CPU使用率统计-列表 -->
+		<action name="cpuHistoryPerformanceByAjax" class="cpuHistoryPerformanceAction"
+			method="getCpuHistoryPerformanceByAjax">
+			<result name="success" type="json">
+				<param name="excludeProperties">ibatisDAO,container</param>
+				<param name="ignoreHierarchy">false</param>
+				<param name="enumAsBean">true</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">historyPerformanceInfolist</param>
+			</result>
+		</action>
+		
+		<!-- 业务性能统计-CPU使用率超标设备统计-列表 -->
+		<action name="cpuHistoryPerformanceOverByAjax" class="cpuHistoryPerformanceOverAction"
+			method="getCpuHistoryPerformanceOverByAjax">
+			<result name="success" type="json">
+				<param name="excludeProperties">ibatisDAO,container</param>
+				<param name="ignoreHierarchy">false</param>
+				<param name="enumAsBean">true</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">historyPerformanceInfolist</param>
+			</result>
+		</action>
+		
+		<!-- 业务性能统计-内存使用率统计-列表 -->
+		<action name="memHistoryPerformanceByAjax" class="memHistoryPerformanceAction"
+			method="getMemHistoryPerformanceByAjax">
+			<result name="success" type="json">
+				<param name="excludeProperties">ibatisDAO,container</param>
+				<param name="ignoreHierarchy">false</param>
+				<param name="enumAsBean">true</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">historyPerformanceInfolist</param>
+			</result>
+		</action>
+		
+		<!-- 业务性能统计-内存使用率超标设备统计-列表 -->
+		<action name="memHistoryPerformanceOverByAjax" class="memHistoryPerformanceOverAction"
+			method="getMemHistoryPerformanceOverByAjax">
+			<result name="success" type="json">
+				<param name="excludeProperties">ibatisDAO,container</param>
+				<param name="ignoreHierarchy">false</param>
+				<param name="enumAsBean">true</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">historyPerformanceInfolist</param>
+			</result>
+		</action>
+		
+		<!-- 业务性能统计-磁盘使用率统计-列表 -->
+		<action name="diskHistoryPerformanceByAjax" class="diskHistoryPerformanceAction"
+			method="getDiskHistoryPerformanceByAjax">
+			<result name="success" type="json">
+				<param name="excludeProperties">ibatisDAO,container</param>
+				<param name="ignoreHierarchy">false</param>
+				<param name="enumAsBean">true</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">historyPerformanceInfolist</param>
+			</result>
+		</action>
+		
+		<!-- 业务性能统计-磁盘使用率超标设备统计-列表 -->
+		<action name="diskHistoryPerformanceOverByAjax" class="diskHistoryPerformanceOverAction"
+			method="getDiskHistoryPerformanceOverByAjax">
+			<result name="success" type="json">
+				<param name="excludeProperties">ibatisDAO,container</param>
+				<param name="ignoreHierarchy">false</param>
+				<param name="enumAsBean">true</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">historyPerformanceInfolist</param>
+			</result>
+		</action>
+		
+		<!-- 设备性能统计-top10页面下方CPU、内存使用率统计-列表 -->
+		<action name="cpuDevicePerformanceByAjax" class="cpuDeviceTop10PerformanceAction"
+			method="getCpuDevicePerformanceByAjax">
+			<result name="success" type="json">
+				<param name="excludeProperties">ibatisDAO,container</param>
+				<param name="ignoreHierarchy">false</param>
+				<param name="enumAsBean">true</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">devicePerformanceInfolist</param>
+			</result>
+		</action>
+		
+		<!-- 业务性能统计-性能统计查询-列表 -->
+		<action name="performanceSearchByAjax" class="performanceSearchAction"
+			method="getPerformanceByAjax">
+			<result name="success" type="json">
+				<param name="excludeProperties">ibatisDAO,container</param>
+				<param name="ignoreHierarchy">false</param>
+				<param name="enumAsBean">true</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">performanceInfolist</param>
+			</result>
+		</action>
+		
+		<!-- 性能统计 - 24小时实时统计 -->
+		<action name="devicePerformanceRTDetailByAjax" class="deviceformanceRTDetailAction">
+		    <result name="success" type="json">
+				<param name="excludeProperties">ibatisDAO,container</param>
+				<param name="ignoreHierarchy">false</param>
+				<param name="enumAsBean">true</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">realTime</param>
+				<param name="root">realTimeList</param>
+			</result>
+		</action>
+		
+		<!-- 通过资源池id获取分区列表 -->
+		<action name="getPoolPartListByAjax" class="cpuDevicePerformanceAction"
+			method="getPoolPartListByAjax">
+			<result name="success" type="json">
+				<param name="excludeProperties">ibatisDAO,container</param>
+				<param name="ignoreHierarchy">false</param>
+				<param name="enumAsBean">true</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">poolPartList</param>
+			</result>
+		</action>
+		
+			<!-- 月度性能统计-页面下方CPU、内存使用率统计-列表 -->
+		<action name="monthPerformanceByAjax" class="cpuDevicePerformanceAction"
+			method="getMonthPerformanceByAjax">
+			<result name="success" type="json">
+				<param name="excludeProperties">ibatisDAO,container</param>
+				<param name="ignoreHierarchy">false</param>
+				<param name="enumAsBean">true</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">monthPerformanceInfolist</param>
+			</result>
+		</action>
+	</package>
+
+</struts>

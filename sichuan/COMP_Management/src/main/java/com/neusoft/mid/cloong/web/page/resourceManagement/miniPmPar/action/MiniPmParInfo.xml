@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="MiniPmParInfo">
+	<typeAlias alias="miniPmParInfo" type="com.neusoft.mid.cloong.web.page.resourceManagement.info.MiniPmParInfo" />
+	<select id="queryMiniPmParInfos" parameterClass="miniPmParInfo" resultClass="miniPmParInfo">
+		SELECT  V.MINIPMPAR_ID miniPmParId,
+				V.MINIPMPAR_NAME miniPmParName,
+				V.PRIVATE_IP privateIp,
+				V.CPU_NUM cpuNum,
+				V.CPU_FREQUENCY cpuFrequency,
+				CASE V.MEMORY_SIZE WHEN '' THEN '' ELSE FORMAT(V.MEMORY_SIZE / 1024, 2) END AS memorySize,
+				V.DISK_SIZE diskSize,
+				DATE_FORMAT(
+					V.RUN_TIME,
+					'%Y-%m-%d %H:%i:%s'
+				) runTime,
+				V.CUR_STATUS curStatus,
+				V.APP_ID appId,
+				A.APP_NAME appName,
+				V.RES_POOL_ID resPoolId,
+				R.RES_POOL_NAME resPoolName,
+				V.RES_POOL_PART_ID resPoolPartId,
+				RP.RES_POOL_PART_NAME resPoolPartName,
+				V.OS_TYPE osType,
+				V.VM_OS vmOs,
+				P.MINIPM_NAME miniPmName,
+				DATE_FORMAT(
+					V.UPDATE_TIME,
+					'%Y-%m-%d %H:%i:%s'
+				) updateTime
+		  FROM COMP_RM_MINIPMPAR_T V
+			  LEFT JOIN COMP_RM_MINIPM_T P ON V.MINIPM_ID = P.MINIPM_ID
+			  LEFT JOIN COMP_RES_POOL_T R ON V.RES_POOL_ID = R.RES_POOL_ID
+			  LEFT JOIN COMP_RES_POOL_PART_T RP ON V.RES_POOL_PART_ID = RP.RES_POOL_PART_ID
+			  LEFT JOIN COMP_APP_T A ON V.APP_ID = A.APP_ID
+		   WHERE 1= 1
+		<dynamic prepend="">
+			<isNotEmpty prepend="and" property="miniPmParId">
+				upper(MINIPMPAR_ID) like
+				upper(CONCAT('%',trim(#miniPmParId#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="miniPmParName">
+				upper(MINIPMPAR_NAME) like
+				upper(CONCAT('%',trim(#miniPmParName#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="miniPmId">
+				V.MINIPM_ID = #miniPmId#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="miniPmName">
+				upper(MINIPM_NAME) like
+				upper(CONCAT('%',trim(#miniPmName#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="appId">
+				upper(V.APP_ID) like
+				upper(CONCAT('%',trim(#appId#),'%'))
+			</isNotEmpty>
+		</dynamic>
+		ORDER BY updateTime DESC
+	</select>
+	
+	<select id="countQueryMiniPmPar" parameterClass="miniPmParInfo" resultClass="java.lang.Integer">
+		SELECT  count(*)
+		 FROM COMP_RM_MINIPMPAR_T V
+			  LEFT JOIN COMP_RM_MINIPM_T P ON V.MINIPM_ID = P.MINIPM_ID
+			  LEFT JOIN COMP_RES_POOL_T R ON V.RES_POOL_ID = R.RES_POOL_ID
+			  LEFT JOIN COMP_RES_POOL_PART_T RP ON V.RES_POOL_PART_ID = RP.RES_POOL_PART_ID
+			  LEFT JOIN COMP_APP_T A ON V.APP_ID = A.APP_ID
+	    WHERE 1= 1
+		<dynamic prepend="">
+			<isNotEmpty prepend="and" property="miniPmParId">
+				upper(MINIPMPAR_ID) like
+				upper(CONCAT('%',trim(#miniPmParId#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="miniPmParName">
+				upper(MINIPMPAR_NAME) like
+				upper(CONCAT('%',trim(#miniPmParName#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="miniPmId">
+				V.MINIPM_ID = #miniPmId#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="miniPmName">
+				upper(MINIPM_NAME) like
+				upper(CONCAT('%',trim(#miniPmName#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="appId">
+				upper(V.APP_ID) like
+				upper(CONCAT('%',trim(#appId#),'%'))
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<!-- 查看小型分区机详情 -->
+    <select id="queryMiniPmParInfo" parameterClass="miniPmParInfo" resultClass="miniPmParInfo">
+		SELECT  V.MINIPMPAR_ID miniPmParId,
+				V.MINIPMPAR_NAME miniPmParName,
+				V.PRIVATE_IP privateIp,
+				V.CPU_NUM cpuNum,
+				V.CPU_FREQUENCY cpuFrequency,
+				CASE V.MEMORY_SIZE WHEN '' THEN '' ELSE FORMAT(V.MEMORY_SIZE / 1024, 2) END AS memorySize,
+				V.DISK_SIZE diskSize,
+				DATE_FORMAT(
+					V.RUN_TIME,
+					'%Y-%m-%d %H:%i:%s'
+				) runTime,
+				V.CUR_STATUS curStatus,
+				V.APP_ID appId,
+				A.APP_NAME appName,
+				V.RES_POOL_ID resPoolId,
+				R.RES_POOL_NAME resPoolName,
+				V.RES_POOL_PART_ID resPoolPartId,
+				RP.RES_POOL_PART_NAME resPoolPartName,
+				V.OS_TYPE osType,
+				V.VM_OS vmOs,
+				P.MINIPM_NAME miniPmName,
+				DATE_FORMAT(
+					V.UPDATE_TIME,
+					'%Y-%m-%d %H:%i:%s'
+				) updateTime
+		 FROM COMP_RM_MINIPMPAR_T V
+			  LEFT JOIN COMP_RM_MINIPM_T P ON V.MINIPM_ID = P.MINIPM_ID
+			  LEFT JOIN COMP_RES_POOL_T R ON V.RES_POOL_ID = R.RES_POOL_ID
+			  LEFT JOIN COMP_RES_POOL_PART_T RP ON V.RES_POOL_PART_ID = RP.RES_POOL_PART_ID
+			  LEFT JOIN COMP_APP_T A ON V.APP_ID = A.APP_ID
+		 <dynamic prepend="WHERE">
+			<isNotEmpty prepend="" property="miniPmParId">
+				V.MINIPMPAR_ID = #miniPmParId#
+			</isNotEmpty>
+			<isEmpty prepend="" property="miniPmParId">
+				1=1
+				ORDER BY updateTime DESC
+			</isEmpty>
+		  </dynamic>
+	</select>
+</sqlMap>

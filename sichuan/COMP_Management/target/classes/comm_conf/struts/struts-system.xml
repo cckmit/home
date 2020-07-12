@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<!-- 这只浏览器时候缓存静态内容，默认值为true(生产环境下使用),开发阶段最好关闭 -->
+	<constant name="struts.serve.static.vrowserCache" value="false"></constant>
+	<!-- 当struts的配置文件修改后，系统是否自动重新加载该文件，默认为false(生产环境下使用),开发阶段最好打开 -->
+	<constant name="struts.serve.static.vrowserCache" value="true"></constant>
+	<constant name="struts.ui.theme" value="simple"></constant>
+
+
+	<package name="com.neusoft.mid.cloong.system" namespace="/system"
+		extends="struts-default">
+		<interceptors>
+			<interceptor name="authenticate" class="authenticateInterceptor" />
+			<interceptor name="turnPageInter" class="turnPageInterceptor" />
+			<interceptor-stack name="authStack">
+				<interceptor-ref name="authenticate" />
+				<interceptor-ref name="defaultStack" />
+				<interceptor-ref name="turnPageInter" />
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="authStack" />
+		<global-results>
+			<result name="LOGIN" type="redirectAction">logout</result>
+			<result name="error" type="chain">exceptionIntercepor</result>
+		</global-results>
+		<global-exception-mappings>
+			<exception-mapping exception="java.lang.Exception"
+				result="error" />
+		</global-exception-mappings>
+		<action name="resource" class="queryResourceListAction">
+			<result name="success">/WEB-INF/pages/system/sysConfig/resource_paramenter_list.jsp
+			</result>
+			<result name="error">/WEB-INF/pages/system/sysConfig/resource_paramenter_list.jsp
+			</result>
+			<result name="failure">/WEB-INF/pages/system/sysConfig/resource_paramenter_list.jsp
+			</result>
+		</action>
+		<action name="resourcePart" class="queryResourcePartListAction">
+			<result name="success">/WEB-INF/pages/system/sysConfig/resource_zone_list.jsp
+			</result>
+			<result name="error">/WEB-INF/pages/system/sysConfig/resource_zone_list.jsp
+			</result>
+			<result name="failure">/WEB-INF/pages/system/sysConfig/resource_zone_list.jsp
+			</result>
+		</action>
+		<action name="user" class="queryUserListAction">
+			<result name="success">/WEB-INF/pages/system/security/user_list.jsp
+			</result>
+			<result name="error">/WEB-INF/pages/system/security/user_list.jsp
+			</result>
+			<result name="failure">/WEB-INF/pages/system/security/user_list.jsp
+			</result>
+		</action>
+		<!-- 查询角色 -->
+		<action name="roleSearch" class="RoleSearchAction">
+			<result name="success">/WEB-INF/pages/system/security/role_list.jsp
+			</result>
+			<result name="error">/WEB-INF/pages/system/security/role_list.jsp
+			</result>
+			<result name="failure">/WEB-INF/pages/system/security/role_list.jsp
+			</result>
+		</action>
+	</package>
+	<package name="system.json" extends="json-default">
+		<interceptors>
+			<interceptor name="authenticate" class="authenticateInterceptor" />
+			<interceptor name="turnPageInter" class="turnPageInterceptor" />
+			<interceptor-stack name="authStack">
+				<interceptor-ref name="authenticate" />
+				<interceptor-ref name="defaultStack" />
+				<interceptor-ref name="turnPageInter" />
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="authStack" />
+		<global-results>
+			<result name="LOGIN" type="redirectAction">logout</result>
+			<result name="error" type="chain">exceptionIntercepor</result>
+		</global-results>
+		<global-exception-mappings>
+			<exception-mapping exception="java.lang.Exception"
+				result="error" />
+		</global-exception-mappings>
+		<!-- 资源池参数查询 JSON -->
+		<action name="resourceQuery" class="queryResourceListJsonAction">
+			<result name="success" type="json">
+				<param name="root">resourceInfos</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">resourceInfos</param>
+			</result>
+		</action>
+		<!-- 资源池参数保存JSON -->
+		<action name="resourceCreate" class="resourceCreateAction">
+			<result name="success" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<!-- 资源池参数修改JSON -->
+		<action name="resourceUpdate" class="resourceUpdateAction">
+			<result name="success" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<!-- 资源池暂停 JSON -->
+		<action name="resourcePause" class="resourcePauseAction">
+			<result name="success" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<!-- 资源池终止 JSON -->
+		<action name="resourceStop" class="resourceStopAction">
+			<result name="success" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<!-- 资源池恢复 JSON -->
+		<action name="resourceRecover" class="resourceNormalAction">
+			<result name="success" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<!-- 资源池删除 JSON -->
+		<action name="resourceDelete" class="resourceDeleteAction">
+			<result name="success" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<!-- 资源池分区保存JSON -->
+		<action name="resPartSave" class="resourcePartCreateAction">
+			<result name="success" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<!-- 资源池分区修改JSON -->
+		<action name="resPartModify" class="resourcePartUpdateAction">
+			<result name="success" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<!-- 资源池分区删除JSON -->
+		<action name="resPartDel" class="resourcePartDeleteAction">
+			<result name="success" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+
+		<!-- 用户详情 -->
+		<action name="userDetail" class="userDetailAction">
+			<result name="success" type="json">
+				<param name="root">user</param>
+				<param name="ignoreHierarchy">false</param>
+				<param name="enumAsBean">true</param>
+				<param name="excludeProperties">password</param>
+			</result>
+			<result name="failure" type="json">
+			</result>
+			<result name="error" type="json">
+			</result>
+		</action>
+
+		<!-- 用户编辑 -->
+		<action name="userOperat" class="userOperateAction">
+			<result name="success" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+
+		<!-- 用户创建 -->
+		<action name="userCreate" class="userCreateAction">
+			<result name="success" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+		
+		<action name="registerValidateUserIdAction" class="registerValidateUserIdAction">
+			<interceptor-ref name="jsonValidationWorkflowStack"></interceptor-ref>
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+			<result name="error" type="json"></result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		
+		<!-- 用户状态变更 -->
+		<action name="userStatusChange" class="userStatusChangeAction">
+			<result name="success" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+
+		<!-- 用户密码重置 -->
+		<action name="userResetPassword" class="userResetPasswordAction">
+			<result name="success" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+
+		<!-- 获取角色列表 -->
+		<action name="queryRoleListForUserOp" class="queryRoleListForUserOpAction">
+			<result name="success" type="json">
+				<!-- <param name="includeProperties">queryRole,roleList,page,pageSize,url,param,pageBar</param> -->
+				<param name="excludeProperties">ibatisDAO,roleService,authId,container</param>
+				<param name="ignoreHierarchy">false</param>
+				<param name="enumAsBean">true</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+
+		<!-- 获得业务列表 @zhangyunfeng 2015-03-09 -->
+		 <action name="queryAppListAction" class="queryAppListAction">
+			<interceptor-ref name="jsonValidationWorkflowStack" />
+			<interceptor-ref name="turnPageInter" />
+			<result name="success" type="json">
+				<param name="excludeProperties">ibatisDAO,authId,container</param>
+				<param name="ignoreHierarchy">false</param>
+				<param name="enumAsBean">true</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">result</param>
+			</result>
+		</action> 
+
+		<!-- 创建角色 -->
+		<action name="roleCreate" class="RoleCreateAction">
+			<result name="success" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<!-- 创建角色 -->
+		<action name="roleSearchPermission" class="RoleSearchPermissionAction">
+			<result name="success" type="json">
+				<param name="root">authTree</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="roleAuth" class="RoleAuthAction">
+			<result name="success" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<!-- 删除角色 -->
+		<action name="roleDelete" class="RoleDeleteAction">
+			<result name="success" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<!-- 修改角色 -->
+		<action name="roleOperate" class="RoleOperateAction">
+			<result name="success" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+	</package>
+</struts>

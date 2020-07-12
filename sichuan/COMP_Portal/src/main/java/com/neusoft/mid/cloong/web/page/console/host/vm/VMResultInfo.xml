@@ -1,0 +1,827 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="VMResultInfo">
+	<typeAlias alias="VMResultInfo"
+		type="com.neusoft.mid.cloong.web.page.console.host.vm.info.VMResultInfo" />
+	<typeAlias alias="VmErrorInfo"
+		type="com.neusoft.mid.cloong.web.page.console.host.vm.info.VMDelFailErrorInfo" />
+	<typeAlias alias="LbInfo"
+		type="com.neusoft.mid.cloong.web.page.console.host.vm.info.LoadBalanceInfo" />
+	<typeAlias alias="OrderInfo"
+		type="com.neusoft.mid.cloong.web.page.host.vm.order.info.OrderInfo" />
+	<typeAlias alias="objipinfo"
+		type="com.neusoft.mid.cloong.web.page.console.host.vm.info.LBobjInfo" />
+	<typeAlias alias="NetInfo"
+		type="com.neusoft.mid.cloong.web.page.console.host.vm.info.NetInfo" />
+	<typeAlias alias="VmPerformance"
+		type="com.neusoft.mid.cloong.web.page.console.business.info.VmPerformanceInfo" />
+		
+	<!-- 查询所有虚拟机信息 -->
+	<select id="queryVmUserListAll" parameterClass="VMResultInfo"
+		resultClass="VMResultInfo">
+		SELECT
+		comp_case_vm_t.case_id caseId,
+		comp_case_vm_t.vm_id vmId,
+		ifnull(vm_name,'') vmName,
+		comp_case_vm_t. STATUS STATUS,
+		iso_id isoId,
+		iso_name isoName,
+		comp_case_vm_t.res_pool_id resPoolId,
+		res_pool_part_id resPoolPartId,
+		iso_description isoDescription,
+		comp_case_vm_t.create_time createTime,
+		ifnull(comp_order_t.EFFECTIVE_TIME,'') effectiveTime,
+		comp_order_t.create_time orderCreateTime,
+		length_time lengthTime,
+		ifnull(comp_order_t.EXPIRE_TIME,'') overTime,
+		ifnull(group_concat(ip),'') privateIpStr,
+		app_name appName
+		FROM
+		comp_case_vm_t
+		LEFT JOIN comp_order_t ON comp_case_vm_t.order_id =
+		comp_order_t.order_id
+		LEFT JOIN comp_app_t ON comp_case_vm_t.APP_ID =
+		comp_app_t.APP_ID
+		LEFT JOIN comp_case_vm_net_t ON
+		comp_case_vm_t.CASE_ID = comp_case_vm_net_t.CASE_ID
+		WHERE
+		comp_case_vm_t.status !=#vmStatus#
+		AND comp_order_t.order_id IS NOT
+		NULL
+		AND comp_order_t.status!='2'
+		<isNotEmpty prepend="and" property="vmName">
+			Lower(vm_name) like
+			CONCAT('%',#vmName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="privateIp">
+			ip like
+			CONCAT('%',#privateIp#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="isoName">
+			iso_name like
+			CONCAT('%',#isoName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="vmId">
+			comp_case_vm_t.vm_id =
+			#vmId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="appIdList">
+			comp_case_vm_t.APP_ID in
+			<iterate property="appIdList" conjunction="," close=")" open="(">
+				#appIdList[]#
+			</iterate>
+		</isNotEmpty>
+		GROUP BY comp_case_vm_t.case_id desc
+		order by
+		comp_order_t.EFFECTIVE_TIME desc,vm_name
+	</select>
+	<!--查询负载均衡列表个数 -->
+	<select id="Loadbalancecount" parameterClass="LbInfo"
+		resultClass="int">
+		SELECT COUNT(*)
+		from comp_load_balance_service_tab 
+		where (create_status
+		= '0'
+		OR create_status = '1')
+		<isNotEmpty prepend="and" property="lbname">
+			Lower(lb_name) like
+			CONCAT('%',#lbname#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="lbip">
+			LBip like
+			CONCAT('%',#lbip#,'%')
+		</isNotEmpty>
+			<isNotEmpty prepend="and" property="appIdList">
+			AppId in
+			<iterate property="appIdList" conjunction="," close=")" open="(">
+				#appIdList[]#
+			</iterate>
+		</isNotEmpty>
+	</select>
+	<!--查询负载均衡列表 -->
+	<select id="queryLoadbalanceInfo" parameterClass="LbInfo"
+		resultClass="LbInfo">
+		SELECT l.lb_name lbname,l.LBIP lbip,
+		DATE_FORMAT(l.create_time,'%Y-%m-%d %H:%i:%s')
+		createtime,
+		l.LBStrategy
+		Strategy,l.LBPort lbport,a.APP_NAME appname,l.create_status
+		status,l.LBID LBid
+		from comp_load_balance_service_tab l
+		LEFT JOIN
+		comp_app_t a ON a.APP_ID=l.appid
+		where (l.create_status = '0' or
+		l.create_status = '1')
+		<isNotEmpty prepend="and" property="lbname">
+			Lower(l.lb_name) like
+			CONCAT('%',#lbname#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="lbip">
+			l.LBip like
+			CONCAT('%',#lbip#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="appIdList">
+			l.AppId in
+			<iterate property="appIdList" conjunction="," close=")" open="(">
+				#appIdList[]#
+			</iterate>
+		</isNotEmpty>
+		order by l.create_time desc
+	</select>
+	<!-- 查询负载均衡详细信息 -->
+	<select id="LBdetailinfo" parameterClass="LbInfo" resultClass="LbInfo">
+		SELECT l.lb_name lbname,l.LBID LBid,l.LBStrategy Strategy,l.Protocal
+		protocal,l.LBIP lbip,l.LBPort lbport,l.LBType LBType,
+		a.APP_NAME
+		appname,l.AppId appid,r.RES_POOL_NAME respoolname,p.RES_POOL_PART_NAME
+		respoolPartname,l.IPSEGMENT_ID IPSEGMENT_ID,v.VLAN_NAME
+		vlanName,l.VlanId vlanId,
+		l.Throughput Throughput,l.ConnectNum
+		KbpsConnectNum,l.NewConnectNum NewConnectNum,l.create_status
+		status,l.instance_id instanceid,l.respoolPartId
+		respoolPartId,l.respoolId respoolId,l.IP_TYPE AS ipType
+		FROM comp_load_balance_service_tab
+		l
+		LEFT JOIN comp_app_t a on a.APP_ID=l.AppId
+		LEFT JOIN COMP_RES_POOL_T r
+		ON r.RES_POOL_ID=l.respoolId
+		LEFT JOIN COMP_RES_POOL_PART_T p on
+		p.RES_POOL_PART_ID=l.respoolPartId
+		LEFT JOIN comp_case_vlan_t v on
+		v.VLAN_ID=l.VlanId
+		WHERE l.LBID=#LBid#
+	</select>
+
+	<select id="LBdetailnetinfo" parameterClass="LbInfo"
+		resultClass="NetInfo">
+		SELECT i.START_IP startIp,i.END_IP endIp
+		FROM
+		comp_case_ipsegment_t i
+		where i.IPSEGMENT_ID=#IPSEGMENT_ID#
+	</select>
+	<!-- 修改负载均衡 -->
+	<update id="updateLBinfo" parameterClass="LbInfo">
+		UPDATE
+		comp_load_balance_service_tab l
+		SET
+		l.LBStrategy=#Strategy#
+		WHERE
+		l.LBID=#LBid#
+	</update>
+	<!-- 添加对象信息 -->
+	<insert id="LBaddobjinfo" parameterClass="objipinfo">
+		INSERT INTO
+		comp_load_balance_host_tab(
+		LBID,
+		objdescription,
+		HOST_IP,
+		host_port,
+		create_time,
+		create_user,
+<!-- 		VlanId, -->
+<!-- 		IPSEGMENT_ID, -->
+		Status,
+		IP_TYPE
+		)
+		VALUES(
+		#LBid#,
+		#objdescription#,
+		#hostip#,
+		#hostport#,
+		#create_time#,
+		#create_user#,
+<!-- 		#obj_Vlan#, -->
+<!-- 		#ipsegmentid#, -->
+		#status#,
+		#ipType#)
+	</insert>
+	<!-- 删除负载均衡对象 -->
+	<update id="delLBobjinfo" parameterClass="objipinfo">
+		UPDATE
+		comp_load_balance_host_tab l
+		SET
+		l.Status=#status#
+		WHERE l.LBID=#LBid#
+		and l.HOST_IP=#hostip#
+		and l.host_port=#hostport#
+		and l.id=#id#
+	</update>
+	<!-- 删除负载均衡服务 -->
+	<update id="delLBinfo" parameterClass="LbInfo">
+		UPDATE
+		comp_load_balance_service_tab l
+		SET
+		l.create_status=#status#
+		WHERE
+		l.LBID=#LBid#
+	</update>
+	<update id="delorderLB" parameterClass="OrderInfo">
+		UPDATE comp_order_t l
+		SET
+		l.STATUS=#status#
+		WHERE l.CASE_ID=#caseId#
+	</update>
+	<!-- 查询负载均衡对象详细信息 -->
+	<select id="LBobjipinfo" parameterClass="LbInfo" resultClass="objipinfo">
+		SELECT DATE_FORMAT(h.create_time,'%Y-%m-%d %H:%i:%s') create_time,
+		u.USER_NAME create_user,
+		h.HOST_IP hostip,
+		h.host_port hostport,
+		h.objdescription objdescription,
+		h.id id
+		from comp_load_balance_host_tab
+		h
+		LEFT JOIN comp_authority_user_t u on u.USER_ID=h.create_user
+		where
+		h.LBID=#LBid#
+		and h.Status ='0'
+	</select>
+	<!--申请负载均衡 -->
+	<insert id="insertLbinfo" parameterClass="LbInfo">
+		INSERT INTO
+		comp_load_balance_service_tab (
+		LBID,
+		LBType,
+		lb_name,
+		LBStrategy,
+		LBIP,
+		LBPort,
+		Protocal,
+		AppId,
+		create_user,
+		create_time,
+		respoolId,
+		respoolPartId,
+		create_status,
+		vlanId,
+		IPSEGMENT_ID,
+		Throughput,
+		ConnectNum,
+		NewConnectNum,
+		IP_TYPE
+		)
+		VALUES
+		(#LBid#,#LBType#,#lbname#,#Strategy#,#lbip#,#lbport#,#protocal#,#appid#,#createuser#,#createtime#,#respoolId#,#respoolPartId#,#status#,#vlanId#,#IPSEGMENT_ID#,#Throughput#,#KbpsConnectNum#,#NewConnectNum#,#ipType#)
+	</insert>
+	<insert id="createLBOrder" parameterClass="OrderInfo">
+		INSERT into
+		comp_order_t(ORDER_ID,PARENT_ID,CREATE_TIME,CREATE_USER,STATUS,CASE_ID,CASE_TYPE,UPDATE_USER,UPDATE_TIME,APP_ID,RES_POOL_ID)
+		VALUES(#orderId#,#parentId#,#createTime#,#createUser#,#status#,#caseId#,#caseType#,#updateUser#,#updateTime#,#appId#,#resPoolId#)
+	</insert>
+	<!-- 校验负载均衡名称 -->
+	<select id="checklbname" parameterClass="LbInfo" resultClass="LbInfo">
+		SELECT lb_name lbname
+		from comp_load_balance_service_tab
+		where
+		lb_name=#lbname#
+	</select>
+	<!-- 校验负载均衡对象名称 -->
+	<select id="checkobjname" parameterClass="objipinfo"
+		resultClass="objipinfo">
+		SELECT objname objname
+		from comp_load_balance_host_tab
+		where objname=#objname#
+	</select>
+	<!-- 查询所有虚拟机个数 -->
+	<select id="countVmUserListAll" parameterClass="VMResultInfo"
+		resultClass="int">
+		SELECT
+		count(distinct comp_case_vm_t.case_id)
+		FROM
+		comp_case_vm_t
+		LEFT
+		JOIN comp_order_t ON comp_case_vm_t.order_id =
+		comp_order_t.order_id
+		LEFT JOIN comp_app_t ON comp_case_vm_t.APP_ID =
+		comp_app_t.APP_ID
+		LEFT
+		JOIN comp_case_vm_net_t ON
+		comp_case_vm_t.CASE_ID =
+		comp_case_vm_net_t.CASE_ID
+		WHERE
+		comp_case_vm_t.status !=#vmStatus#
+		AND
+		comp_order_t.order_id IS NOT
+		NULL
+		AND comp_order_t.status!='2'
+		<isNotEmpty prepend="and" property="vmName">
+			Lower(vm_name) like
+			CONCAT('%',#vmName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="privateIp">
+			ip like
+			CONCAT('%',#privateIp#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="isoName">
+			iso_name like
+			CONCAT('%',#isoName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="vmId">
+			comp_case_vm_t.vm_id =
+			#vmId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="appIdList">
+			comp_case_vm_t.APP_ID in
+			<iterate property="appIdList" conjunction="," close=")" open="(">
+				#appIdList[]#
+			</iterate>
+		</isNotEmpty>
+	</select>
+
+	<!-- 查询所有虚拟机个数 -->
+	<select id="countVmUserExceptNotCreateCount" parameterClass="VMResultInfo"
+		resultClass="int">
+		SELECT
+		count(distinct comp_case_vm_t.case_id)
+		FROM
+		comp_case_vm_t
+		LEFT
+		JOIN comp_order_t ON comp_case_vm_t.order_id =
+		comp_order_t.order_id
+		LEFT JOIN comp_app_t ON comp_case_vm_t.APP_ID =
+		comp_app_t.APP_ID
+		LEFT
+		JOIN comp_case_vm_net_t ON
+		comp_case_vm_t.CASE_ID =
+		comp_case_vm_net_t.CASE_ID
+		WHERE
+		comp_case_vm_t.status !=#vmStatus#
+		AND
+		comp_order_t.order_id IS NOT
+		NULL
+		AND comp_order_t.status!='2'
+		AND
+		comp_order_t.status!='0'
+		<isNotEmpty prepend="and" property="vmName">
+			Lower(vm_name) like
+			CONCAT('%',#vmName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="privateIp">
+			ip like
+			CONCAT('%',#privateIp#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="isoName">
+			iso_name like
+			CONCAT('%',#isoName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="vmId">
+			comp_case_vm_t.vm_id =
+			#vmId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="appIdList">
+			comp_case_vm_t.APP_ID in
+			<iterate property="appIdList" conjunction="," close=")" open="(">
+				#appIdList[]#
+			</iterate>
+		</isNotEmpty>
+	</select>
+	<!-- 按状态查询虚拟机 -->
+	<select id="queryVmUserListExceptNotCreate" parameterClass="VMResultInfo"
+		resultClass="VMResultInfo">
+		SELECT
+		comp_case_vm_t.case_id caseId,
+		comp_case_vm_t.vm_id vmId,
+		ifnull(vm_name,'') vmName,
+		comp_case_vm_t. STATUS STATUS,
+		iso_id isoId,
+		iso_name isoName,
+		comp_case_vm_t.res_pool_id resPoolId,
+		res_pool_part_id resPoolPartId,
+		iso_description isoDescription,
+		comp_case_vm_t.create_time createTime,
+		ifnull(comp_order_t.EFFECTIVE_TIME,'') effectiveTime,
+		comp_order_t.create_time orderCreateTime,
+		length_time lengthTime,
+		ifnull(comp_order_t.EXPIRE_TIME,'') overTime,
+		ifnull(group_concat(ip),'') privateIpStr,
+		app_name appName
+		FROM
+		comp_case_vm_t
+		LEFT JOIN comp_order_t ON comp_case_vm_t.order_id =
+		comp_order_t.order_id
+		LEFT JOIN comp_app_t ON comp_case_vm_t.APP_ID =
+		comp_app_t.APP_ID
+		LEFT JOIN comp_case_vm_net_t ON
+		comp_case_vm_t.CASE_ID = comp_case_vm_net_t.CASE_ID
+		WHERE
+		comp_case_vm_t.status !=#vmStatus#
+		AND comp_order_t.order_id IS NOT
+		NULL
+		AND comp_order_t.status!='2'
+		AND comp_order_t.status!='0'
+		<!-- AND comp_case_vm_t.status = #queryStatus# -->
+		<isNotEmpty prepend="and" property="vmName">
+			Lower(vm_name) like
+			CONCAT('%',#vmName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="privateIp">
+			ip like
+			CONCAT('%',#privateIp#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="isoName">
+			iso_name like
+			CONCAT('%',#isoName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="vmId">
+			comp_case_vm_t.vm_id =
+			#vmId#
+		</isNotEmpty>
+		<isNotNull property="statusList" prepend="and">
+			comp_case_vm_t.status in
+			<iterate property="statusList" conjunction="," close=")"
+				open="(">
+				#statusList[]#
+			</iterate>
+		</isNotNull>
+		<isNotEmpty prepend="and" property="appIdList">
+			comp_case_vm_t.APP_ID in
+			<iterate property="appIdList" conjunction="," close=")" open="(">
+				#appIdList[]#
+			</iterate>
+		</isNotEmpty>
+		GROUP BY comp_case_vm_t.case_id desc
+		order by
+		comp_order_t.EFFECTIVE_TIME desc,vm_name
+	</select>
+
+	<!-- 按状态查询虚拟机 -->
+	<select id="queryVmUserListStatus" parameterClass="VMResultInfo"
+		resultClass="VMResultInfo">
+		SELECT
+		comp_case_vm_t.case_id caseId,
+		comp_case_vm_t.vm_id vmId,
+		ifnull(vm_name,'') vmName,
+		comp_case_vm_t. STATUS STATUS,
+		iso_id isoId,
+		iso_name isoName,
+		comp_case_vm_t.res_pool_id resPoolId,
+		res_pool_part_id resPoolPartId,
+		iso_description isoDescription,
+		comp_case_vm_t.create_time createTime,
+		ifnull(comp_order_t.EFFECTIVE_TIME,'') effectiveTime,
+		comp_order_t.create_time orderCreateTime,
+		length_time lengthTime,
+		ifnull(comp_order_t.EXPIRE_TIME,'') overTime,
+		ifnull(group_concat(ip),'') privateIpStr,
+		app_name appName
+		FROM
+		comp_case_vm_t
+		LEFT JOIN comp_order_t ON comp_case_vm_t.order_id =
+		comp_order_t.order_id
+		LEFT JOIN comp_app_t ON comp_case_vm_t.APP_ID =
+		comp_app_t.APP_ID
+		LEFT JOIN comp_case_vm_net_t ON
+		comp_case_vm_t.CASE_ID = comp_case_vm_net_t.CASE_ID
+		WHERE
+		comp_case_vm_t.status !=#vmStatus#
+		AND comp_order_t.order_id IS NOT
+		NULL
+		AND comp_order_t.status!='2'
+		<!-- AND comp_case_vm_t.status = #queryStatus# -->
+		<isNotEmpty prepend="and" property="vmName">
+			Lower(vm_name) like
+			CONCAT('%',#vmName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="privateIp">
+			ip like
+			CONCAT('%',#privateIp#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="isoName">
+			iso_name like
+			CONCAT('%',#isoName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="vmId">
+			comp_case_vm_t.vm_id =
+			#vmId#
+		</isNotEmpty>
+		<isNotNull property="statusList" prepend="and">
+			comp_case_vm_t.status in
+			<iterate property="statusList" conjunction="," close=")"
+				open="(">
+				#statusList[]#
+			</iterate>
+		</isNotNull>
+		<isNull property="statusList" prepend="and">
+			comp_case_vm_t.status is
+			null
+		</isNull>
+		<isNotEmpty prepend="and" property="appIdList">
+			comp_case_vm_t.APP_ID in
+			<iterate property="appIdList" conjunction="," close=")" open="(">
+				#appIdList[]#
+			</iterate>
+		</isNotEmpty>
+		GROUP BY comp_case_vm_t.case_id desc
+		order by
+		comp_order_t.EFFECTIVE_TIME desc,vm_name
+	</select>
+
+	<!-- 按状态虚拟机个数 -->
+	<select id="countVmUserListStatus" parameterClass="VMResultInfo"
+		resultClass="int">
+		SELECT
+		count(distinct comp_case_vm_t.case_id)
+		FROM
+		comp_case_vm_t
+		LEFT
+		JOIN comp_order_t ON comp_case_vm_t.order_id =
+		comp_order_t.order_id
+		LEFT JOIN comp_app_t ON comp_case_vm_t.APP_ID =
+		comp_app_t.APP_ID
+		LEFT
+		JOIN comp_case_vm_net_t ON
+		comp_case_vm_t.CASE_ID =
+		comp_case_vm_net_t.CASE_ID
+		WHERE
+		comp_case_vm_t.status !=#vmStatus#
+		AND
+		comp_order_t.order_id IS NOT
+		NULL
+		AND comp_order_t.status!='2'
+		<!-- AND comp_case_vm_t.status = #queryStatus# -->
+		<isNotEmpty prepend="and" property="vmName">
+			Lower(vm_name) like
+			CONCAT('%',#vmName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="privateIp">
+			ip like
+			CONCAT('%',#privateIp#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="isoName">
+			iso_name like
+			CONCAT('%',#isoName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="vmId">
+			comp_case_vm_t.vm_id =
+			#vmId#
+		</isNotEmpty>
+		<isNotNull property="statusList" prepend="and">
+			comp_case_vm_t.status in
+			<iterate property="statusList" conjunction="," close=")"
+				open="(">
+				#statusList[]#
+			</iterate>
+		</isNotNull>
+		<isNull property="statusList" prepend="and">
+			comp_case_vm_t.status is
+			null
+		</isNull>
+		<isNotEmpty prepend="and" property="appIdList">
+			comp_case_vm_t.APP_ID in
+			<iterate property="appIdList" conjunction="," close=")" open="(">
+				#appIdList[]#
+			</iterate>
+		</isNotEmpty>
+	</select>
+
+	<select id="queryStatusByVmIdOwner" parameterClass="java.util.Map"
+		resultClass="VMResultInfo">
+		SELECT vm_id vmId,
+		comp_case_vm_t.status status,
+		comp_order_t.EFFECTIVE_TIME effectiveTime,
+		length_time lengthTime,
+		comp_order_t.EXPIRE_TIME overTime
+		FROM comp_case_vm_t LEFT JOIN
+		comp_order_t ON
+		comp_case_vm_t.order_id=comp_order_t.order_id
+		<isNotEmpty prepend="WHERE" property="vmIds">
+			<iterate property="vmIds" open="(" close=")" conjunction="OR">
+				VM_ID=#vmIds[]#
+			</iterate>
+		</isNotEmpty>
+	</select>
+
+	<select id="queryResPoolByVmId" parameterClass="java.lang.String"
+		resultClass="VMResultInfo">
+		SELECT vm_id vmId,
+		comp_case_vm_t.res_pool_id resPoolId,
+		res_pool_part_id resPoolPartId,
+		comp_case_vm_t.status status,
+		comp_order_t.EFFECTIVE_TIME effectiveTime,
+		length_time
+		lengthTime,
+		comp_order_t.EXPIRE_TIME overTime
+		FROM comp_case_vm_t LEFT
+		JOIN
+		comp_order_t ON
+		comp_case_vm_t.order_id=comp_order_t.order_id
+		WHERE
+		VM_ID = #vmId#
+		and comp_case_vm_t.STATUS != '3'
+	</select>
+
+	<insert id="insertVmDelFailErrorInfo" parameterClass="VmErrorInfo">
+		insert
+		into
+		COMP_VM_DEL_FAIL_T
+		values(#vmId#,#failCause#,#failCode#,#resourcePoolId#,#resourcePoolPartId#,#createTime#,#serialNum#)
+	</insert>
+	
+	<!-- 虚拟机性能统计-查询设备列表 -->
+	<select id="getVmDeviceList" resultClass="VmPerformance" parameterClass="VmPerformance">
+       SELECT DISTINCT
+	     v.PRIVATE_IP AS vmIp,
+	     v.VM_ID AS vmId,
+	     v.VM_NAME AS vmName
+       FROM
+	     COMP_RM_VM_T v
+       INNER JOIN x86.vm_performance_tab per ON v.PRIVATE_IP = per.Per_Hid
+       WHERE
+         v.CUR_STATUS != '0'
+		<isNotEmpty prepend="and" property="appId">
+			v.APP_ID = #appId#
+		</isNotEmpty> 
+		ORDER BY
+	      v.PRIVATE_IP  	    
+	</select>
+
+	<select id="getVm2DeviceList" resultClass="VmPerformance" parameterClass="VmPerformance">
+		SELECT DISTINCT
+		v.PRIVATE_IP AS vmIp,
+		v.VM_ID AS vmId,
+		v.VM_NAME AS vmName
+		FROM
+		COMP_RM_VM_T v
+		INNER JOIN vm_performance_tab per ON v.PRIVATE_IP = per.Per_Hid
+		WHERE
+		v.CUR_STATUS != '0'
+		<isNotEmpty prepend="and" property="appId">
+			v.APP_ID = #appId#
+		</isNotEmpty>
+		ORDER BY
+		v.PRIVATE_IP
+	</select>
+	
+	<!-- 虚拟机性能统计-查询设备性能数据列表 -->
+	<select id="getVmPerformanceList" resultClass="VmPerformance" parameterClass="VmPerformance">
+	  SELECT
+	    vm.VM_NAME AS vmName,
+	    vm.APP_ID AS appId,
+	    vm.PRIVATE_IP AS vmIp,
+	    per.Cpu_Idle AS CpuIdle,
+    	per.Cpu_Speed AS CpuSpeed,
+	    per.Mem_Total AS memTotalKb,
+	    per.Mem_Percent AS memUtilization,
+     	per.Disk_Total AS diskTotalG,
+    	per.Disk_Percent AS diskUtilization,
+	    per.Bytes_In AS bytesIn,
+	    per.Bytes_Out AS bytesOut,
+	    per.Per_Time AS createTime
+      FROM
+	    comp_rm_vm_t vm
+      LEFT JOIN x86.vm_performance_tab per ON vm.PRIVATE_IP = per.Per_Hid
+      WHERE
+        vm.CUR_STATUS != '0'      
+        <isNotEmpty prepend="and" property="vmIp">
+			per.Per_Hid = #vmIp#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="startDate">
+			<![CDATA[ per.Per_Time >= #startDate# ]]>
+		</isNotEmpty> 
+		<isNotEmpty prepend="and" property="endDate">
+			<![CDATA[ per.Per_Time <= #endDate# ]]>
+		</isNotEmpty>  
+      ORDER BY
+	    per.Per_Time DESC	    
+	</select>
+
+	<select id="getVm2PerformanceList" resultClass="VmPerformance" parameterClass="VmPerformance">
+		SELECT
+		vm.VM_NAME AS vmName,
+		vm.APP_ID AS appId,
+		vm.PRIVATE_IP AS vmIp,
+		per.Cpu_Idle AS CpuIdle,
+		per.Cpu_Speed AS CpuSpeed,
+		per.Mem_Total AS memTotalKb,
+		per.Mem_Percent AS memUtilization,
+		per.Disk_Total AS diskTotalG,
+		per.Disk_Percent AS diskUtilization,
+		per.Bytes_In AS bytesIn,
+		per.Bytes_Out AS bytesOut,
+		per.Per_Time AS createTime
+		FROM
+		comp_rm_vm_t vm
+		LEFT JOIN vm_performance_tab per ON vm.PRIVATE_IP = per.Per_Hid
+		WHERE
+		vm.CUR_STATUS != '0'
+		<isNotEmpty prepend="and" property="vmIp">
+			per.Per_Hid = #vmIp#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="startDate">
+			<![CDATA[ per.Per_Time >= #startDate# ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="endDate">
+			<![CDATA[ per.Per_Time <= #endDate# ]]>
+		</isNotEmpty>
+		ORDER BY
+		per.Per_Time DESC
+	</select>
+	
+	<!-- 虚拟机性能统计-查询设备性能数据列表条数 -->
+	<select id="getVmPerformanceListCount" resultClass="java.lang.Integer" parameterClass="VmPerformance">
+	  SELECT
+        COUNT(*)
+      FROM
+	    comp_rm_vm_t vm
+      LEFT JOIN x86.vm_performance_tab per ON vm.PRIVATE_IP = per.Per_Hid
+      WHERE
+        vm.CUR_STATUS != '0'     
+        <isNotEmpty prepend="and" property="vmIp">
+			per.Per_Hid = #vmIp#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="startDate">
+			<![CDATA[ per.Per_Time >= #startDate# ]]>
+		</isNotEmpty> 
+		<isNotEmpty prepend="and" property="endDate">
+			<![CDATA[ per.Per_Time <= #endDate# ]]>
+		</isNotEmpty>  	    
+	</select>
+
+	<select id="getVm2PerformanceListCount" resultClass="java.lang.Integer" parameterClass="VmPerformance">
+		SELECT
+		COUNT(*)
+		FROM
+		comp_rm_vm_t vm
+		LEFT JOIN vm_performance_tab per ON vm.PRIVATE_IP = per.Per_Hid
+		WHERE
+		vm.CUR_STATUS != '0'
+		<isNotEmpty prepend="and" property="vmIp">
+			per.Per_Hid = #vmIp#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="startDate">
+			<![CDATA[ per.Per_Time >= #startDate# ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="endDate">
+			<![CDATA[ per.Per_Time <= #endDate# ]]>
+		</isNotEmpty>
+	</select>
+	
+		<!-- 虚拟机性能统计-导出性能数据查询 -->
+	<select id="getVmPerformanceReport" resultClass="VmPerformance" parameterClass="VmPerformance">
+	  SELECT
+	    vm.VM_NAME AS vmName,
+	    vm.APP_ID AS appId,
+	    vm.PRIVATE_IP AS vmIp,
+	    per.Cpu_Idle AS CpuIdle,
+    	per.Cpu_Speed AS CpuSpeed,
+	    per.Mem_Total AS memTotalKb,
+	    per.Mem_Percent AS memUtilization,
+     	per.Disk_Total AS diskTotalG,
+    	per.Disk_Percent AS diskUtilization,
+	    per.Bytes_In AS bytesIn,
+	    per.Bytes_Out AS bytesOut,
+	    per.Per_Time AS reportDate
+      FROM
+	    comp_rm_vm_t vm
+      LEFT JOIN x86.vm_performance_tab per ON vm.PRIVATE_IP = per.Per_Hid
+      WHERE
+        vm.CUR_STATUS != '0'      
+        <isNotEmpty prepend="and" property="vmIp">
+			per.Per_Hid = #vmIp#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="startDate">
+			<![CDATA[ per.Per_Time >= #startDate# ]]>
+		</isNotEmpty> 
+		<isNotEmpty prepend="and" property="endDate">
+			<![CDATA[ per.Per_Time <= #endDate# ]]>
+		</isNotEmpty>  
+      ORDER BY
+	    per.Per_Time DESC    
+	</select>
+
+	<select id="getVm2PerformanceReport" resultClass="VmPerformance" parameterClass="VmPerformance">
+		SELECT
+		vm.VM_NAME AS vmName,
+		vm.APP_ID AS appId,
+		vm.PRIVATE_IP AS vmIp,
+		per.Cpu_Idle AS CpuIdle,
+		per.Cpu_Speed AS CpuSpeed,
+		per.Mem_Total AS memTotalKb,
+		per.Mem_Percent AS memUtilization,
+		per.Disk_Total AS diskTotalG,
+		per.Disk_Percent AS diskUtilization,
+		per.Bytes_In AS bytesIn,
+		per.Bytes_Out AS bytesOut,
+		per.Per_Time AS reportDate
+		FROM
+		comp_rm_vm_t vm
+		LEFT JOIN vm_performance_tab per ON vm.PRIVATE_IP = per.Per_Hid
+		WHERE
+		vm.CUR_STATUS != '0'
+		<isNotEmpty prepend="and" property="vmIp">
+			per.Per_Hid = #vmIp#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="startDate">
+			<![CDATA[ per.Per_Time >= #startDate# ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="endDate">
+			<![CDATA[ per.Per_Time <= #endDate# ]]>
+		</isNotEmpty>
+		ORDER BY
+		per.Per_Time DESC
+	</select>
+			
+</sqlMap>

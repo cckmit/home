@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="RtInfo">
+	<typeAlias alias="rtInfo" type="com.neusoft.mid.cloong.web.page.resourceManagement.info.RtInfo" />
+	
+	<select id="queryRtInfos" parameterClass="rtInfo" resultClass="rtInfo">
+		SELECT  V.router_id routerId,
+			    V.router_name routerName,
+			    V.router_type routerType,
+			    V.sw_version swVersion,
+			    V.vendor_name vendorName,
+			    V.router_ip routerIp,
+			    V.cur_status curStatus,
+			    V.router_serialnum routerSerialnum,
+			    V.asset_origin_type assetOriginType,
+			    V.asset_state assetState,
+			    V.asset_sla_type assetSlaType,
+				V.RES_POOL_ID resPoolId,
+				R.RES_POOL_NAME resPoolName,
+				DATE_FORMAT(
+					V.UPDATE_TIME,
+					'%Y-%m-%d %H:%i:%s'
+				) updateTime
+		  FROM COMP_RM_ROUTER_T V
+			  LEFT JOIN COMP_RES_POOL_T R ON V.RES_POOL_ID = R.RES_POOL_ID
+		   WHERE 1= 1
+		<dynamic prepend="">
+			<isNotEmpty prepend="and" property="routerId">
+				upper(V.router_id) like
+				upper(CONCAT('%',trim(#routerId#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="routerName">
+				upper(V.router_name) like
+				upper(CONCAT('%',trim(#routerName#),'%'))
+			</isNotEmpty>
+		</dynamic>
+		ORDER BY updateTime DESC
+	</select>
+	
+	<select id="countQueryRt" parameterClass="rtInfo" resultClass="java.lang.Integer">
+		SELECT  count(*)
+		  FROM COMP_RM_ROUTER_T V
+			  LEFT JOIN COMP_RES_POOL_T R ON V.RES_POOL_ID = R.RES_POOL_ID
+		   WHERE 1= 1
+		<dynamic prepend="">
+			<isNotEmpty prepend="and" property="routerId">
+				upper(V.router_id) like
+				upper(CONCAT('%',trim(#routerId#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="routerName">
+				upper(V.router_name) like
+				upper(CONCAT('%',trim(#routerName#),'%'))
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<!-- 查看虚拟机详情 -->
+    <select id="queryRtInfo" parameterClass="rtInfo" resultClass="rtInfo">
+		SELECT  V.router_id routerId,
+			    V.router_name routerName,
+			    V.router_type routerType,
+			    V.sw_version swVersion,
+			    V.vendor_name vendorName,
+			    V.router_ip routerIp,
+			    V.cur_status curStatus,
+			    V.router_serialnum routerSerialnum,
+			    V.asset_origin_type assetOriginType,
+			    V.asset_state assetState,
+			    V.asset_sla_type assetSlaType,
+				V.RES_POOL_ID resPoolId,
+				R.RES_POOL_NAME resPoolName,
+				DATE_FORMAT(
+					V.UPDATE_TIME,
+					'%Y-%m-%d %H:%i:%s'
+				) updateTime
+		  FROM COMP_RM_ROUTER_T V
+			  LEFT JOIN COMP_RES_POOL_T R ON V.RES_POOL_ID = R.RES_POOL_ID
+		  <dynamic prepend="WHERE">
+			<isNotEmpty prepend="" property="routerId">
+				V.router_id = #routerId#
+			</isNotEmpty>
+			<isEmpty prepend="" property="routerId">
+				1=1
+				ORDER BY updateTime DESC
+			</isEmpty>
+		  </dynamic>
+	</select>
+	
+	<select id="queryRtifInfos" parameterClass="rtInfo" resultClass="rtInfo">
+		SELECT  V.router_if_id routerIfId,
+			    V.router_if_name routerIfName,
+			    RT.router_name routerName,
+			    V.if_description ifDescription,
+			    V.if_status ifStatus,
+			    V.if_type ifType,
+			    V.if_set_local_ip ifSetLocalIp,
+			    V.ip_sub_netmask ipSubNetmask,
+			    V.if_connect_eqp_ip ifConnectEqpIp,
+			    V.if_phy_address ifPhyAddress,
+			    V.if_speed ifSpeed,
+			    V.dest_if_id destIfId,
+				V.RES_POOL_ID resPoolId,
+				R.RES_POOL_NAME resPoolName,
+				DATE_FORMAT(
+					V.UPDATE_TIME,
+					'%Y-%m-%d %H:%i:%s'
+				) updateTime
+		  FROM COMP_RM_ROUTER_IF_T V
+		  	  INNER JOIN COMP_RM_ROUTER_T RT ON V.router_id = RT.router_id
+			  LEFT JOIN COMP_RES_POOL_T R ON V.RES_POOL_ID = R.RES_POOL_ID
+		   WHERE 1=1
+		<dynamic prepend="">
+			<isNotEmpty prepend="and" property="routerIfId">
+				upper(V.router_if_id) like
+				upper(CONCAT('%',trim(#routerIfId#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="routerIfName">
+				upper(V.router_if_name) like
+				upper(CONCAT('%',trim(#routerIfName#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="routerId">
+				V.router_id = #routerId#
+			</isNotEmpty>
+		</dynamic>
+		ORDER BY updateTime DESC
+	</select>
+	
+	<select id="countQueryRtif" parameterClass="rtInfo" resultClass="java.lang.Integer">
+		SELECT  count(*)
+		  FROM COMP_RM_ROUTER_IF_T V
+			  LEFT JOIN COMP_RES_POOL_T R ON V.RES_POOL_ID = R.RES_POOL_ID
+		   WHERE 1= 1
+		<dynamic prepend="">
+			<isNotEmpty prepend="and" property="routerIfId">
+				upper(V.router_if_id) like
+				upper(CONCAT('%',trim(#routerIfId#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="routerIfName">
+				upper(V.router_if_name) like
+				upper(CONCAT('%',trim(#routerIfName#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="routerId">
+				V.router_id = #routerId#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<!-- 查看虚拟机详情 -->
+    <select id="queryRtifInfo" parameterClass="rtInfo" resultClass="rtInfo">
+		SELECT  V.router_if_id routerIfId,
+			    V.router_if_name routerIfName,
+			    V.router_id routerId,
+			    RT.router_name routerName,
+			    V.if_description ifDescription,
+			    V.if_status ifStatus,
+			    V.if_type ifType,
+			    V.if_set_local_ip ifSetLocalIp,
+			    V.ip_sub_netmask ipSubNetmask,
+			    V.if_connect_eqp_ip ifConnectEqpIp,
+			    V.if_phy_address ifPhyAddress,
+			    V.if_speed ifSpeed,
+			    V.dest_if_id destIfId,
+				V.RES_POOL_ID resPoolId,
+				R.RES_POOL_NAME resPoolName,
+				DATE_FORMAT(
+					V.UPDATE_TIME,
+					'%Y-%m-%d %H:%i:%s'
+				) updateTime
+		  FROM COMP_RM_ROUTER_IF_T V
+		  	  INNER JOIN COMP_RM_ROUTER_T RT ON V.router_id = RT.router_id
+			  LEFT JOIN COMP_RES_POOL_T R ON V.RES_POOL_ID = R.RES_POOL_ID
+		  <dynamic prepend="WHERE">
+			<isNotEmpty prepend="" property="routerIfId">
+				V.router_if_id = #routerIfId#
+			</isNotEmpty>
+			<isEmpty prepend="" property="routerIfId">
+				1=1
+				ORDER BY updateTime DESC
+			</isEmpty>
+		  </dynamic>
+	</select>
+</sqlMap>

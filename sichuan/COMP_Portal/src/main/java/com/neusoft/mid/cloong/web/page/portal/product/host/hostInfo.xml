@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="HostInfo">
+	<typeAlias alias="hostItem"
+		type="com.neusoft.mid.cloong.web.page.portal.product.host.HostItem" />
+	<typeAlias alias="String" type="java.lang.String" />
+
+	<select id="getHostItems" resultClass="hostItem" parameterClass="String">
+	SELECT DISTINCT ci.ITEM_ID itemID,
+	       ci.ITEM_NAME itemName,
+	       cct.CATALOG_NAME catalogName,
+	       ci.RECOMMEND recommend,
+	       ctv.CPU_NUM cpuNum,
+	       ctv.RAM_SIZE ramSize,
+	       ctv.DISC_SIZE discSize,
+	       ctv.DESCRIPTION description
+	  FROM COMP_ITEM_T ci, COMP_STANDARD_VM_T ctv ,COMP_CATALOG_T cct,
+	  	   comp_standard_syn_t csst,comp_res_pool_t crpt
+	 WHERE ci.STANDARD_ID = ctv.STANDARD_ID
+	   AND ci.STATUS = '5'
+	   AND ci.STANDARD_TYPE = '0'
+	   AND ci.CATALOG_ID = cct.CATALOG_ID
+       AND ctv.standard_id = csst.standard_id
+       AND csst.res_pool_id = crpt.res_pool_id
+       AND crpt.status = '1'
+     ORDER BY ci.ITEM_NAME
+	</select>	
+	
+	<select id="getPMHostItems" resultClass="hostItem" parameterClass="String">
+	SELECT DISTINCT
+		ci.ITEM_ID itemID,
+		ci.ITEM_NAME itemName,
+		cct.CATALOG_NAME catalogName,
+		ci.RECOMMEND recommend,
+		cpt.CPU_TYPE cpuType,
+		cpt.RAM_SIZE ramSize,
+		cpt.DISC_SIZE discSize,
+		ctv.DESCRIPTION description
+	FROM
+		COMP_ITEM_T ci,
+		COMP_STANDARD_PM_T ctv,
+		COMP_CATALOG_T cct,
+		comp_standard_syn_t csst,
+		comp_res_pool_t crpt,
+		COMP_PM_TYPE_T cpt
+	WHERE
+		ci.STANDARD_ID = ctv.STANDARD_ID
+	AND ci. STATUS = '5'
+	AND ci.STANDARD_TYPE = '1'
+	AND ci.CATALOG_ID = cct.CATALOG_ID
+	AND ctv.standard_id = csst.standard_id
+	AND ctv.SERVER_TYPE = cpt.PM_TYPE_ID
+	AND csst.res_pool_id = crpt.res_pool_id
+	AND crpt. STATUS = '1'
+	ORDER BY
+		ci.ITEM_NAME
+	</select>
+</sqlMap>

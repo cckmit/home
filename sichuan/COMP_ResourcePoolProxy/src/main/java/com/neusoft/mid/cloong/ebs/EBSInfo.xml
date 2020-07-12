@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="EBSInfo">
+	<typeAlias alias="EBSInfo" type="com.neusoft.mid.cloong.ebs.EBSInfo" />
+	<typeAlias alias="OrderInfo" type="com.neusoft.mid.cloong.order.info.OrderInfo" />
+	<typeAlias alias="EBSStateQueueItemInfo" type="com.neusoft.mid.cloong.ebs.EBSStateQueueItemInfo" />
+	<update id="updateEBSStatus" parameterClass="EBSInfo">
+		update
+		COMP_CASE_EBS_T
+		set
+		STATUS=#ebsStatus#
+		where EBS_ID=#ebsId#
+	</update>
+
+	<!-- 查询虚拟机订单信息 -->
+	<select id="queryEBSOrderInfo" parameterClass="java.lang.String" resultClass="OrderInfo">
+		select
+		ORDER_ID orderId,STATUS
+		status,LENGTH_TIME
+		lengthTime,LENGTH_UNIT
+		lengthUnit,CREATE_TIME
+		createTime,CREATE_USER
+		createUser,EFFECTIVE_TIME
+		effectiveTime,EXPIRE_TIME expireTime from
+		COMP_ORDER_T
+		where
+		ORDER_ID=(select order_id from COMP_CASE_EBS_T
+		where EBS_ID = #ebsId#)
+	</select>
+
+	<!-- 更新虚拟机订单为生效,及开始计费时间、到期时间 -->
+	<update id="updateEBSOrder" parameterClass="java.util.HashMap">
+		update
+		COMP_ORDER_T
+		set
+		STATUS=#ebsStatus#
+		,
+		EFFECTIVE_TIME=#effectiveTime# , EXPIRE_TIME=#expireTime#
+		where ORDER_ID=
+		(select order_id from
+		COMP_CASE_EBS_T
+		where EBS_ID = #ebsId#)
+	</update>
+
+	<!-- 查询处于创建中状态的所有块 -->
+	<select id="queryCreateingEBSState" resultClass="EBSStateQueueItemInfo">
+		SELECT
+		ebs_id ebsId,
+		ebs_id serialNum,
+		res.res_pool_id resourcePoolId,
+		res.res_pool_url resourceUrl,
+		ebs.res_pool_part_id
+		resourcePoolPartId
+		FROM comp_case_ebs_t ebs left join comp_res_pool_t res on
+		ebs.res_pool_id =
+		res.res_pool_id
+		WHERE
+		ebs.status = '1'
+	</select>
+
+</sqlMap>

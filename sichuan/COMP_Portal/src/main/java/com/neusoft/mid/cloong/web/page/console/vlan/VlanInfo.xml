@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="vlan">
+
+	<typeAlias alias="vlanInfo"
+		type="com.neusoft.mid.cloong.web.page.console.vlan.info.VlanInfo" />
+	<typeAlias alias="vlanIpRel"
+		type="com.neusoft.mid.cloong.web.page.console.vlan.info.VlanIpSegmentRel" />
+	<typeAlias alias="IpSegment"
+		type="com.neusoft.mid.cloong.web.page.console.vlan.info.IpSegment" />
+	<typeAlias alias="resourceInfo"
+		type="com.neusoft.mid.cloong.web.page.console.business.info.ResourceInfo" />
+	<typeAlias alias="lbinfo"
+		type="com.neusoft.mid.cloong.web.page.console.host.vm.info.LoadBalanceInfo" />
+
+	<!-- 查询lbList -->
+	<select id="getLbList" resultClass="lbinfo" parameterClass="lbinfo">
+		SELECT l.lb_name lbname,l.LBIP lbip,
+		DATE_FORMAT(l.create_time,'%Y-%m-%d %H:%i:%s')
+		createtime,
+		l.LBStrategy Strategy,l.LBPort lbport,a.APP_NAME appname,l.create_status
+		status,l.LBID LBid
+		from comp_load_balance_service_tab l
+		LEFT JOIN comp_app_t a ON a.APP_ID=l.appid
+		WHERE
+		(l.create_status='0' or
+		l.create_status='1')
+		<isNotEmpty prepend="and" property="businessList">
+			l.appid in
+			<iterate property="businessList" conjunction="," open="("
+				close=")">
+				#businessList[]#
+			</iterate>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="lbname">
+			lb_name like
+			CONCAT('%',#lbname#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="lbip">
+			LBip like
+			CONCAT('%',#lbip#,'%')
+		</isNotEmpty>
+		order by l.create_time DESC
+	</select>
+
+	<select id="getLbCount" resultClass="java.lang.Integer"
+		parameterClass="lbinfo">
+		SELECT COUNT(*)
+		from comp_load_balance_service_tab l
+		WHERE
+		(l.create_status='0' or
+		l.create_status='1')
+		<isNotEmpty prepend="and" property="businessList">
+			l.appid in
+			<iterate property="businessList" conjunction="," open="("
+				close=")">
+				#businessList[]#
+			</iterate>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="lbname">
+			lb_name like
+			CONCAT('%',#lbname#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="lbip">
+			LBip like
+			CONCAT('%',#lbip#,'%')
+		</isNotEmpty>
+	</select>
+	<!-- 查询vlanList -->
+	<select id="getVlanList" resultClass="vlanInfo" parameterClass="vlanInfo">
+		SELECT
+		v.CASE_ID AS caseId,
+		v.VLAN_ID AS vlanId,
+		v.VLAN_NAME AS vlanName,
+		v.APP_ID AS appId,
+		v.RES_POOL_ID AS resPoolId,
+		v.RES_POOL_PART_ID AS
+		resPoolPartId,
+		v.ZONE_TYPE AS zoneType,
+		v.VLAN_TYPE AS vlanType,
+		v.CREATE_TIME AS createTime,
+		v.CREATE_USER AS createUser,
+		v.CANCELED AS
+		STATUS,
+		a.app_name AS appName,
+		ip.start_ip AS startIp,
+		ip.end_ip AS
+		endIp,
+		ip.ipsegment_id ipsegmentId,
+		ip.IP_TYPE AS ipType,
+		ip.IPSEGMENT_DESC AS ipSegmentDesc
+		FROM
+		comp_case_vlan_t v
+		LEFT JOIN
+		comp_app_t
+		a ON v.app_id = a.app_id
+		LEFT JOIN
+		comp_vlan_ipsegment_bind_t
+		b ON
+		v.vlan_id = b.vlan_id AND b. STATUS =
+		'0'
+		LEFT JOIN
+		comp_case_ipsegment_t ip ON b.IPSEGMENT_ID =
+		ip.IPSEGMENT_ID AND
+		ip.RELEASED = '0'
+		WHERE
+		v.canceled in
+		<iterate property="canceled" open="(" conjunction="," close=")">
+			#canceled[]#
+		</iterate>
+		<isNotEmpty prepend="and" property="businessList">
+			v.app_id in
+			<iterate property="businessList" conjunction="," open="("
+				close=")">
+				#businessList[]#
+			</iterate>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="vlanId">
+			v.vlan_id = #vlanId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="resPoolId">
+			v.RES_POOL_ID = #resPoolId#
+		</isNotEmpty>
+		order by createTime DESC
+	</select>
+
+	<select id="getVlanCount" resultClass="java.lang.Integer"
+		parameterClass="vlanInfo">
+		SELECT
+		count(v.CASE_ID)
+		FROM
+		comp_case_vlan_t v
+		LEFT JOIN comp_app_t a ON
+		v.app_id = a.app_id
+		LEFT JOIN
+		comp_vlan_ipsegment_bind_t b ON v.vlan_id
+		= b.vlan_id and b. STATUS =
+		'0'
+		LEFT JOIN comp_case_ipsegment_t ip ON
+		b.IPSEGMENT_ID =
+		ip.IPSEGMENT_ID AND ip.RELEASED = '0'
+		WHERE
+		v.canceled
+		in
+		<iterate property="canceled" open="(" conjunction="," close=")">
+			#canceled[]#
+		</iterate>
+		<isNotEmpty prepend="and" property="businessList">
+			v.app_id in
+			<iterate property="businessList" conjunction="," open="("
+				close=")">
+				#businessList[]#
+			</iterate>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="vlanId">
+			v.vlan_id = #vlanId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="vlanName">
+			v.vlan_name like '%'||
+			#vlanName# || '%'
+		</isNotEmpty>
+	</select>
+
+	<!-- 查询vlanList -->
+	<select id="getVlansForVm" resultClass="vlanInfo"
+		parameterClass="vlanInfo">
+		SELECT
+		v.CASE_ID AS caseId,
+		v.VLAN_ID AS vlanId,
+		v.VLAN_NAME AS vlanName,
+		v.APP_ID AS appId,
+		v.RES_POOL_ID AS resPoolId,
+		v.RES_POOL_PART_ID AS
+		resPoolPartId,
+		v.ZONE_TYPE AS zoneType,
+		v.VLAN_TYPE AS vlanType,
+		v.CREATE_TIME AS createTime,
+		v.CREATE_USER AS createUser,
+		v.CANCELED AS
+		STATUS,
+		v.CANCEL_TIME AS cancelTime,
+		v.CANCEL_USER AS cancelUser,
+		a.app_name AS appName,
+		ip.start_ip AS startIp,
+		ip.end_ip AS endIp,
+		ip.ipsegment_id ipsegmentId
+		FROM
+		comp_case_vlan_t v
+		LEFT JOIN comp_app_t
+		a ON v.app_id = a.app_id
+		LEFT JOIN
+		comp_vlan_ipsegment_bind_t b ON
+		v.vlan_id = b.vlan_id
+		LEFT JOIN comp_case_ipsegment_t ip ON
+		b.IPSEGMENT_ID = ip.IPSEGMENT_ID AND ip.RELEASED = '0'
+		WHERE (b. STATUS
+		= '0' or b. STATUS is null)
+		AND v.canceled in
+		<iterate property="canceled" open="(" conjunction="," close=")">
+			#canceled[]#
+		</iterate>
+		<isNotEmpty prepend="and" property="businessList">
+			v.app_id in
+			<iterate property="businessList" conjunction="," open="("
+				close=")">
+				#businessList[]#
+			</iterate>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="vlanId">
+			v.vlan_id = #vlanId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="ipType">
+			v.IP_TYPE = #ipType#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="resPoolId">
+			v.RES_POOL_ID = #resPoolId#
+		</isNotEmpty>
+	</select>
+
+	<insert id="createVLANInstanceInfo" parameterClass="vlanInfo">
+		INSERT INTO
+		`comp_case_vlan_t`
+		VALUES
+		(#caseId#,#vlanId#,#vlanName#,#orderId#,#appId#,
+		#resPoolId#,#resPoolPartId#,#zoneType#,
+		#vlanType#,#createTime#,#createUser#,
+		<iterate property="canceled">
+			#canceled[0]#,
+		</iterate>
+
+		#cancelTime#,#cancelUser#,#ipType#);
+	</insert>
+
+	<!-- 查询vlan和IP段关系表 -->
+	<select id="getVlanIpBindAss" parameterClass="vlanIpRel"
+		resultClass="vlanIpRel">
+		SELECT
+		b.VLAN_ID AS vlanId,
+		b.IPSEGMENT_ID AS ipSegmentId,
+		b.CREATE_TIME
+		AS createTime,
+		b.CREATE_USER AS createUser,
+		b.UPDATE_TIME
+		AS updateTime,
+		b.UPDATE_USER AS updateUser,
+		b.Status AS status
+		FROM
+		comp_vlan_ipsegment_bind_t b
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="status">
+				b.`Status` = #status#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="vlanId">
+				b.VLAN_ID =
+				#vlanId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="ipSegmentId">
+				b.IPSEGMENT_ID = #ipSegmentId#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+	<!-- 查询虚拟机网卡使用vlan的情况 -->
+	<select id="getVmBindingVlan" parameterClass="java.lang.String"
+		resultClass="java.lang.Integer">
+		SELECT
+		COUNT(*)
+		FROM
+		comp_case_vm_net_t n
+		LEFT JOIN
+		comp_case_vm_t vm ON vm.CASE_ID = n.CASE_ID
+		WHERE
+		n.VLAN_ID = #vlanId#
+		AND vm.`STATUS` != '3'
+	</select>
+
+	<update id="cancelVlan" parameterClass="vlanInfo">
+		UPDATE `comp_case_vlan_t`
+		SET
+		CANCELED = '1',
+		CANCEL_TIME = #cancelTime#,
+		CANCEL_USER =
+		#cancelUser#
+		WHERE
+		VLAN_ID = #vlanId#
+	</update>
+
+	<select id="getIPsegmentByID" parameterClass="java.lang.String"
+		resultClass="IpSegment">
+		SELECT
+		t.CASE_ID AS caseId,
+		t.IPSEGMENT_ID as ipSegmentId,
+		t.APP_ID AS appId,
+		t.RES_POOL_ID AS resPoolID,
+		t.RES_POOL_PART_ID AS
+		resPoolPartID,
+		t.IP_SUBNET AS ipSubnet,
+		t.START_IP AS startIp,
+		t.END_IP
+		AS endIp,
+		t.IP_TOTAL AS ipTotal,
+		t.RELEASED AS ipRelease,
+		t.IP_TYPE AS ipType
+		FROM
+		comp_case_ipsegment_t t
+		WHERE t.IPSEGMENT_ID= #ipSegment#
+		and RELEASED =
+		'0'
+	</select>
+
+	<select id="getVlanByBusinessId" resultClass="resourceInfo"
+		parameterClass="java.util.Map">
+		SELECT
+		v.VLAN_ID AS resourceId,
+		v.VLAN_NAME AS `name`,
+		v.APP_ID AS appId,
+		v.CANCELED AS `status`,
+		'3' AS `type`
+		FROM
+		comp_case_vlan_t v
+		LEFT JOIN comp_app_t a ON v.app_id = a.app_id
+		WHERE
+		v.APP_ID = #businessId#
+		AND v.CANCELED IN ('0','2')
+		ORDER BY
+		v.create_time DESC
+	</select>
+
+	<select id="vlanQuery" resultClass="vlanInfo" parameterClass="vlanInfo">
+		SELECT
+		v.CASE_ID AS caseId,
+		v.VLAN_ID AS vlanId,
+		v.VLAN_NAME AS vlanName,
+		v.APP_ID AS appId,
+		v.RES_POOL_ID AS resPoolId,
+		v.RES_POOL_PART_ID AS
+		resPoolPartId,
+		v.ZONE_TYPE AS zoneType,
+		v.VLAN_TYPE AS vlanType,
+		v.CREATE_TIME AS createTime,
+		v.CREATE_USER AS createUser,
+		v.CANCELED AS
+		STATUS,
+		v.CANCEL_TIME AS cancelTime,
+		v.CANCEL_USER AS cancelUser
+		FROM
+		comp_case_vlan_t v
+		WHERE
+		v.vlan_id = #vlanId#
+		AND
+		v.vlan_name = #vlanName#
+	</select>
+
+	<update id="editVlanName" parameterClass="vlanInfo">
+		UPDATE comp_case_vlan_t
+		SET VLAN_NAME = #vlanName#
+		WHERE CASE_ID =#caseId#
+	</update>
+</sqlMap>

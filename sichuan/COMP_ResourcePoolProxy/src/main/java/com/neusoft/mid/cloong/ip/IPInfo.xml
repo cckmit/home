@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="IPInfo">
+	<typeAlias alias="OrderInfo" type="com.neusoft.mid.cloong.order.info.OrderInfo" />
+
+	<!-- 查询订单信息 -->
+	<select id="queryIPOrderInfo" parameterClass="java.lang.String" resultClass="OrderInfo">
+		select
+		ORDER_ID orderId,STATUS
+		status,LENGTH_TIME
+		lengthTime,LENGTH_UNIT
+		lengthUnit,CREATE_TIME
+		createTime,CREATE_USER
+		createUser,EFFECTIVE_TIME
+		effectiveTime,EXPIRE_TIME expireTime from
+		COMP_ORDER_T
+		where
+		ORDER_ID=(select order_id from COMP_CASE_IPSEGMENT_T
+		where IPSEGMENT_ID = #ipSegmentURI#
+		and RELEASED != '1' )
+	</select>
+
+	<!-- 更新订单状态,及开始计费时间、到期时间 -->
+	<update id="updateIPOrder" parameterClass="java.util.HashMap">
+		update
+		COMP_ORDER_T
+		set
+		STATUS=#orderStatus#
+		, EFFECTIVE_TIME=#effectiveTime# , EXPIRE_TIME=#expireTime#
+		where ORDER_ID= #orderId#
+	</update>
+
+</sqlMap>

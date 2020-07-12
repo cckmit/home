@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE validators PUBLIC 
+  		"-//Apache Struts//XWork Validator 1.0.2//EN"
+  		"http://struts.apache.org/dtds/xwork-validator-1.0.2.dtd">
+<validators>
+	<field name="cpuNum">
+		<field-validator type="regex">
+			<param name="expression"><![CDATA[^[0-9]{1,10}$]]></param>
+			<message>cpu数量只能填写数字，请重新输入</message>
+		</field-validator>
+	</field>
+	<field name="discSize">
+		<field-validator type="regex">
+			<param name="expression"><![CDATA[^[0-9]{1,10}$]]></param>
+			<message>磁盘空间只能填写数字，请重新输入</message>
+		</field-validator>
+	</field>
+	<field name="ramSize">
+		<field-validator type="regex">
+			<param name="expression"><![CDATA[^[0-9]{1,10}$]]></param>
+			<message>内存容量只能填写数字，请重新输入</message>
+		</field-validator>
+	</field>
+</validators>

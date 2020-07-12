@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="ProductEbsInfo">
+	<typeAlias alias="ebsItem"
+		type="com.neusoft.mid.cloong.web.page.portal.product.ebs.EbsItem" />
+	<typeAlias alias="String" type="java.lang.String" />
+
+	<select id="getEbsItems" resultClass="ebsItem" parameterClass="String">
+	SELECT DISTINCT ci.ITEM_ID itemID,
+	       ci.ITEM_NAME itemName,
+	       ci.RECOMMEND recommend,
+	       cct.CATALOG_NAME catalogName,
+	       cte.DISC_SIZE discSize,
+	       cte.DESCRIPTION description
+	  FROM COMP_ITEM_T ci, COMP_STANDARD_EBS_T cte,COMP_CATALOG_T cct,comp_standard_syn_t csst,comp_res_pool_t crpt
+	 WHERE ci.STANDARD_ID = cte.STANDARD_ID
+	   AND ci.STATUS = '5'
+	   AND ci.STANDARD_TYPE = '5'
+	   AND ci.CATALOG_ID = cct.CATALOG_ID
+	   AND cte.standard_id = csst.standard_id
+       AND csst.res_pool_id = crpt.res_pool_id
+       AND crpt.status = '1'
+  	ORDER BY ci.ITEM_NAME
+	</select>
+</sqlMap>

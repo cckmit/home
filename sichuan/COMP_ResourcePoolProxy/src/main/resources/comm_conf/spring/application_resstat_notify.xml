@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
+    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+
+
+	<!-- JOB START -->
+	<bean id="baseJob" class="com.neusoft.mid.cloong.resourcePool.businessOpt.resStat.suport.BaseJob"
+		abstract="true">
+		<property name="ibatisDAO" ref="ibatisDAOProxy" />
+	</bean>
+
+
+
+	<!-- 计量信息处理JOB -->
+	<bean id="resStatCountJob"
+		class="com.neusoft.mid.cloong.resourcePool.businessOpt.resStat.notify.job.CycReportResCountJob"
+		parent="baseJob">
+		<property name="pmTasklet" ref="pmTasklet" />
+		<property name="vmTasklet" ref="vmTasklet" />
+		<property name="ebsTasklet" ref="ebsTasklet" />
+		<property name="bkTasklet" ref="vmbakTasklet" />
+	</bean>
+
+	<bean id="BaseResCountTasklet"
+		class="com.neusoft.mid.cloong.resourcePool.businessOpt.resStat.notify.job.tasklet.BaseResCountTasklet"
+		abstract="true">
+		<property name="ibatisDAO" ref="ibatisDAOProxy" />
+	</bean>
+
+	<bean id="pmTasklet"
+		class="com.neusoft.mid.cloong.resourcePool.businessOpt.resStat.notify.job.tasklet.PMResCountTasklet"
+		parent="BaseResCountTasklet">
+	</bean>
+
+	<bean id="vmTasklet"
+		class="com.neusoft.mid.cloong.resourcePool.businessOpt.resStat.notify.job.tasklet.VMResCountTasklet"
+		parent="BaseResCountTasklet">
+	</bean>
+
+	<bean id="ebsTasklet"
+		class="com.neusoft.mid.cloong.resourcePool.businessOpt.resStat.notify.job.tasklet.EBSResCountTasklet"
+		parent="BaseResCountTasklet">
+	</bean>
+
+	<bean id="vmbakTasklet"
+		class="com.neusoft.mid.cloong.resourcePool.businessOpt.resStat.notify.job.tasklet.VMBAKResCountTasklet"
+		parent="BaseResCountTasklet">
+	</bean>
+
+
+	<!-- 监控信息处理JOB -->
+	<bean id="resStatusJob"
+		class="com.neusoft.mid.cloong.resourcePool.businessOpt.resStat.CycReportResStatus.job.CycReportResStatusJob"
+		parent="baseJob">
+<!-- 		<property name="localTempPath" value="${resourcePool.reportResStatus.localPath}" /> -->
+        <property name="localTempPathTwo" value="${resourcePoolTwo.reportResStatus.localPath}" />
+        <property name="localTempPathThree" value="${resourcePoolThree.reportResStatus.localPath}" />
+<!-- 		<property name="sftpInfo">
+			<bean
+				class="com.neusoft.mid.cloong.resourcePool.businessOpt.resStat.CycReportResStatus.info.ReportSftpInfo">
+				<property name="ip" value="${resourcePool.reportResStatus.sftp.ip}" />
+				<property name="port" value="${resourcePool.reportResStatus.sftp.port}" />
+				<property name="userName" value="${resourcePool.reportResStatus.sftp.userName}" />
+				<property name="password" value="${resourcePool.reportResStatus.sftp.password}" />
+				<property name="rootPath" value="${resourcePool.reportResStatus.sftp.rootPath}" />
+			</bean>
+		</property> -->
+		<property name="sftpInfoTwo">
+			<bean
+				class="com.neusoft.mid.cloong.resourcePool.businessOpt.resStat.CycReportResStatus.info.ReportSftpInfo">
+				<property name="ip" value="${resourcePoolTwo.reportResStatus.sftp.ip}" />
+				<property name="port" value="${resourcePoolTwo.reportResStatus.sftp.port}" />
+				<property name="userName" value="${resourcePoolTwo.reportResStatus.sftp.userName}" />
+				<property name="password" value="${resourcePoolTwo.reportResStatus.sftp.password}" />
+				<property name="rootPath" value="${resourcePoolTwo.reportResStatus.sftp.rootPath}" />
+			</bean>
+		</property>
+		<property name="sftpInfoThree">
+			<bean
+				class="com.neusoft.mid.cloong.resourcePool.businessOpt.resStat.CycReportResStatus.info.ReportSftpInfo">
+				<property name="ip" value="${resourcePoolThree.reportResStatus.sftp.ip}" />
+				<property name="port" value="${resourcePoolThree.reportResStatus.sftp.port}" />
+				<property name="userName" value="${resourcePoolThree.reportResStatus.sftp.userName}" />
+				<property name="password" value="${resourcePoolThree.reportResStatus.sftp.password}" />
+				<property name="rootPath" value="${resourcePoolThree.reportResStatus.sftp.rootPath}" />
+			</bean>
+		</property>
+		<property name="pmSrvTasklet" ref="pmSrvTasklet" />
+		<property name="pmVmTaskLet" ref="pmVmTaskLet" />
+		<property name="pmRaidTaskLet" ref="pmRaidTaskLet" />
+		<property name="pmBsTaskLet" ref="pmBsTaskLet" />
+		<property name="pmSwitchTaskLet" ref="pmSwitchTaskLet" />
+		<property name="pmSwitchPortTaskLet" ref="pmSwitchPortTaskLet" />
+		<property name="pmFirewallTasklet" ref="pmFirewallTasklet" />
+		<property name="pmRouterTasklet" ref="pmRouterTasklet" />
+		<property name="pmRouterIFTasklet" ref="pmRouterIFTasklet" />
+	</bean>
+
+	<bean id="BaseResStatusTasklet"
+		class="com.neusoft.mid.cloong.resourcePool.businessOpt.resStat.CycReportResStatus.job.tasklet.BaseResStatusTasklet"
+		abstract="true">
+		<property name="ibatisDAO" ref="ibatisDAOProxy" />
+	</bean>
+
+	<bean id="pmSrvTasklet"
+		class="com.neusoft.mid.cloong.resourcePool.businessOpt.resStat.CycReportResStatus.job.tasklet.PMSrvTasklet"
+		parent="BaseResCountTasklet">
+	</bean>
+
+	<bean id="pmVmTaskLet"
+		class="com.neusoft.mid.cloong.resourcePool.businessOpt.resStat.CycReportResStatus.job.tasklet.PMVMTasklet"
+		parent="BaseResCountTasklet">
+	</bean>
+	
+	<bean id="pmRaidTaskLet"
+		class="com.neusoft.mid.cloong.resourcePool.businessOpt.resStat.CycReportResStatus.job.tasklet.PMRAIDTasklet"
+		parent="BaseResCountTasklet">
+	</bean>
+	<bean id="pmBsTaskLet"
+		class="com.neusoft.mid.cloong.resourcePool.businessOpt.resStat.CycReportResStatus.job.tasklet.PMBSTasklet"
+		parent="BaseResCountTasklet">
+	</bean>
+	<bean id="pmSwitchTaskLet"
+		class="com.neusoft.mid.cloong.resourcePool.businessOpt.resStat.CycReportResStatus.job.tasklet.PMSWITCHTasklet"
+		parent="BaseResCountTasklet">
+	</bean>
+	<bean id="pmSwitchPortTaskLet"
+		class="com.neusoft.mid.cloong.resourcePool.businessOpt.resStat.CycReportResStatus.job.tasklet.PMSWITCHPORTTasklet"
+		parent="BaseResCountTasklet">
+	</bean>
+	
+	<bean id="pmFirewallTasklet"
+		class="com.neusoft.mid.cloong.resourcePool.businessOpt.resStat.CycReportResStatus.job.tasklet.PMFIREWALLTasklet"
+		parent="BaseResCountTasklet">
+	</bean>
+	<bean id="pmRouterTasklet"
+		class="com.neusoft.mid.cloong.resourcePool.businessOpt.resStat.CycReportResStatus.job.tasklet.PMROUTERTasklet"
+		parent="BaseResCountTasklet">
+	</bean>
+	<bean id="pmRouterIFTasklet"
+		class="com.neusoft.mid.cloong.resourcePool.businessOpt.resStat.CycReportResStatus.job.tasklet.PMROUTERIFTasklet"
+		parent="BaseResCountTasklet">
+	</bean>
+
+	<!-- 模板状态上报处理JOB -->
+	<!-- 监控信息处理JOB -->
+	<bean id="reportTemplateJob"
+		class="com.neusoft.mid.cloong.resourcePool.businessOpt.resStat.CycReportResStatus.job.ReportTemplateJob"
+		parent="baseJob">
+		<property name="standardReport" ref="standardReport" />
+	</bean>
+	<bean id="standardReport" class="com.neusoft.mid.cloong.stardard.StandardReport">
+		<property name="ibatisDao">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+</beans>

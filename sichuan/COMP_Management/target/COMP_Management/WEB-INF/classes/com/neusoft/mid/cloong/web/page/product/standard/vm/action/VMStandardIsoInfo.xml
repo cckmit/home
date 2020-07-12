@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="VMStandardIso">
+	<update id="deleteStandardIso">
+		update COMP_STANDARD_ISO_T 
+		set status='0'
+		where
+		standard_Id=#standardId# 
+	</update>
+	<!-- 统计虚拟机规格与镜像存在关联关系数量 -->
+	<select id="queryCountStandardIso" parameterClass="java.lang.String" resultClass="int">
+		select count(*) from COMP_STANDARD_ISO_T where standard_Id=#standardId# 
+	</select>
+</sqlMap>

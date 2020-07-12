@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="billing">
+		<typeAlias alias="billing" type="com.neusoft.mid.cloong.identity.bean.BillingRecodInfo" />
+		<typeAlias alias="int" type="java.lang.Integer"/>
+		<typeAlias alias="string" type="java.lang.String"/>
+		<insert id="insertBilling" parameterClass="billing">
+				INSERT INTO   comp_billing_record_t
+				(
+				charges_user_id,
+				resource_id,
+				length_unit,
+				length_time,
+				price,
+				resource_type,
+				charges_id,
+				user_id,
+				create_time,
+				billing_status,
+				cpu,
+				memory,
+				disk_size
+				)
+				VALUES
+				(
+				#chargesUserId#,
+				#resourceId#,
+				#lengthUnit#,
+				#lengthTime#,
+				#price#,
+				#resourceType#,
+				#chargesId#,
+				#userId#,
+				CURRENT_TIMESTAMP,
+				'0',
+				#cpu#,
+				#memory#,
+				#diskSize#
+				)
+		</insert>
+		
+		<select id="queryAllBilling" resultClass="billing">
+				SELECT
+						id,
+						charges_user_id as chargesUserId,
+						resource_id as resourceId,
+						length_unit as lengthUnit,
+						length_time as lengthTime,
+						price,
+						resource_type as resourceType,
+						charges_id as chargesId,
+						user_id as userId ,
+						create_time as createTime,
+						synch_time as synchTime,
+						billing_status as billingStatus,
+						cpu,
+						memory,
+						disk_size as diskSize
+					FROM
+						comp_billing_record_t
+					WHERE
+						billing_status = '0'
+		</select>
+		<!-- 批量更新状态. -->
+		<update id="batchUpdate" parameterClass="java.util.List">
+				UPDATE comp_billing_record_t
+				SET billing_status = '1'
+				WHERE  id  in
+				<iterate  open="(" close=")" conjunction=",">
+						#ids[]#
+				</iterate>
+		</update>
+</sqlMap>

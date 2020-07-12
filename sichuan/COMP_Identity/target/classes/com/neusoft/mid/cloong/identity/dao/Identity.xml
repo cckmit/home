@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="UserInfo">
+	<typeAlias alias="User"
+		type="com.neusoft.mid.cloong.identity.bean.UserBean" />
+	<typeAlias alias="SMorMail"
+		type="com.neusoft.mid.cloong.identity.bean.SMorMailValidateBean" />
+	
+	<insert id="insertSMorMailTime" parameterClass="SMorMail">
+		insert into COMP_SM_MAIL_TIME_T 
+		(USER_ID ,
+		KEYWORD,
+		TIMESTAMP)
+		 values 
+		(#userId#,
+		#keyWord#,
+		#timeStamp#)
+	</insert>
+	
+	<select id="getSMvalidation"  parameterClass="SMorMail" resultClass="SMorMail">
+		SELECT
+		USER_ID userId, KEYWORD keyWord, TIMESTAMP timeStamp
+		FROM COMP_SM_MAIL_TIME_T
+	    WHERE USER_ID=#userId#
+	    <![CDATA[ AND KEYWORD = #keyWord# ]]>   
+	</select>
+	
+	<delete id="deleteSmMailValidateInfo"  parameterClass="SMorMail">
+		DELETE
+		FROM COMP_SM_MAIL_TIME_T
+	    WHERE USER_ID=#userId#
+	    <![CDATA[ AND KEYWORD = #keyWord# ]]>   
+	</delete>
+	
+	<select id="selectCaseVmCount"  parameterClass="User" resultClass="int">
+		SELECT
+		COUNT(*)
+		FROM COMP_CASE_VM_T
+	    WHERE OWN_USER=#userId#
+	</select>
+	
+	<select id="selectCaseEBSCount"  parameterClass="User" resultClass="int">
+		SELECT
+		COUNT(*)
+		FROM COMP_CASE_EBS_T
+	    WHERE CREATE_USER=#userId#
+	</select>
+</sqlMap>
+

@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="BusinessView">
+	<typeAlias alias="QueryBusinessInfo"
+		type="com.neusoft.mid.cloong.web.page.business.bean.QueryBusiness" />
+	<typeAlias alias="BusinessInfo"
+		type="com.neusoft.mid.cloong.web.page.console.business.info.BusinessInfo" />
+	<typeAlias alias="ResourceInfo"
+		type="com.neusoft.mid.cloong.web.page.console.business.info.ResourceInfo" />
+
+	<sql id="businessCol">
+		APP_ID businessId, 
+		APP_NAME name,
+		DESCRIPTION description,
+		CREATE_TIME createTime,
+		CREATE_USER createUserId,
+		UPDATE_TIME updateTime,
+		UPDATE_USER updateUserId
+	</sql>
+
+	<sql id="queryWhere">
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="name">
+				upper(APP_NAME)
+				like
+				upper(CONCAT('%',trim(#name#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="beforeCreateTime">
+				<![CDATA[ CREATE_TIME
+				<= #beforeCreateTime# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="afterCreateTime">
+				<![CDATA[CREATE_TIME >=
+				#afterCreateTime# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="createUserId">
+				<![CDATA[CREATE_USER =
+				#createUserId# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="businessId">
+				<![CDATA[APP_ID =
+				#businessId# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="businessList">
+				APP_ID IN
+				<iterate property="businessList" open="(" conjunction="," close=")">
+					#businessList[]#
+				</iterate>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="resPoolId">
+            COMP_APP_T.RES_POOL_ID = #resPoolId#
+        </isNotEmpty>
+		</dynamic>
+	</sql>
+
+	<select id="queryWhereByNameByUID" resultClass="java.lang.Integer">
+		select count(*)
+		FROM
+		COMP_BUSINESS_T
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="businessName">
+				upper(BUSINESS_NAME)
+				=
+				upper(trim(#businessName#))
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="ownerId">
+				<![CDATA[CREATE_USER =
+				#ownerId# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="businessId">
+				<![CDATA[BUSINESS_ID !=
+				#businessId# ]]>
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+	<select id="queryBusinessByQueryObj" parameterClass="QueryBusinessInfo"
+		resultClass="BusinessInfo">
+		select
+		<include refid="businessCol" />
+		FROM
+		COMP_APP_T
+		<include refid="queryWhere" />
+		ORDER BY CREATE_TIME desc
+	</select>
+
+	<select id="countBusinessByQueryObj" parameterClass="QueryBusinessInfo"
+		resultClass="java.lang.Integer">
+		select count(*)
+		FROM
+		COMP_APP_T
+		<include refid="queryWhere" />
+		ORDER BY CREATE_TIME desc
+	</select>
+
+	<insert id="insertBusiness" parameterClass="BusinessInfo">
+		insert into
+		COMP_BUSINESS_T
+		(BUSINESS_ID,
+		BUSINESS_NAME,
+		DESCRIPTION,
+		CREATE_TIME,
+		CREATE_USER,
+		UPDATE_TIME,
+		UPDATE_USER
+		)values(
+		#businessId#,
+		#name#,
+		#description#,
+		#createTime#,
+		#createUserId#,
+		#updateTime#,
+		#updateUserId#
+		)
+	</insert>
+
+	<delete id="delBusinessResBind" parameterClass="java.lang.String">
+		DELETE from
+		COMP_BUSINESS_CASE_T where BUSINESS_ID = #businessId#
+	</delete>
+	
+	<delete id="delBusinessCaseByBidCid" parameterClass="java.util.HashMap">
+		DELETE from
+		COMP_BUSINESS_CASE_T where BUSINESS_ID = #businessId# AND CASE_ID = #caseId#
+		
+	</delete>
+
+	<delete id="delBusinessRes" parameterClass="java.lang.String">
+		DELETE from
+		COMP_BUSINESS_T where BUSINESS_ID = #businessId#
+	</delete>
+
+	<insert id="insertBusinessResBind" parameterClass="java.util.HashMap">
+		insert into
+		COMP_BUSINESS_CASE_T
+		(BUSINESS_ID,
+		CASE_ID,
+		CASE_TYPE,
+		CREATE_TIME
+		)
+		SELECT 
+		#businessId#,
+		#caseId#,
+		#caseType#,
+		#createTime#
+		FROM DUAL
+		WHERE not exists(
+			SELECT * 
+			FROM COMP_BUSINESS_CASE_T 
+			WHERE 
+			COMP_BUSINESS_CASE_T.BUSINESS_ID=#businessId#
+			AND COMP_BUSINESS_CASE_T.CASE_ID=#caseId#)
+	</insert>
+
+	<sql id="hostByUserId_body">
+		FROM
+		(
+		SELECT
+		comp_case_pm_t.CASE_ID resourceId,
+		pm_name name,
+		comp_case_pm_t.ip operationIP,
+		comp_case_pm_t.status
+		status,
+		'1' type,
+		comp_case_pm_t.update_time,
+		comp_order_t.EFFECTIVE_TIME effectiveTime,
+		comp_order_t.EXPIRE_TIME overTime,
+		'' isoName
+		FROM comp_case_pm_t LEFT
+		JOIN comp_order_t ON
+		comp_case_pm_t.order_id=comp_order_t.order_id
+		WHERE OWN_USER= #userId#
+		AND
+		comp_case_pm_t.status != '3'
+		AND
+		comp_order_t.order_id IS NOT
+		NULL
+		AND comp_order_t.status!='2'
+		UNION
+		SELECT comp_case_vm_t.CASE_ID resourceId,
+		vm_name name,
+		'' operationIP,
+		comp_case_vm_t.status
+		status,
+		'0' type,
+		comp_case_vm_t.UPDATE_TIME,
+		comp_order_t.EFFECTIVE_TIME effectiveTime,
+		comp_order_t.EXPIRE_TIME
+		overTime,
+		comp_case_vm_t.ISO_NAME isoName
+		FROM
+		comp_case_vm_t LEFT
+		JOIN
+		comp_order_t ON
+		comp_case_vm_t.order_id=comp_order_t.order_id
+		WHERE
+		OWN_USER= #userId#
+		AND
+		comp_case_vm_t.status != '3'
+		AND
+		comp_order_t.order_id IS NOT NULL
+		AND comp_order_t.status!='2'
+		) T1
+		<dynamic>
+			<isNotEmpty property="name">
+				WHERE
+				upper(T1.name) like
+				upper(CONCAT('%',trim(#name#),'%'))
+			</isNotEmpty>
+		</dynamic>
+		ORDER BY
+		T1.UPDATE_TIME
+	</sql>
+
+	<select id="getHostByUserId" parameterClass="java.util.HashMap"
+		resultClass="ResourceInfo">
+		SELECT
+		resourceId,name,operationIP,status,type,update_time,effectiveTime,overTime,isoName
+		<include refid="hostByUserId_body" />
+	</select>
+
+	<select id="countHostByUserId" parameterClass="java.util.HashMap"
+		resultClass="java.lang.Integer">
+		SELECT
+		count(*)
+		<include refid="hostByUserId_body" />
+	</select>
+
+	<update id="updateBusiness" parameterClass="BusinessInfo">
+		UPDATE 
+		COMP_BUSINESS_T
+		SET
+		BUSINESS_NAME = #name#,
+		DESCRIPTION = #description#,
+		UPDATE_TIME = #updateTime#,
+		UPDATE_USER = #updateUserId#
+		WHERE BUSINESS_ID = #businessId#
+	</update>
+	
+	
+
+</sqlMap>

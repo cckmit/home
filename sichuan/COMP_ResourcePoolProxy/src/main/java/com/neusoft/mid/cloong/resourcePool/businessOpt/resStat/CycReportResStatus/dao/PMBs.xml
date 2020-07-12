@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="PMBs">
+	<typeAlias alias="BsPerfPo"
+		type="com.neusoft.mid.cloong.resourcePool.businessOpt.resStat.CycReportResStatus.dao.BSPerfPo" />
+
+	<insert id="insertBSPerformance" parameterClass="BsPerfPo">
+		INSERT INTO `comp_sta_bs_rt_t` (
+			`BS_ID`,
+			`LV_WORK_STATE`,
+			`LV_WRITE_RATE`,
+			`CREATE_TIME`,
+			`RES_POOL_ID`
+		)
+		VALUES
+			(
+				#instanceId#,
+				#lvWorkState#,
+				#lvWriteRate#,
+				#collectTime#,
+				#resPoolId#
+			);
+		
+	</insert>
+	
+</sqlMap>

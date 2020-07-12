@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE validators PUBLIC 
+  		"-//Apache Struts//XWork Validator 1.0.2//EN"
+  		"http://struts.apache.org/dtds/xwork-validator-1.0.2.dtd">
+<validators>
+	<field name="respoolId">
+		<field-validator type="regex">
+			<param name="expression"><![CDATA[^[a-z0-9A-Z-]{0,30}$]]></param>
+			<message>资源池ID由1-30位数字及英文组成，请重新输入</message>
+		</field-validator>
+	</field>
+	<field name="itemId">
+		<field-validator type="regex">
+			<param name="expression"><![CDATA[^[a-z0-9A-Z-]{0,30}$]]></param>
+			<message>条目ID由1-30位数字及英文组成，请重新输入</message>
+		</field-validator>
+	</field>
+	<field name="respoolPartId">
+		<field-validator type="regex">
+			<param name="expression"><![CDATA[^[a-z0-9A-Z-]{0,30}$]]></param>
+			<message>资源池分区ID由30数字及英文组成，请重新输入</message>
+		</field-validator>
+	</field>
+</validators>

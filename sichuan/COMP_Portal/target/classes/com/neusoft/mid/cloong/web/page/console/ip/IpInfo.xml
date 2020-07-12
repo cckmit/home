@@ -1,0 +1,433 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="ip">
+	<typeAlias alias="publicIp"
+		type="com.neusoft.mid.cloong.web.page.console.ip.info.PublicIpInfo" />
+	<typeAlias alias="portConfig"
+		type="com.neusoft.mid.cloong.web.page.console.ip.info.PortConfigInfo" />
+	<typeAlias alias="publicIpInstance"
+		type="com.neusoft.mid.cloong.web.page.ip.order.info.PublicIpInstanceInfo" />
+	<typeAlias alias="OrderInfo"
+		type="com.neusoft.mid.cloong.web.page.host.vm.order.info.OrderInfo" />
+	<typeAlias alias="vmInstanceInfo"
+		type="com.neusoft.mid.cloong.web.page.console.host.vm.info.VMInstanceInfo" />
+	<typeAlias alias="portCreateFail"
+		type="com.neusoft.mid.cloong.publicIp.core.PublicPortCreateFail" />
+	<typeAlias alias="portDelFail"
+		type="com.neusoft.mid.cloong.publicIp.core.PublicPortDelFail" />
+
+	<!-- 公有ip list -->
+	<select id="getPublicIpList" parameterClass="publicIp"
+		resultClass="publicIp">
+		SELECT
+		t.CASE_ID AS caseId,
+		t.PUBLIC_IP AS publicIp,
+		t.`STATUS` AS
+		STATUS,
+		t.ORDER_ID AS orderId,
+		t.APP_ID AS appId,
+		app.APP_NAME AS
+		appName,
+		t.HOST_ID AS hostId,
+		vm.VM_NAME AS hostName,
+		t.RES_POOL_ID AS
+		resPoolId,
+		pool.RES_POOL_NAME AS resPoolName,
+		t.RES_POOL_PART_ID AS
+		resPoolPartId,
+		part.RES_POOL_PART_NAME AS
+		resPoolPartName,
+		t.DESCRIPTION
+		AS description,
+		t.CREATE_TIME AS
+		createTime,
+		t.CREATE_USER AS createUser,
+		t.UPDATE_TIME AS updateTime,
+		t.UPDATE_USER AS updateUser
+		FROM
+		`comp_case_publicip_t` t
+		LEFT JOIN
+		comp_app_t app ON t.APP_ID =
+		app.APP_ID
+		LEFT JOIN comp_case_vm_t vm ON
+		t.HOST_ID = VM_ID
+		LEFT JOIN
+		comp_res_pool_t pool ON t.RES_POOL_ID =
+		pool.RES_POOL_ID
+		LEFT JOIN
+		comp_res_pool_part_t part on
+		t.RES_POOL_PART_ID
+		=part.RES_POOL_PART_ID
+		WHERE t.`STATUS` not in ('4')
+		<isNotEmpty prepend="and" property="appIdList">
+			t.APP_ID in
+			<iterate property="appIdList" conjunction="," close=")" open="(">
+				#appIdList[]#
+			</iterate>
+		</isNotEmpty>
+		ORDER BY t.CASE_ID DESC
+	</select>
+
+	<!-- 公有ip数量 -->
+	<select id="getPublicIpCount" parameterClass="publicIp"
+		resultClass="java.lang.Integer">
+		SELECT
+		count(*)
+		FROM
+		`comp_case_publicip_t` t
+		LEFT JOIN
+		comp_app_t app ON
+		t.APP_ID = app.APP_ID
+		LEFT JOIN comp_case_vm_t vm ON
+		t.HOST_ID = VM_ID
+		LEFT JOIN comp_res_pool_t pool ON t.RES_POOL_ID =
+		pool.RES_POOL_ID
+		LEFT
+		JOIN comp_res_pool_part_t part on
+		t.RES_POOL_PART_ID
+		=part.RES_POOL_PART_ID WHERE t.`STATUS` not in ('4')
+		<isNotEmpty prepend="and" property="appIdList">
+			t.APP_ID in
+			<iterate property="appIdList" conjunction="," close=")" open="(">
+				#appIdList[]#
+			</iterate>
+		</isNotEmpty>
+	</select>
+
+	<select id="getPublicIpDetail" parameterClass="java.lang.String"
+		resultClass="publicIp">
+		SELECT
+		t.CASE_ID AS caseId,
+		t.PUBLIC_IP AS publicIp,
+		t.`STATUS` AS STATUS,
+		t.ORDER_ID AS orderId,
+		t.APP_ID AS appId,
+		app.APP_NAME AS appName,
+		t.HOST_ID AS hostId,
+		vm.VM_NAME AS hostName,
+		t.RES_POOL_ID AS resPoolId,
+		pool.RES_POOL_NAME AS resPoolName,
+		t.RES_POOL_PART_ID AS resPoolPartId,
+		part.RES_POOL_PART_NAME AS
+		resPoolPartName,
+		t.DESCRIPTION AS description,
+		t.CREATE_TIME AS
+		createTime,
+		t.CREATE_USER AS createUser,
+		t.UPDATE_TIME AS updateTime,
+		t.UPDATE_USER AS updateUser
+		FROM
+		`comp_case_publicip_t` t
+		LEFT JOIN
+		comp_app_t app ON t.APP_ID = app.APP_ID
+		LEFT JOIN comp_case_vm_t vm ON
+		t.HOST_ID = VM_ID
+		LEFT JOIN comp_res_pool_t pool ON t.RES_POOL_ID =
+		pool.RES_POOL_ID
+		LEFT JOIN comp_res_pool_part_t part on
+		t.RES_POOL_PART_ID
+		=part.RES_POOL_PART_ID
+		WHERE
+		t.CASE_ID=#caseId#
+	</select>
+
+	<!-- 未分配ip查询 list -->
+	<select id="getIpList" parameterClass="publicIp" resultClass="publicIp">
+		SELECT PUBLIC_IP AS publicIp FROM `comp_publicip_t`
+		WHERE `STATUS`='0'
+		ORDER BY CONVERT (
+		REPLACE (PUBLIC_IP, '.', ''),SIGNED
+		)
+	</select>
+
+	<!-- 未分配ip查询count -->
+	<select id="getIpCount" parameterClass="publicIp" resultClass="java.lang.Integer">
+		SELECT count(*) FROM `comp_publicip_t` WHERE
+		`STATUS`='0'
+	</select>
+
+	<insert id="createPublicIpOrder" parameterClass="OrderInfo">
+		insert into
+		COMP_ORDER_T(ORDER_ID,
+		STATUS,
+		EFFECTIVE_TIME,
+		EXPIRE_TIME,
+		LENGTH_TIME,
+		LENGTH_UNIT,
+		CREATE_TIME,
+		CREATE_USER,
+		UPDATE_TIME,
+		UPDATE_USER,
+		CASE_TYPE,
+		PARENT_ID,
+		CASE_ID,
+		APP_ID,
+		RES_POOL_ID
+		)
+		values
+		(#orderId#,#status#,#effectiveTime#,#expireTime#,#lengthTime#,#lengthUnit#,#createTime#,#createUser#,#updateTime#,#updateUser#,#caseType#,#parentId#,#caseId#,#appId#,#resPoolId#)
+	</insert>
+
+	<insert id="createPublicIpInstanceInfo" parameterClass="publicIpInstance">
+		INSERT
+		INTO `comp_case_publicip_t` (
+		`CASE_ID`,
+		`PUBLIC_IP`,
+		`STATUS`,
+		`CREATE_TIME`,
+		`CREATE_USER`,
+		`UPDATE_TIME`,
+		`UPDATE_USER`,
+		`ORDER_ID`,
+		`APP_ID`,
+		`RES_POOL_ID`,
+		`RES_POOL_PART_ID`,
+		`HOST_ID`,
+		`DESCRIPTION`
+		)
+		VALUES
+		(
+		#caseId#,
+		#publicIp#,
+		#status#,
+		#createTime#,
+		#createUser#,
+		#updateTime#,
+		#updateUser#,
+		#orderId#,
+		#appId#,
+		#resPoolId#,
+		#resPoolPartId#,
+		#hostId#,
+		#description#
+		)
+	</insert>
+
+	<update id="updatePublicIpStatus" parameterClass="publicIpInstance">
+		UPDATE
+		`comp_publicip_t` SET
+		`STATUS`='1' WHERE `PUBLIC_IP`=#publicIp#
+	</update>
+
+
+	<!-- 取得虚拟机 -->
+	<select id="queryVms" parameterClass="vmInstanceInfo"
+		resultClass="vmInstanceInfo">
+		SELECT
+		t.vm_id vmId,
+		IFNULL(t.vm_name, '') vmName,
+		net.IP privateIp,
+		os.OS AS os
+		FROM
+		comp_case_vm_t t
+		LEFT JOIN comp_case_vm_net_t net ON
+		t.case_id =
+		net.case_id LEFT JOIN comp_os_t os ON t.ISO_ID=os.OS_ID
+		WHERE
+		t.APP_ID = #appId#
+		AND t. STATUS
+		IN ('2', '4', '6', '16')
+		AND t.vm_id IS NOT
+		NULL
+
+		<isNotEmpty prepend="AND" property="vmName">
+			Lower(t.vm_name) like
+			CONCAT('%',#vmName#,'%')
+		</isNotEmpty>
+		ORDER BY t.vm_id DESC
+	</select>
+
+	<select id="queryVmsCount" parameterClass="vmInstanceInfo"
+		resultClass="java.lang.Integer">
+		SELECT
+		COUNT(*)
+		FROM
+		comp_case_vm_t t
+		LEFT JOIN comp_case_vm_net_t net ON
+		t.case_id =
+		net.case_id LEFT JOIN comp_os_t os ON t.ISO_ID=os.OS_ID
+		WHERE
+		t.APP_ID = #appId#
+		AND t. STATUS IN ('2', '4', '6', '16')
+		AND t.vm_id IS NOT
+		NULL
+		<isNotEmpty prepend="AND" property="vmName">
+			Lower(t.vm_name) like
+			CONCAT('%',#vmName#,'%')
+		</isNotEmpty>
+	</select>
+
+	<!-- 添加端口映射 -->
+	<insert id="addPortConfig" parameterClass="portConfig">
+		INSERT INTO
+		`comp_port_config_t` (
+		`VM_ID`,
+		`PORT_CONFIG_ID`,
+		`PORT_CONFIG_NAME`,
+		`MAPPING_MODE`,
+		`PROTOCOL`,
+		`VM_PRIVATEIP`,
+		`VM_PORT`,
+		`PUBLIC_IP`,
+		`PUBLIC_PORT`,
+		`CREATE_TIME`,
+		`CREATE_USER`
+		)
+		VALUES
+		(
+		#vmId#,
+		#portConfigId#,
+		#portConfigName#,
+		#mappingMode#,
+		#protocol#,
+		#vmPrivateIp#,
+		#vmPort#,
+		#publicIp#,
+		#publicPort#,
+		#createTime#,
+		#createUser#
+		);
+
+	</insert>
+
+	<!-- 跟进公网ip查端口配置 -->
+	<select id="getPortConfigByPublicIp" parameterClass="java.lang.String"
+		resultClass="portConfig">
+		SELECT
+		t.`VM_ID` AS vmId,
+		vm.VM_NAME AS vmName,
+		t.`PORT_CONFIG_ID` AS portConfigId,
+		t.`PORT_CONFIG_NAME` AS
+		portConfigName,
+		t.`MAPPING_MODE` AS mappingMode,
+		t.`PROTOCOL` AS
+		protocol,
+		t.`VM_PRIVATEIP` AS vmPrivateIp,
+		t.`VM_PORT` AS vmPort,
+		t.`PUBLIC_IP` AS publicIp,
+		t.`PUBLIC_PORT` AS publicPort,
+		t.`CREATE_TIME` AS createTime,
+		t.`CREATE_USER` AS createUser
+		FROM
+		`comp_port_config_t` t
+		LEFT JOIN comp_case_vm_t vm ON t.VM_ID =
+		vm.VM_ID
+		WHERE
+		t.`PUBLIC_IP`=#ipAdress#
+	</select>
+
+	<delete id="delPortConfig" parameterClass="portConfig">
+		DELETE FROM
+		comp_port_config_t WHERE PORT_CONFIG_NAME=#portConfigName# and
+		VM_ID=#vmId#
+	</delete>
+
+	<update id="updateHostId" parameterClass="portConfig">
+		UPDATE
+		`comp_case_publicip_t`
+		SET
+		`HOST_ID` = #vmId#
+		WHERE PUBLIC_IP=#publicIp#
+	</update>
+
+	<update id="clearHostId" parameterClass="portConfig">
+		UPDATE
+		`comp_case_publicip_t`
+		SET
+		`HOST_ID` = ''
+		WHERE PUBLIC_IP=#publicIp#
+	</update>
+
+	<update id="deleteCasePublicIp" parameterClass="publicIp">
+		UPDATE
+		`comp_case_publicip_t`
+		SET `STATUS` = '4'
+		WHERE
+		`CASE_ID` = #caseId# AND
+		PUBLIC_IP=#publicIp#
+	</update>
+
+	<update id="deletePublicIp" parameterClass="publicIp">
+		UPDATE
+		`comp_publicip_t`
+		SET
+		`STATUS` = '0'
+		WHERE
+		`PUBLIC_IP` = #publicIp#
+	</update>
+
+	<insert id="insertPortCreateFail" parameterClass="portCreateFail">
+		INSERT INTO
+		`comp_public_port_create_fail_t` (
+		`FAIL_CAUSE`,
+		`FAIL_CODE`,
+		`SERIAL_NUM`,
+		`RES_POOL_ID`,
+		`RES_POOL_PART_ID`,
+		`APP_ID`,
+		`PUBLIC_IP`,
+		`CREATE_TIME`
+		)
+		VALUES
+		(
+		#failCause#,
+		#failCode#,
+		#serialNum#,
+		#resPoolId#,
+		#resPoolPartId#,
+		#appId#,
+		#publicIp#,
+		#createTime#
+		)
+	</insert>
+
+	<insert id="insertPortDelFail" parameterClass="portDelFail">
+		INSERT INTO
+		`comp_public_port_del_fail_t` (
+		`PORT_CONFIG_ID`,
+		`FAIL_CAUSE`,
+		`FAIL_CODE`,
+		`SERIAL_NUM`,
+		`RES_POOL_ID`,
+		`RES_POOL_PART_ID`,
+		`APP_ID`,
+		`PUBLIC_IP`,
+		`CREATE_TIME`
+		)
+		VALUES
+		(
+		#portConfigId#,
+		#failCause#,
+		#failCode#,
+		#serialNum#,
+		#resPoolId#,
+		#resPoolPartId#,
+		#appId#,
+		#publicIp#,
+		#createTime#
+		)
+	</insert>
+	<select id="getPortMapConfig" parameterClass="portConfig"
+		resultClass="portConfig">
+		SELECT
+		VM_ID AS vmId,
+		PORT_CONFIG_ID AS portConfigId,
+		PORT_CONFIG_NAME AS portConfigName,
+		MAPPING_MODE AS mappingMode,
+		PROTOCOL AS protocol,
+		VM_PRIVATEIP AS vmPrivateIp,
+		VM_PORT AS vmPort,
+		PUBLIC_IP AS publicIp,
+		PUBLIC_PORT AS publicPort,
+		CREATE_TIME AS createTime,
+		CREATE_USER AS createUser
+		FROM
+		comp_port_config_t a
+		WHERE
+		a.VM_ID = #vmId#
+		AND a.PORT_CONFIG_NAME = #portConfigName#
+	</select>
+</sqlMap>

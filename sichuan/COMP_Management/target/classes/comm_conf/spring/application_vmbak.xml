@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
+    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+	<!-- 虚拟机备份规格 -->
+	<!-- 虚拟机备份规格创建 -->
+	<bean id="VMBAKStandardCreateAction"
+		class="com.neusoft.mid.cloong.web.page.product.standard.vmbak.action.VMBAKStandardCreateAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="gen">
+			<ref bean="sequenceGenerator" />
+		</property>
+	</bean>
+	<!-- 虚拟机备份规格修改 -->
+	<bean id="VMBAKStandardModifyAction"
+		class="com.neusoft.mid.cloong.web.page.product.standard.vmbak.action.VMBAKStandardModifyAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="templateIsUseModify" value="${templateIsUseModify}" />
+	</bean>
+	<!-- 虚拟机备份规格删除 -->
+	<bean id="VMBAKStandardDeleteAction"
+		class="com.neusoft.mid.cloong.web.page.product.standard.vmbak.action.VMBAKStandardDeleteAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="standardSynchronizeDel">
+			<ref bean="standardSynchronizeDeleteImpl" />
+		</property>
+		<property name="templateIsUseDel" value="${templateIsUseDel}" />
+	</bean>
+	<!-- 虚拟机备份规格查询 -->
+	<bean id="VMBAKStandardListQueryAction"
+		class="com.neusoft.mid.cloong.web.page.product.standard.vmbak.action.VMBAKStandardListQueryAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<bean id="VMBAKStandardListQueryActionJson"
+		class="com.neusoft.mid.cloong.web.page.product.standard.vmbak.action.VMBAKStandardListQueryAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<!-- 虚拟机备份规格详细 -->
+	<bean id="VMBAKStandardDetailAction"
+		class="com.neusoft.mid.cloong.web.page.product.standard.vmbak.action.VMBAKStandardDetailAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<!-- 查询虚拟机备份规格同步资源池 -->
+	<bean id="VMBAKStandardResListAction"
+		class="com.neusoft.mid.cloong.web.page.product.standard.vmbak.action.VMBAKStandardResListAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+		<property name="querySqlId" value="queryVMBAKStandResList" />
+	</bean>
+	<!-- 虚拟备份规格同步资源池 -->
+	<bean id="VMBAKSynchroResPoolAction"
+		class="com.neusoft.mid.cloong.web.page.product.standard.vmbak.action.VMBAKSynchroResPoolAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="vmbakStandardSynchronize">
+			<ref bean="VMBAKStandardSynchronizeImpl" />
+		</property>
+		<property name="vmbakSynchroResPoolService">
+			<ref bean="VMBAKSynchroResPoolService" />
+		</property>
+	</bean>
+	<bean id="VMBAKStandardSynchronizeImpl"
+		class="com.neusoft.mid.cloong.resourceProxy.standard.vmbak.impl.VMBAKStandardSynchronizeImpl">
+		<property name="recieveTimeOut">
+			<value>${receiveTimeout}</value>
+		</property>
+		<property name="socketTimeOut">
+			<value>${httpTimeOut}</value>
+		</property>
+		<property name="url">
+			<value>${resourcePoolProxyUrlVmbak}</value>
+		</property>
+		<property name="senderEntry" ref="senderEntry"></property>
+	</bean>
+	<bean id="VMBAKSynchroResPoolService"
+		class="com.neusoft.mid.cloong.web.page.product.standard.vmbak.service.VMBAKSynchroResPoolService"
+		abstract="false">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="sequenceGenerator">
+			<ref bean="sequenceGeneratorProxy" />
+		</property>
+	</bean>
+	<!-- 虚拟机备份条目 -->
+	<!-- 虚拟机备份查询列表 -->
+	<bean id="vmbakItemQueryListAction"
+		class="com.neusoft.mid.cloong.web.page.product.item.vm.action.ItemQueryListAction"
+		scope="prototype" parent="abstractAction">
+		<property name="itemQueryListService">
+			<ref bean="itemQueryListService" />
+		</property>
+		<property name="itemType" value="4" />
+		<property name="sqlKey" value="queryItemListByItemType" />
+		<property name="itemCount" value="queryItemCountByItemType" />
+		<property name="noItemStatus" value="8" />
+	</bean>
+	<!-- 虚拟机备份服务条目创建跳转 -->
+	<bean id="vmbakItemCreateInfoAction"
+		class="com.neusoft.mid.cloong.web.page.product.item.vm.action.ItemCreateInfoAction"
+		scope="prototype">
+		<property name="itemCreateInfoService">
+			<ref bean="itemCreateInfoService" />
+		</property>
+		<property name="itemType" value="4" />
+	</bean>
+	<!-- 虚拟机备份条目保存 -->
+	<bean id="vmbakItemCreateAction"
+		class="com.neusoft.mid.cloong.web.page.product.item.vm.action.ItemCreateAction"
+		scope="prototype">
+		<property name="itemCreateService">
+			<ref bean="itemCreateService" />
+		</property>
+		<property name="itemType" value="4" />
+		<property name="statusType" value="0" />
+		<property name="itemIdType" value="VMBAK" />
+	</bean>
+	<!-- 虚拟机备份条目保存并提交 -->
+	<bean id="vmbakItemCreateAndSubmitAction"
+		class="com.neusoft.mid.cloong.web.page.product.item.vm.action.ItemCreateAction"
+		scope="prototype">
+		<property name="itemCreateService">
+			<ref bean="itemCreateService" />
+		</property>
+		<property name="itemType" value="4" />
+		<property name="statusType" value="1" />
+		<property name="itemIdType" value="VMBAK" />
+	</bean>
+	<!-- 虚拟机备份条目跳转 -->
+	<bean id="vmbakItemInfoAction"
+		class="com.neusoft.mid.cloong.web.page.product.item.vm.action.ItemInfoAction"
+		scope="prototype">
+		<property name="itemInfoService">
+			<ref bean="itemInfoService" />
+		</property>
+		<property name="itemType" value="4" />
+	</bean>
+	<!-- 虚拟机备份条目修改 -->
+	<bean id="vmbakItemUpdateAction"
+		class="com.neusoft.mid.cloong.web.page.product.item.vm.action.ItemUpdateAction"
+		scope="prototype">
+		<property name="itemUpdateService">
+			<ref bean="itemUpdateService" />
+		</property>
+		<property name="itemType" value="4" />
+		<property name="statusType" value="0" />
+	</bean>
+				<!-- 虚拟机备份条目修改并提交 -->
+	<bean id="vmbakItemUpdateAndSubmitAction"
+		class="com.neusoft.mid.cloong.web.page.product.item.vm.action.ItemUpdateAction"
+		scope="prototype">
+		<property name="itemUpdateService">
+			<ref bean="itemUpdateService" />
+		</property>
+		<property name="itemType" value="4" />
+		<property name="statusType" value="1" />
+	</bean>
+	
+	<!-- 虚拟机备份条目,关联资源规格查询 -->
+	<bean id="VmBakStandardListAction"
+		class="com.neusoft.mid.cloong.web.page.product.standard.vmbak.action.VMBAKStandardListAction"
+		scope="prototype">
+		<property name="vmBakStandardListService">
+			<ref bean="vmBakStandardListService" />
+		</property>
+		<property name="querySqlKey" value="queryVMBAKStandardInfo">
+		</property>
+	</bean>
+	<!-- 虚拟机备份资源规格查询Service -->
+	<bean id="vmBakStandardListService"
+		class="com.neusoft.mid.cloong.web.page.product.standard.vmbak.service.VMBAKStandardListService"
+		abstract="false">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	
+	
+</beans>

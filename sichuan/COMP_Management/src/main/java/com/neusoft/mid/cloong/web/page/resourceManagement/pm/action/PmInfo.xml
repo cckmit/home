@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="PmInfo">
+	<typeAlias alias="pmInfo"
+		type="com.neusoft.mid.cloong.web.page.resourceManagement.info.PmInfo" />
+	<typeAlias alias="machinerRoomInfo"
+		type="com.neusoft.mid.cloong.web.page.resourceManagement.info.MachinerRoomInfo" />
+	<typeAlias alias="cabinetInfo"
+		type="com.neusoft.mid.cloong.web.page.resourceManagement.info.CabinetInfo" />
+	<!-- 查询物理机列表 -->
+	<select id="queryPmInfos" parameterClass="pmInfo" resultClass="pmInfo">
+		SELECT P.PM_ID pmId,
+		P.PM_NAME pmName,
+		RM.MACHINEROOM_NAME machinerRoomName,
+		RC.CABINET_NAME cabinetName,
+		P.IP ip,
+		P.CPU_NUM cpuNum,
+		P.MEMORY_SIZE memorySize,
+		/* CASE P.MEMORY_SIZE WHEN '' THEN '' ELSE FORMAT(P.MEMORY_SIZE / 1024,
+		2) END AS memorySize, */
+		P.DISK_SIZE diskSize,
+		P.CUR_STATUS curStatus,
+		P.PM_STATE pmState,
+		DATE_FORMAT(
+		P.UPDATE_TIME,
+		'%Y-%m-%d %H:%i:%s'
+		) updateTime
+		FROM COMP_RM_PM_T P
+		LEFT JOIN COMP_RM_MACHINEROOM_T RM ON P.MACHINEROOM_ID = RM.MACHINEROOM_ID
+		LEFT JOIN COMP_RM_CABINET_T RC ON P.CABINET_ID = RC.CABINET_ID
+		WHERE 1=1
+		<dynamic prepend="">
+			<isNotEmpty prepend="and" property="pmId">
+				upper(PM_ID) like
+				upper(CONCAT('%',trim(#pmId#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="pmName">
+				upper(PM_NAME) like
+				upper(CONCAT('%',trim(#pmName#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="appId">
+				upper(P.APP_ID) like
+				upper(CONCAT('%',trim(#appId#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="cabinetId">
+				P.CABINET_ID =
+				#cabinetId#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="machinerRoomId">
+				P.MACHINEROOM_ID =
+				#machinerRoomId#
+			</isNotEmpty>
+
+			<isNotEmpty prepend="and" property="querypmState">
+				P.PM_STATE =
+				#querypmState#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="querycurStatus">
+				P.CUR_STATUS =
+				#querycurStatus#
+			</isNotEmpty>
+
+
+
+		</dynamic>
+		ORDER BY updateTime DESC
+	</select>
+	<!-- 查询物理机列表 数目 -->
+	<select id="countQueryPm" parameterClass="pmInfo" resultClass="java.lang.Integer">
+		SELECT count(*)
+		FROM COMP_RM_PM_T P
+		LEFT JOIN COMP_RM_MACHINEROOM_T RM ON P.MACHINEROOM_ID = RM.MACHINEROOM_ID
+		LEFT JOIN COMP_RM_CABINET_T RC ON P.CABINET_ID = RC.CABINET_ID
+		WHERE 1=1
+		<dynamic prepend="">
+			<isNotEmpty prepend="and" property="pmId">
+				upper(PM_ID) like
+				upper(CONCAT('%',trim(#pmId#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="pmName">
+				upper(PM_NAME) like
+				upper(CONCAT('%',trim(#pmName#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="appId">
+				upper(P.APP_ID) like
+				upper(CONCAT('%',trim(#appId#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="cabinetId">
+				P.CABINET_ID =
+				#cabinetId#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="machinerRoomId">
+				P.MACHINEROOM_ID =
+				#machinerRoomId#
+			</isNotEmpty>
+
+			<isNotEmpty prepend="and" property="querypmState">
+				P.PM_STATE =
+				#querypmState#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="querycurStatus">
+				P.CUR_STATUS =
+				#querycurStatus#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+	<!-- 查询分配状态 -->
+	<select id="querypmState" parameterClass="pmInfo" resultClass="java.lang.Integer">
+		SELECT P.PM_ID pmId,
+		P.PM_NAME pmName,
+		RM.MACHINEROOM_NAME machinerRoomName,
+		RC.CABINET_NAME cabinetName,
+		P.IP ip,
+		P.CPU_NUM cpuNum,
+		P.MEMORY_SIZE memorySize,
+		/* CASE P.MEMORY_SIZE WHEN '' THEN '' ELSE FORMAT(P.MEMORY_SIZE / 1024,
+		2) END AS memorySize, */
+		P.DISK_SIZE diskSize,
+		P.CUR_STATUS curStatus,
+		P.PM_STATE pmState,
+		DATE_FORMAT(
+		P.UPDATE_TIME,
+		'%Y-%m-%d %H:%i:%s'
+		) updateTime
+		FROM COMP_RM_PM_T P
+		WHERE
+		<dynamic prepend="">
+
+			<isNotEmpty prepend="and" property="pmId">
+				upper(PM_ID) like
+				upper(CONCAT('%',trim(#pmId#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="pmName">
+				upper(PM_NAME) like
+				upper(CONCAT('%',trim(#pmName#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="pmState">
+				P.PM_STATE = #pmState#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="curStatus">
+				P.CUR_STATUS =
+				#curStatus#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+
+
+	<!-- 查询机房下拉框列表 -->
+	<select id="queryMachinerRoomInfos" parameterClass="machinerRoomInfo"
+		resultClass="machinerRoomInfo">
+		SELECT RM.MACHINEROOM_ID machinerRoomId,
+		RM.MACHINEROOM_NAME machinerRoomName
+		FROM COMP_RM_MACHINEROOM_T RM
+	</select>
+	<!-- 查询机柜下拉框列表 -->
+	<select id="queryCabinetInfos" parameterClass="cabinetInfo"
+		resultClass="cabinetInfo">
+		SELECT RM.CABINET_ID cabinetId, RM.CABINET_NAME
+		cabinetName
+		FROM COMP_RM_CABINET_T RM
+		WHERE RM.MACHINEROOM_ID =
+		#machinerRoomId#
+	</select>
+
+	<!-- 查看物理机详情 -->
+	<select id="queryPmInfo" parameterClass="pmInfo" resultClass="pmInfo">
+		SELECT P.PM_ID pmId,
+		P.PM_NAME pmName,
+		P.IP ip,
+		P.NETMASK netMask,
+		P.SERVER_TYPE serverType,
+		P.CPU_NUM cpuNum,
+		P.CPU_TYPE cpuType,
+		P.CPU_FREQUENCY cpuFrequency,
+		P.NUC_NUM_PER_CPU nucNumPerCpu,
+		P.MEMORY_SIZE memorySize,
+		/*CASE P.MEMORY_SIZE WHEN '' THEN '' ELSE FORMAT(P.MEMORY_SIZE / 1024, 2)
+		END AS memorySize,*/
+		P.DISK_SIZE diskSize,
+		P.VENDOR_NAME vendorName,
+		p.ETHADA_TYPE ethadaType,
+		DATE_FORMAT(
+		P.RUN_TIME,
+		'%Y-%m-%d %H:%i:%s'
+		) runTime,
+		P.CUR_STATUS curStatus,
+		P.SERIALNUM serialNum,
+		A.APP_NAME appName,
+		R.RES_POOL_NAME resPoolName,
+		RP.RES_POOL_PART_NAME resPoolPartName,
+		P.OS_TYPE osType,
+		P.SWITCH_IF_RELATIONS switchIfRelations,
+		DATE_FORMAT(
+		P.UPDATE_TIME,
+		'%Y-%m-%d %H:%i:%s'
+		) updateTime,
+		RM.MACHINEROOM_NAME machinerRoomName,
+		RC.CABINET_NAME cabinetName,
+		P.CPU_MODEL cpuModel,
+		P.NTP_IP ntpIp,
+		P.MAINTENANCE_FACTORY maintenanceFactory,
+		P.GATEWAY gateway,
+		P.HB_DESCRIPTION hbDescription,
+		P.BK_PM bkPm,
+		P.BUSINESS_CONTACT businessContact,
+		P.SYS_EXCHANGE_AREA_SIZE sysExchangeAreaSize,
+		DATE_FORMAT(
+		P.ONLINE_TIME,
+		'%Y-%m-%d %H:%i:%s'
+		) onlineTime,
+		P.TCPP_VALUE tcppValue,
+		P.APPLICATION_DESCRIBE applicationDescribe,
+		P.PORT_LABEL portLabel,
+		P.CPUEQP_SERIALNUM cpueqpSerialnum,
+		P.PM_STATE pmState
+		FROM COMP_RM_PM_T P
+		LEFT JOIN COMP_RES_POOL_T R ON P.RES_POOL_ID = R.RES_POOL_ID
+		LEFT JOIN COMP_RES_POOL_PART_T RP ON P.RES_POOL_PART_ID =
+		RP.RES_POOL_PART_ID
+		LEFT JOIN COMP_APP_T A ON P.APP_ID = A.APP_ID
+		LEFT JOIN COMP_RM_MACHINEROOM_T RM ON P.MACHINEROOM_ID = RM.MACHINEROOM_ID
+		LEFT JOIN COMP_RM_CABINET_T RC ON P.CABINET_ID = RC.CABINET_ID
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="" property="pmId">
+				P.PM_ID = #pmId#
+			</isNotEmpty>
+			<isEmpty prepend="" property="pmId">
+				1=1
+				ORDER BY updateTime DESC
+			</isEmpty>
+		</dynamic>
+	</select>
+
+</sqlMap>

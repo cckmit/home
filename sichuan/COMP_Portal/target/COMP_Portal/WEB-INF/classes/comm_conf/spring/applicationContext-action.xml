@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
+    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+	<!-- portal-产品-主机 -->
+	<bean id="HostPriceAction"
+		class="com.neusoft.mid.cloong.web.page.portal.product.host.HostPriceAction">
+		<property name="ibatisDAO" ref="ibatisDAOProxy" />
+	</bean>
+	<!-- portal-产品-硬盘 -->
+	<bean id="EbsPriceAction"
+		class="com.neusoft.mid.cloong.web.page.portal.product.ebs.EbsPriceAction">
+		<property name="ibatisDAO" ref="ibatisDAOProxy" />
+	</bean>
+	<!-- portal-产品-虚拟机备份 -->
+	<bean id="VmbakPriceAction"
+		class="com.neusoft.mid.cloong.web.page.portal.product.vmbak.VmbakPriceAction">
+		<property name="ibatisDAO" ref="ibatisDAOProxy" />
+	</bean>
+	<!-- 通用获取镜像 -->
+	<bean id="ImageAction"
+		class="com.neusoft.mid.cloong.web.page.common.vm.image.ImageAction">
+		<property name="ibatisDAO" ref="ibatisDAOProxy" />
+	</bean>
+	<bean id="OrderQueryAction"
+		class="com.neusoft.mid.cloong.web.page.user.order.OrderQueryAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy" />
+		<property name="syncFlage" value="1" />
+	</bean>
+	<bean id="UserInfoAction"
+		class="com.neusoft.mid.cloong.web.page.user.userInfo.UserInfoAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy" />
+	</bean>
+	<bean id="UserUpdateAction"
+		class="com.neusoft.mid.cloong.web.page.user.userInfo.UserUpdateAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<bean id="UserUpdateSaveAction"
+		class="com.neusoft.mid.cloong.web.page.user.userInfo.UserUpdateSaveAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<bean id="ModifyPasswordAction"
+		class="com.neusoft.mid.cloong.web.page.user.userInfo.ModifyPasswordAction"
+		scope="prototype">
+	</bean>
+	<bean id="ModifyPasswordUpdateAction"
+		class="com.neusoft.mid.cloong.web.page.user.userInfo.ModifyPasswordUpdateAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<bean id="closeAccountAction"
+		class="com.neusoft.mid.cloong.web.page.user.userInfo.CloseAccountAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<!-- <property name="mailService"> <ref bean="mailService" /> </property> -->
+		<property name="mailSender">
+			<ref bean="mailSender" />
+		</property>
+		<property name="fromMailAddress" value="${notify.user.mail.fromMailAddress}" />
+	</bean>
+
+	<bean id="mailSender" class="com.neusoft.mid.cloong.common.util.MailService">
+		<constructor-arg index="0" value="${smtp.ip}" />
+		<constructor-arg index="1" value="${smtp.port}" />
+		<constructor-arg index="2" value="${smtp.userName}" />
+		<constructor-arg index="3" value="${smtp.passwd}" />
+		<constructor-arg index="4" value="${smpt.enableSSL}" />
+		<constructor-arg index="5"
+			value="${smtp.sslCert.trustStore.filepath}" />
+		<constructor-arg index="6"
+			value="${smtp.sslCert.trustStore.password}" />
+	</bean>
+
+
+
+	<bean id="mailService" class="com.neusoft.mid.cloong.identity.service.MailService"
+		scope="prototype">
+	</bean>
+	<bean id="OrderQueryJsonAction"
+		class="com.neusoft.mid.cloong.web.page.user.order.OrderQueryAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy" />
+	</bean>
+	<bean id="VMOrderDetailQueryAction"
+		class="com.neusoft.mid.cloong.web.page.user.order.VMOrderDetailQueryAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy" />
+	</bean>
+	<bean id="VMModifyOrderDetailQueryAction"
+		class="com.neusoft.mid.cloong.web.page.user.order.VMModifyOrderDetailQueryAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy" />
+	</bean>
+	<bean id="EBSOrderDetailQueryAction"
+		class="com.neusoft.mid.cloong.web.page.user.order.EBSOrderDetailQueryAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy" />
+	</bean>
+	<bean id="PMOrderDetailQueryAction"
+		class="com.neusoft.mid.cloong.web.page.user.order.PMOrderDetailQueryAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy" />
+	</bean>
+	<bean id="BKOrderDetailQueryAction"
+		class="com.neusoft.mid.cloong.web.page.user.order.BKOrderDetailQueryAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy" />
+	</bean>
+	<!-- 快照订单查看详情 -->
+	<bean id="vmSnapshotOrderDetailQueryAction"
+		class="com.neusoft.mid.cloong.web.page.user.order.VmSnapshotOrderDetailQueryAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy" />
+	</bean>
+	<bean id="DiskDetailAction"
+		class="com.neusoft.mid.cloong.web.page.console.disk.DiskDetailAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy" />
+	</bean>
+	<bean id="DiskNameUpdateAction"
+		class="com.neusoft.mid.cloong.web.page.console.disk.DiskNameUpdateAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy" />
+		<property name="seqCen">
+			<bean class="com.neusoft.mid.cloong.common.util.CommonSequenceGenerator">
+				<property name="prefix" value="BUSI-"></property>
+			</bean>
+		</property>
+		<property name="modify" ref="ebsModify" />
+		<property name="audit" value="${audit}">
+		</property>
+	</bean>
+	<bean id="DiskDeleteAction"
+		class="com.neusoft.mid.cloong.web.page.console.disk.DiskDeleteAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy" />
+		<property name="delete" ref="ebsDelete"></property>
+		<property name="seqCen">
+			<bean class="com.neusoft.mid.cloong.common.util.CommonSequenceGenerator">
+				<property name="prefix" value="BUSI-"></property>
+			</bean>
+		</property>
+	</bean>
+	<bean id="DiskMountAction"
+		class="com.neusoft.mid.cloong.web.page.console.disk.DiskMountAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy" />
+		<property name="status">
+			<value>4</value>
+		</property>
+		<property name="detach" ref="ebsDetach"></property>
+		<property name="attach" ref="ebsAttach"></property>
+		<property name="seqCen">
+			<bean class="com.neusoft.mid.cloong.common.util.CommonSequenceGenerator">
+				<property name="prefix" value="BUSI-"></property>
+			</bean>
+		</property>
+	</bean>
+	<bean id="DiskUnMountAction"
+		class="com.neusoft.mid.cloong.web.page.console.disk.DiskMountAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy" />
+		<property name="status">
+			<value>5</value>
+		</property>
+		<property name="detach" ref="ebsDetach"></property>
+		<property name="attach" ref="ebsAttach"></property>
+		<property name="seqCen">
+			<bean class="com.neusoft.mid.cloong.common.util.CommonSequenceGenerator">
+				<property name="prefix" value="BUSI-"></property>
+			</bean>
+		</property>
+	</bean>
+	<bean id="EmptyAction" class="com.neusoft.mid.cloong.web.EmptyAction"
+		scope="prototype" />
+	<!-- 翻页 -->
+	<bean id="turnPageInterceptor"
+		class="com.neusoft.mid.cloong.web.page.common.TurnPageInterceptor">
+		<property name="paramFilter">
+			<value>${paramFilter}</value>
+		</property>
+	</bean>
+	<bean id="abstractAction" abstract="true">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	
+	
+	<!-- 实时性能 -->
+	<bean id="hostRealTimePerformance" 
+	      class="com.neusoft.mid.cloong.web.page.console.host.HostRealTimePerformanceAction"
+		  scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+
+
+</beans>

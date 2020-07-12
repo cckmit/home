@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<!-- 这只浏览器时候缓存静态内容，默认值为true(生产环境下使用),开发阶段最好关闭 -->
+	<constant name="struts.serve.static.vrowserCache" value="false"></constant>
+	<constant name="struts.ui.theme" value="simple"></constant>
+
+	<!-- 资源视图 -->
+	<package name="com.neusoft.mid.cloong.web.page.vlan" namespace="/console"
+		extends="struts-default,json-default">
+		<interceptors>
+			<interceptor name="authenticate" class="authenticateInterceptor" />
+			<interceptor name="turnPageInter" class="turnPageInterceptor" />
+			<interceptor-stack name="authStack">
+				<interceptor-ref name="authenticate" />
+				<interceptor-ref name="defaultStack" />
+				<interceptor-ref name="turnPageInter" />
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="authStack" />
+		<global-results>
+			<result name="error" type="chain">exceptionIntercepor
+			</result>
+			<result name="LOGIN" type="redirectAction">logout</result>
+		</global-results>
+		<global-exception-mappings>
+			<exception-mapping exception="java.lang.Exception"
+				result="error" />
+		</global-exception-mappings>
+
+		<!-- 查询vlan列表 -->
+		<action name="vlanQueryListAction" class="vlanQueryListAction">
+			<result name="success">/WEB-INF/pages/console/vlan/vlan_list.jsp
+			</result>
+			<result name="error">/WEB-INF/pages/console/vlan/vlan_list.jsp
+			</result>
+			<result name="failure">/WEB-INF/pages/console/vlan/vlan_list.jsp
+			</result>
+			<result name="input">/WEB-INF/pages/console/vlan/vlan_list.jsp
+			</result>
+		</action>
+		
+		<!-- 查询vlan列表  34期 -->
+		<action name="vlanQueryList3PhaseAction" class="vlanQueryList3PhaseAction">
+			<result name="success">/WEB-INF/pages/console/vlan3Phase/vlan_list.jsp
+<!-- 			    <param name="msg">${msg}</param> -->
+			</result>
+			<result name="error">/WEB-INF/pages/console/vlan3Phase/vlan_list.jsp
+			</result>
+			<result name="failure">/WEB-INF/pages/console/vlan3Phase/vlan_list.jsp
+			</result>
+			<result name="input">/WEB-INF/pages/console/vlan3Phase/vlan_list.jsp
+			</result>
+		</action>
+
+		<!-- 进入vlan创建页面 -->
+		<action name="createVlanAction" class="vlanApplyAction">
+			<result name="success">
+				/WEB-INF/pages/console/vlan/vlan_apply.jsp
+			</result>
+		</action>
+
+		<action name="vlanApplyInfoAction" class="vlanApplyInfoAction">
+			<result name="success" type="redirectAction">
+				<param name="actionName">vlanQueryListAction</param>
+				<param name="msg">${msg}</param>
+			</result>
+			<result name="failure" type="redirectAction">
+				<param name="actionName">vlanQueryListAction</param>
+				<param name="msg">${msg}</param>
+				<param name="errMsg">${errMsg}</param>
+			</result>
+			<result name="input">/WEB-INF/pages/console/vlan/vlan_apply.jsp
+			</result>
+		</action>
+		
+		<!-- 进入vlan创建页面   34期  -->
+		<action name="createVlan3PhaseAction" class="vlanApply3PhaseAction">
+			<result name="success">
+				/WEB-INF/pages/console/vlan3Phase/vlan_apply.jsp
+			</result>
+		</action>
+		
+		<action name="vlanApplyInfo3PhaseAction" class="vlanApplyInfo3PhaseAction">
+			<result name="success" type="redirectAction">
+				<param name="actionName">vlanQueryList3PhaseAction</param>
+				<param name="msg">${msg}</param>
+			</result>
+			<result name="failure" type="redirectAction">
+				<param name="actionName">vlanQueryList3PhaseAction</param>
+<!-- 				<param name="msg">${msg}</param> -->
+				<param name="errMsg">${errMsg}</param>
+			</result>
+			<result name="input">/WEB-INF/pages/console/vlan3Phase/vlan_apply.jsp
+			</result>
+		</action>
+		
+		<action name="vlanCancelAction" class="vlanCancelAction">
+			<result name="success" type="redirectAction">
+				<param name="actionName">vlanQueryListAction</param>
+				<param name="msg">${msg}</param>
+			</result>
+			<result name="failure" type="redirectAction">
+				<param name="actionName">vlanQueryListAction</param>
+				<param name="msg">${msg}</param>
+				<param name="errMsg">${errMsg}</param>
+			</result>
+			<result name="statusinvalid" type="redirectAction">
+				<param name="actionName">vlanQueryListAction</param>
+				<param name="msg">${msg}</param>
+				<param name="errMsg">${errMsg}</param>
+			</result>
+		</action>
+		
+		<!-- 释放vlan  34期 -->
+		<action name="vlanCancel3PhaseAction" class="VLANCancel3PhaseAction">
+			<result name="success" type="redirectAction">
+				<param name="actionName">vlanQueryList3PhaseAction</param>
+				<param name="msg">${msg}</param>
+			</result> 
+			<result name="failure" type="redirectAction">
+				<param name="actionName">vlanQueryList3PhaseAction</param>
+				<param name="msg">${msg}</param>
+				<param name="errMsg">${errMsg}</param>
+			</result>
+			<result name="statusinvalid" type="redirectAction">
+				<param name="actionName">vlanQueryList3PhaseAction</param>
+				<param name="msg">${msg}</param>
+				<param name="errMsg">${errMsg}</param>
+			</result>
+		</action>
+		
+		<action name="vlanQuery4Overview" class="vlanQueryListAction" method="query4Overview">
+			<result name="success" type="json">
+				<param name="root">vlanList</param>
+			</result>
+		</action>
+		
+		<action name="vlanQuery4Overview3Phase" class="vlanQueryList3PhaseAction" method="query4Overview">
+			<result name="success" type="json">
+				<param name="root">vlanList</param>
+			</result>
+		</action>
+		
+		<!-- vlan详情页 -->
+		<action name="vlanDetailAction" class="vlanDetailAction">
+			<result name="success">
+				/WEB-INF/pages/console/vlan/vlan_detail.jsp
+			</result>
+			<result name="error">
+				/WEB-INF/pages/console/vlan/vlan_list.jsp
+			</result>
+		</action>
+		
+		<!-- vlan详情页 34期  -->
+		<action name="vlanDetail3PhaseAction" class="vlanDetail3PhaseAction">
+			<result name="success">
+				/WEB-INF/pages/console/vlan3Phase/vlan_detail.jsp
+			</result>
+			<result name="error">
+				/WEB-INF/pages/console/vlan3Phase/vlan_list.jsp
+			</result>
+		</action>
+		
+		<!-- 修改vlan -->
+		<action name="vlanNameEdit" class="vlanNameEditAction" >
+			<result name="success" type="json">
+			</result>
+			<result name="error" type="json">
+			</result>
+		</action>
+		
+		<!-- 修改vlan 34期-->
+		<action name="vlanNameEdit3Phase" class="vlanNameEdit3PhaseAction" >
+			<result name="success" type="json">
+			</result>
+			<result name="error" type="json">
+			</result>
+		</action>
+		
+	</package>
+
+</struts>

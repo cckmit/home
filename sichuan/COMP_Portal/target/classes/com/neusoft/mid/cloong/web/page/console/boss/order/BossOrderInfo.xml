@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="BossOrderInfo">
+	<typeAlias alias="BossOrderInfo"
+		type="com.neusoft.mid.cloong.web.page.console.boss.order.info.BossOrderInfo" />
+
+
+	<select id="queryBossOrderListAll" parameterClass="BossOrderInfo"
+		resultClass="BossOrderInfo">
+		SELECT
+		boss.ID id,
+		boss.BOSS_ORDER_ID bossOrderId,
+		boss.OPERATE_TYPE operateType,
+		boss.PRODUCT_CODE productCode,
+		boss.PRODUCT_NAME productName,
+		boss.PRODUCT_ITEM productItem,
+		boss.AGREEMENT_BEGING_TIME agreementBeginTime,
+		boss.AGREEMENT_END_TIME agreementEndTime,
+		boss.CHARGE_TYPE chargeType,
+		boss.RATE rate,
+		boss.PRICE price,
+		boss.PAYMENT_TYPE paymentType,
+		boss.BILL_BG_TIME billBgTime,
+		boss.BILL_END_TIME billEndTime,
+		boss.TIME_STAMP timeStamp,
+		boss.STATUS status,
+		boss.REASON_TYPE reasonType,
+		cb.APP_ID appId,
+		app.APP_NAME appName
+		FROM
+		comp_boss_order_t boss, comp_corporation_boss_t cb, comp_app_t app
+		where cb.BOSS_ORDER_ID = boss.BOSS_ORDER_ID
+		and cb.APP_ID = app.APP_ID
+		<isNotEmpty prepend="and" property="bossOrderId">
+			boss.BOSS_ORDER_ID like
+				CONCAT('%',#bossOrderId#,'%')
+		</isNotEmpty>
+		order by
+		TIME_STAMP desc
+	</select>
+	
+	<select id="countBossOrderListAll" parameterClass="BossOrderInfo"
+		resultClass="int">
+		SELECT
+		count(*)
+		FROM
+		comp_boss_order_t boss, comp_corporation_boss_t cb, comp_app_t app
+		where cb.BOSS_ORDER_ID = boss.BOSS_ORDER_ID
+		and cb.APP_ID = app.APP_ID
+		<isNotEmpty prepend="and" property="bossOrderId">
+			boss.BOSS_ORDER_ID like
+				CONCAT('%',#bossOrderId#,'%')
+		</isNotEmpty>
+		order by
+		TIME_STAMP desc
+	</select>
+	
+	<select id="queryBossOrderByOrderId" parameterClass="java.lang.String"
+		resultClass="BossOrderInfo">
+		SELECT
+		boss.BOSS_ORDER_ID bossOrderId,
+		boss.OPERATE_TYPE operateType,
+		boss.PRODUCT_CODE productCode,
+		boss.PRODUCT_NAME productName,
+		boss.PRODUCT_ITEM productItem,
+		boss.AGREEMENT_BEGING_TIME agreementBeginTime,
+		boss.AGREEMENT_END_TIME agreementEndTime,
+		boss.CHARGE_TYPE chargeType,
+		boss.RATE rate,
+		boss.PRICE price,
+		boss.PAYMENT_TYPE paymentType,
+		boss.BILL_BG_TIME billBgTime,
+		boss.BILL_END_TIME billEndTime,
+		boss.TIME_STAMP timeStamp,
+		boss.STATUS status,
+		boss.REASON_TYPE reasonType,
+		cb.APP_ID appId,
+		app.APP_NAME appName
+		FROM
+		comp_boss_order_t boss, comp_corporation_boss_t cb, comp_app_t app
+		where cb.BOSS_ORDER_ID = boss.BOSS_ORDER_ID
+		and cb.APP_ID = app.APP_ID
+		and boss.ID=#id#
+	</select>
+	
+	<update id="updateBossOrderStatus" parameterClass="BossOrderInfo">
+		update
+		comp_boss_order_t
+		set
+		STATUS=#status# ,
+		TIME_STAMP=#timeStamp#
+		where BOSS_ORDER_ID=#bossOrderId#
+	</update>
+</sqlMap>

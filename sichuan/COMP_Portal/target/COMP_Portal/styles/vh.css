@@ -1,0 +1,106 @@
+@charset "utf-8";
+/* CSS Document */
+
+/* 列表显示 云硬盘 图标 */
+.ico-vh{
+	background:url(../images/ico_vh.png) no-repeat center;
+}
+/* 文本框样式*/
+.vh-input-max{
+	border: 1px solid #d2d3d4;
+	width:170px;
+	background-color:#FFFFFF;
+	font-size:14px;
+	float:left;
+}
+.vh-input-min{
+	border: 1px solid #d2d3d4;
+	width:80px;
+	background-color:#FFFFFF;
+	font-size:14px;
+	float:left;
+	margin-right: 5px;
+}
+/* 详细 页面高度 */
+.vh-info-h{
+	min-height:350px;
+}
+/* 详细 span 按钮 */
+.vh-span-btn{
+	float:left;
+	margin: 1px 0 0 10px;
+	background-color:#3cb4f0;
+	border:1px solid #359dd1;
+	color:#FFF;
+	/*圆角*/
+	-moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius:3px;
+}
+.vh-span-btn a{
+	display:block;
+	color:#FFF;
+	line-height:20px;
+	text-align:center;
+	text-decoration:none;
+	padding: 1px 10px;
+}
+
+.vh-span-btn-gray{
+	float:left;
+	margin: 1px 0 0 10px;
+	background-color:#ebeef0;
+	border:1px solid #c0c2c3;
+	color:#FFF;
+	/*圆角*/
+	-moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius:3px;
+}
+.vh-span-btn-gray a{
+	display:block;
+	color:#222;
+	line-height:20px;
+	text-align:center;
+	text-decoration:none;
+	padding: 1px 10px;
+}
+/* 弹出界面 查询按钮右悬浮 */
+.vh-btn-r{
+	float:right;
+	padding:20px 20px 0 0;
+}
+.vh-btn-r li{
+	margin-right:2px;
+}
+.vh-span-value{
+	margin-top:1px;
+	float:left;
+	display:block;
+	width:173px;
+	line-height:20px;
+	border:1px solid #dfdfdf;
+	/*圆角*/
+	-moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius:3px;
+}
+/** 虚拟机硬盘名称内容显示样式 */
+.detail-text{
+	float:left;
+	min-width:50px;
+}
+
+.mask{
+	color:#C7EDCC;
+    background-color:#eee;
+    position:absolute;
+    top:0px;
+    left:0px;
+    width:100%;
+    height:100%;
+    opacity: 0.65;
+    -moz-opacity: 0.65;
+    filter:alpha(opacity=65);
+    z-index:9988;
+}

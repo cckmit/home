@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="VmInfo">
+	<typeAlias alias="VmInfo" type="com.neusoft.mid.cloong.host.vm.VMInfo" />
+	<typeAlias alias="VMCreateReq" type="com.neusoft.mid.cloong.host.vm.VMCreateReq" />
+	<typeAlias alias="VMCreateResp" type="com.neusoft.mid.cloong.host.vm.VMCreateResp" />
+	<typeAlias alias="VMCreateFail" type="com.neusoft.mid.cloong.host.vm.VMCreateFail" />
+	<typeAlias alias="VmErrorInfo" type="com.neusoft.mid.cloong.host.vm.VMStateQueryErrorInfo" />
+	<typeAlias alias="VMStateQueryReq" type="com.neusoft.mid.cloong.host.vm.VMStateQueryReq" />
+	<typeAlias alias="VMStateQueueItem" type="com.neusoft.mid.cloong.host.vm.VMStateQueueItem" />
+
+	<typeAlias alias="VMStateQueueItemInfo" type="com.neusoft.mid.cloong.host.vm.VMStateQueueItemInfo" />
+	<typeAlias alias="OrderInfo" type="com.neusoft.mid.cloong.order.info.OrderInfo" />
+	<update id="updateVMStatus" parameterClass="VmInfo">
+		update
+		COMP_CASE_VM_T
+		set
+		STATUS=#vmState#
+		<isNotEmpty prepend="," property="operationURL">
+			Operation_URL = #operationURL#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="userName">
+			UserName = #userName#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="password">
+			VM_PASSWORD = #password#
+		</isNotEmpty>
+		where VM_ID=#vmId#
+		AND STATUS != '3'
+	</update>
+	<insert id="insertVmStateQueryErrorInfo" parameterClass="VmErrorInfo">
+		insert
+		into COMP_VM_QUERY_FAIL_T
+		values(#vmId#,#failCause#,#failCode#,#resourcePoolId#,#resourcePoolPartId#,#futureState#,#createTime#,#serialNum#)
+	</insert>
+
+	<insert id="insertVMFail" parameterClass="VMCreateFail">
+		insert into
+		COMP_VM_CREATE_FAIL_T(
+		FAIL_CAUSE,
+		FAIL_CODE,
+		RES_POOL_ID,
+		RES_POOL_PART_ID,
+		STANDARD_ID,
+		SUBNETWORK,
+		OS_ID,
+		NUM,
+		CREATE_TIME)
+		values
+		(#failCause#,#failCode#,#resPoolId#,#resPoolPartId#,#standardId#,#subNetwork#,#osId#,#num#,#createTime#)
+	</insert>
+
+	<!-- 更新虚拟机订单为生效,及开始计费时间、到期时间 -->
+	<update id="updateOrderEFFECTIVE" parameterClass="VMStateQueryReq">
+		update
+		COMP_ORDER_T
+		set
+		STATUS='3'
+		,
+		EFFECTIVE_TIME=#timestamp# , EXPIRE_TIME=#expireTime#
+		where ORDER_ID=
+		(select order_id from
+		COMP_CASE_VM_T
+		where VM_ID = #vmId#)
+	</update>
+
+	<!-- 查询虚拟机订单信息 -->
+	<select id="queryVMOrderInfo" parameterClass="VMStateQueryReq" resultClass="OrderInfo">
+		SELECT
+		ORDER_ID orderId,
+		STATUS STATUS,
+		LENGTH_TIME lengthTime,
+		LENGTH_UNIT lengthUnit,
+		CREATE_TIME createTime,
+		CREATE_USER createUser,
+		EFFECTIVE_TIME effectiveTime,
+		EXPIRE_TIME expireTime
+		FROM
+		COMP_ORDER_T
+		WHERE
+		ORDER_ID=(select order_id from COMP_CASE_VM_T
+		where VM_ID = #vmId#)
+	</select>
+
+	<select id="queryVmBaking" parameterClass="java.lang.String" resultClass="java.lang.String">
+		select VM_ID
+		from COMP_CASE_VMBAK_T where VMBAK_ID=#vmBakId#
+	</select>
+
+	<!-- 服务查询虚拟机状态 -->
+	<!-- 创建中 -->
+	<select id="createVMStateQuery" resultClass="VMStateQueueItemInfo">
+		SELECT
+		vm_id vmId,
+		vm_id serialNum,
+		res.res_pool_id resourcePoolId,
+		res.res_pool_url resourceUrl,
+		res.user_pwd password,
+		vm.res_pool_part_id resourcePoolPartId
+		FROM comp_case_vm_t vm left join comp_res_pool_t res on
+		vm.res_pool_id = res.res_pool_id
+		WHERE
+		vm.status = '1'
+	</select>
+
+	<!-- 查询处理中状态的虚拟机 -->
+	<select id="queryFutureProcessing" resultClass="VMStateQueueItemInfo">
+		SELECT
+		vm_id vmId,
+		vm_id serialNum,
+		res.res_pool_id resourcePoolId,
+		res.res_pool_url resourceUrl,
+		res.user_pwd password,
+		vm.res_pool_part_id resourcePoolPartId
+		FROM comp_case_vm_t vm left join comp_res_pool_t res on
+		vm.res_pool_id = res.res_pool_id
+		WHERE
+		vm.status = '16'
+	</select>
+
+	<!-- 查询指定状态的虚拟机 -->
+	<select id="queryVMByStatus" resultClass="VMStateQueueItemInfo" parameterClass="java.util.List">
+		SELECT
+		vm_id vmId,
+		vm_id serialNum,
+		res.res_pool_id resourcePoolId,
+		res.res_pool_url resourceUrl,
+		res.user_pwd password,
+		vm.res_pool_part_id resourcePoolPartId
+		FROM comp_case_vm_t vm left join
+		comp_res_pool_t res on
+		vm.res_pool_id = res.res_pool_id
+		WHERE
+		<iterate conjunction="or" close=")" open="(">
+			vm.status = #list[]#
+		</iterate>
+	</select>
+
+	<!-- 更新虚拟机订单为生效,及开始计费时间、到期时间 -->
+	<update id="updateVlanIPsegmentBind" parameterClass="java.util.Map">
+		update
+		COMP_VLAN_IPSEGMENT_BIND_T
+		set
+		Status = #toBindState#
+		where
+		VLAN_ID IN
+		<iterate property="vlanList" conjunction="," close=")" open="(">
+			#vlanList[]#
+		</iterate>
+		And Status = #fromBindState#
+	</update>
+</sqlMap>

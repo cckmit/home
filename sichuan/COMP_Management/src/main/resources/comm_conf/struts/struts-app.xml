@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<!-- 这只浏览器时候缓存静态内容，默认值为true(生产环境下使用),开发阶段最好关闭 -->
+	<constant name="struts.serve.static.vrowserCache" value="false"></constant>
+	<!-- 当struts的配置文件修改后，系统是否自动重新加载该文件，默认为false(生产环境下使用),开发阶段最好打开 -->
+	<constant name="struts.serve.static.vrowserCache" value="true"></constant>
+	<constant name="struts.ui.theme" value="simple"></constant>
+
+
+	<package name="com.neusoft.mid.cloong.app" namespace="/app"
+		extends="struts-default">
+		<interceptors>
+			<interceptor name="authenticate" class="authenticateInterceptor" />
+			<interceptor name="turnPageInter" class="turnPageInterceptor" />
+			<interceptor-stack name="authStack">
+				<interceptor-ref name="authenticate" />
+				<interceptor-ref name="defaultStack" />
+				<interceptor-ref name="turnPageInter" />
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="authStack" />
+		<global-results>
+			<result name="LOGIN" type="redirectAction">logout</result>
+			<result name="error" type="chain">exceptionIntercepor</result>
+		</global-results>
+		<global-exception-mappings>
+			<exception-mapping exception="java.lang.Exception"
+				result="error" />
+		</global-exception-mappings>
+		<!-- 查询业务信息 -->
+		<action name="appListQuery" class="appListAction">
+			<result name="success">/WEB-INF/pages/app/app_list.jsp
+			</result>
+			<result name="error">/WEB-INF/pages/app/app_list.jsp
+			</result>
+		</action>
+	</package>
+	
+	<package name="com.neusoft.mid.cloong.app.json" extends="json-default">
+		<interceptors>
+			<interceptor name="authenticate" class="authenticateInterceptor" />
+			<interceptor name="turnPageInter" class="turnPageInterceptor" />
+			<interceptor-stack name="authStack">
+				<interceptor-ref name="authenticate" />
+				<interceptor-ref name="defaultStack" />
+				<interceptor-ref name="turnPageInter" />
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="authStack" />
+		<global-results>
+			<result name="LOGIN" type="redirectAction">logout</result>
+			<result name="error" type="chain">exceptionIntercepor</result>
+		</global-results>
+		<global-exception-mappings>
+			<exception-mapping exception="java.lang.Exception"
+				result="error" />
+		</global-exception-mappings>
+		
+		<!-- 业务详情 -->
+		<action name="appDetail" class="appDetailAction">
+			<result name="success" type="json">
+				<param name="root">app</param>
+				<param name="ignoreHierarchy">false</param>
+				<param name="enumAsBean">true</param>
+				<param name="excludeProperties">password</param>
+			</result>
+			<result name="failure" type="json">
+			</result>
+			<result name="error" type="json">
+			</result>
+		</action>
+		
+		<!-- 业务创建 -->
+		<action name="appAdd" class="appAddAction">
+			<result name="success" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="warn" type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+
+		<!-- 业务修改 -->
+		<action name="appUpdate" class="appUpdateAction">
+			<result name="success" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">result</param>
+			</result>
+			<result name="warn" type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+		
+		<!-- 业务删除  -->
+		<action name="appDelete" class="appDeleteAction">
+			<result name="success" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">result\..+$</param>
+			</result>
+			<result name="error" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">result\..+$</param>
+			</result>
+			<result name="warn" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">result\..+$</param>
+			</result>
+		</action>
+		
+		
+		
+		<!-- 获取联系人列表 
+		<action name="queryUserList" class="queryAppUserListAction">
+			<result name="success" type="json">
+				<param name="includeProperties">queryRole,roleList,page,pageSize,url,param,pageBar</param>
+				<param name="excludeProperties">ibatisDAO,roleService,authId,container</param>
+				<param name="ignoreHierarchy">false</param>
+				<param name="enumAsBean">true</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">result</param>
+			</result>
+		</action>-->
+		
+		<action name="queryUserList" class="queryAppUserListAction">
+			<interceptor-ref name="jsonValidationWorkflowStack" />
+			<interceptor-ref name="turnPageInter" />
+			<result name="success" type="json">
+				<param name="excludeProperties">ibatisDAO,authId,container</param>
+				<param name="ignoreHierarchy">false</param>
+				<param name="enumAsBean">true</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="queryResPool" class="queryResPoolListAction">
+			<interceptor-ref name="jsonValidationWorkflowStack" />
+			<interceptor-ref name="turnPageInter" />
+			<result name="success" type="json">
+				<param name="excludeProperties">ibatisDAO,authId,container</param>
+				<param name="ignoreHierarchy">false</param>
+				<param name="enumAsBean">true</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+		
+		
+		<!--   获得用户列表 @zhangyunfeng 2016-04-09 
+		 <action name="queryAppUser" class="QueryAppUserListAction">
+			<interceptor-ref name="jsonValidationWorkflowStack" />
+			<interceptor-ref name="turnPageInter" />
+			<result name="success" type="json">
+				<param name="excludeProperties">ibatisDAO,authId,container</param>
+				<param name="ignoreHierarchy">false</param>
+				<param name="enumAsBean">true</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">result</param>
+			</result>
+		</action>   -->
+		
+	</package>
+</struts>

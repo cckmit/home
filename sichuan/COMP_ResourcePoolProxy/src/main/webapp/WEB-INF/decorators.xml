@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<decorators defaultdir="/decorators">
+	<!-- 定义那些不使用sitemesh的模板效果 -->
+	<excludes>
+		<pattern>/logout.action*</pattern>  
+		<pattern>/login.action*</pattern>
+		<!-- ajax 返回 页面 -->
+		<pattern>/400.jsp</pattern>
+		<pattern>/500.jsp</pattern>
+		<pattern>/index.jsp</pattern>
+		<pattern>/login.jsp</pattern>
+	</excludes>
+	<!-- decorator结点指定了模板的位置和文件名，通过pattern来指定哪些路径引用这个模板 -->
+	<!-- 
+	<decorator name="header" page="header.jsp">
+		<pattern>/*</pattern>
+	</decorator>
+	 -->
+</decorators>

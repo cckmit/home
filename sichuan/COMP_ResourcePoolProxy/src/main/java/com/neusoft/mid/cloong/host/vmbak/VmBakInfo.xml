@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="VmBakInfo">
+	<typeAlias alias="VmBakInfo" type="com.neusoft.mid.cloong.host.vmbak.VmBakInfo" />
+
+	<typeAlias alias="VmBakStateQueueItemInfo" type="com.neusoft.mid.cloong.host.vmbak.VmBakStateQueueItemInfo" />
+	<typeAlias alias="VmBakErrorInfo" type="com.neusoft.mid.cloong.host.vmbak.VmBakStateQueryErrorInfo" />
+	<typeAlias alias="OrderInfo" type="com.neusoft.mid.cloong.order.info.OrderInfo" />
+
+	<!-- 更新备份状态 -->
+	<update id="updateVmBakStatus" parameterClass="java.util.Map">
+		update
+		COMP_CASE_VMBAK_T
+		set
+		STATUS=#vmBakState# where VMBAK_ID=#vmBakId#
+	</update>
+
+	<!-- 更新虚拟机备份订单为生效,及开始计费时间、到期时间 -->
+	<update id="updateVmbakOrder" parameterClass="java.util.Map">
+		update
+		COMP_ORDER_T
+		set
+		STATUS=#orderStatus#
+		,
+		EFFECTIVE_TIME=#effectiveTime# , EXPIRE_TIME=#expireTime#
+		where ORDER_ID=#orderId#
+	</update>
+	<!-- 查询虚拟机备份订单信息 -->
+	<select id="queryVmBakOrderInfo" resultClass="java.lang.String">
+		select ORDER_ID orderId,STATUS
+		status,LENGTH_TIME
+		lengthTime,LENGTH_UNIT
+		lengthUnit,CREATE_TIME
+		createTime,CREATE_USER
+		createUser,EFFECTIVE_TIME
+		effectiveTime,EXPIRE_TIME expireTime,CASE_ID caseId
+		FROM
+		COMP_ORDER_T
+		where
+		ORDER_ID=(select order_id from COMP_CASE_VMBAK_T
+		where CASE_ID = #caseId#)
+	</select>
+
+
+	<!-- 服务查询备份虚拟机状态 -->
+	<!-- 备份中 -->
+	<select id="queryVMBakCreating" resultClass="VmBakStateQueueItemInfo">
+		SELECT
+		vmbak_id vmbakId,
+		vmbak_id serialNum,
+		res.res_pool_id resourcePoolId,
+		res.res_pool_url resourceUrl,
+		res.user_pwd password,
+		vmbak.res_pool_part_id resourcePoolPartId
+		FROM comp_case_vmbak_t vmbak left join
+		comp_res_pool_t res on vmbak.res_pool_id = res.res_pool_id
+		WHERE vmbak.status = '1'
+	</select>
+
+	<!-- 根据给定状态查询虚拟机备份信息 -->
+	<select id="queryVMbakByState" parameterClass="java.lang.String" resultClass="VmBakStateQueueItemInfo">
+		SELECT
+		vmbak_id vmbakId,
+		vmbak_id serialNum,
+		res.res_pool_id resourcePoolId,
+		res.res_pool_url
+		resourceUrl,
+		res.user_pwd password,
+		vmbak.res_pool_part_id resourcePoolPartId
+		FROM
+		comp_case_vmbak_t vmbak left join comp_res_pool_t res on vmbak.res_pool_id = res.res_pool_id
+		WHERE vmbak.status = #vmBakState#
+	</select>
+</sqlMap>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<!-- 这只浏览器时候缓存静态内容，默认值为true(生产环境下使用),开发阶段最好关闭 -->
+	<constant name="struts.serve.static.vrowserCache" value="false"></constant>
+	<!-- 当struts的配置文件修改后，系统是否自动重新加载该文件，默认为false(生产环境下使用),开发阶段最好打开 -->
+	<constant name="struts.serve.static.vrowserCache" value="true"></constant>
+	<constant name="struts.ui.theme" value="simple"></constant>
+
+
+	<package name="com.neusoft.mid.cloong.vault" namespace="/userCenter"
+		extends="struts-default">
+		<interceptors>
+			<interceptor name="authenticate" class="authenticateInterceptor" />
+			<interceptor name="turnPageInter" class="turnPageInterceptor" />
+			<interceptor-stack name="authStack">
+				<interceptor-ref name="authenticate" />
+				<interceptor-ref name="defaultStack" />
+				<interceptor-ref name="turnPageInter" />
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="authStack" />
+		<global-results>
+			<result name="LOGIN" type="redirectAction">logout</result>
+			<result name="error" type="chain">exceptionIntercepor</result>
+		</global-results>
+		<global-exception-mappings>
+			<exception-mapping exception="java.lang.Exception"
+				result="error" />
+		</global-exception-mappings>
+	</package>
+
+	<package name="com.neusoft.mid.cloong.vault.json" extends="json-default">
+		<interceptors>
+			<interceptor name="authenticate" class="authenticateInterceptor" />
+			<interceptor name="turnPageInter" class="turnPageInterceptor" />
+			<interceptor-stack name="authStack">
+				<interceptor-ref name="authenticate" />
+				<interceptor-ref name="defaultStack" />
+				<interceptor-ref name="turnPageInter" />
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="authStack" />
+		<global-results>
+			<result name="LOGIN" type="redirectAction">logout</result>
+			<result name="error" type="chain">exceptionIntercepor</result>
+		</global-results>
+		<global-exception-mappings>
+			<exception-mapping exception="java.lang.Exception"
+				result="error" />
+		</global-exception-mappings>
+
+		<!-- 金库 应用资源敏感操作金库申请创建接口 -->
+		<action name="createAppRequest" class="queryAppOperJKStatus" method="createAppRequest">
+			<result name="success" type="json" />
+			<result name="error" type="json" />
+		</action>
+		<!-- 金库 应用资源敏感操作金库状态查询接口 -->
+		<action name="queryAppOperJKStatus" class="queryAppOperJKStatus" method="queryAppOperJKStatus">
+			<result name="success" type="json" />
+			<result name="error" type="json" />
+		</action>
+		<!-- 金库 根据金库申请id查询金库状态接口 -->
+		<action name="queryJKStatusByID" class="queryAppOperJKStatus" method="queryJKStatusByID">
+			<result name="success" type="json" />
+			<result name="error" type="json" />
+		</action>
+
+		<!-- 金库 远程授权认证接口 -->
+		<action name="remoteAuth" class="queryAppOperJKStatus" method="remoteAuth">
+			<result name="success" type="json" />
+			<result name="error" type="json" />
+		</action>
+
+		<!-- 金库 本地授权认证接口 -->
+		<action name="localAuth" class="queryAppOperJKStatus" method="localAuth">
+			<result name="success" type="json" />
+			<result name="error" type="json" />
+		</action>
+		<!-- 金库 金库口令重发接口-->
+		<action name="reSendJKPass" class="queryAppOperJKStatus" method="reSendJKPass">
+			<result name="success" type="json" />
+			<result name="error" type="json" />
+		</action>
+		<!-- 金库 金库申请取消接口-->
+		<action name="cancelRequest" class="queryAppOperJKStatus" method="cancelRequest">
+			<result name="success" type="json" />
+			<result name="error" type="json" />
+		</action>
+
+
+	</package>
+</struts>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="SentMail">
+	<typeAlias alias="UserBean"
+		type="com.neusoft.mid.cloong.web.page.user.order.mail.UserBean" />
+	<typeAlias alias="OrderInfo"
+		type="com.neusoft.mid.cloong.web.page.user.order.OrderInfo" />
+				
+	<select id="selectExpireOrderAll" resultClass="OrderInfo" parameterClass="java.lang.String">
+		select 
+		ORDER_ID orderId,
+		CREATE_USER createUser,
+		EXPIRE_TIME expireTime
+        from COMP_ORDER_T
+		where
+		#expireTime# > EXPIRE_TIME  and (STATUS = '1' or STATUS = '3')
+	</select>
+	
+	<select id="selectUserBean" resultClass="UserBean" parameterClass="UserBean">
+		select 
+		USER_NAME userName,
+		USER_ID userId,
+		EMAIL email
+		from COMP_AUTHORITY_USER_T
+		where USER_ID = #userId#
+	</select>
+	
+</sqlMap>

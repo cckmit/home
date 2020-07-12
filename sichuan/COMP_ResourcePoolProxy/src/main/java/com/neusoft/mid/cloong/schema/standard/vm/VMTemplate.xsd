@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 被2012 () 使用XMLSpy v编辑的 (http://www.altova.com) by -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:element name="VMTemplate">
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="TemplateID" type="xs:string"/>
+				<xs:element name="ResourceType" type="xs:string"/>
+				<xs:element name="MeasureMode" type="xs:string"/>
+				<xs:element name="TemplateDesc" type="xs:string"/>
+				<xs:element name="TemplateStatus" type="xs:string"/>
+				<xs:element name="TemplateCreator" type="xs:string"/>
+				<xs:element name="CreateTime" type="xs:string"/>
+				<xs:element name="ResourceInfo">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="CPUNum" type="xs:string"/>
+							<xs:element name="MemorySize" type="xs:string"/>
+							<xs:element name="StorageSize" type="xs:string"/>
+							<xs:element name="VMOS" type="xs:string"/>
+							<xs:element name="MaxBandwidth" type="xs:string" minOccurs="0"/>
+							<xs:element name="OSType" type="xs:string" minOccurs="0"/>
+							<xs:element name="rates" type="xs:string" minOccurs="0"/>
+							<xs:element name="unit" type="xs:string" minOccurs="0"/>
+							<xs:element name="VMSubSystem" type="xs:string" minOccurs="0"/>
+							<xs:element name="diskPartition" type="xs:string" minOccurs="0"/>
+							<xs:element name="cpuArchitecture" type="xs:string" minOccurs="0"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

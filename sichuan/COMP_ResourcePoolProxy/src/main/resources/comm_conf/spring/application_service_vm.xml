@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
+    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+
+	<!-- 虚拟机操作后状态查询队列 -->
+	<bean id="vmProcessingStateQueue" class="com.neusoft.mid.cloong.host.vm.impl.VMStateQueue"></bean>
+
+	<!-- 虚拟机查询状态，timeout时间注入 -->
+	<bean id="createVMSenderImp" class="com.neusoft.mid.cloong.host.vm.impl.CreateVMSenderImp">
+		<property name="timeout">
+			<value>${vmQuerytimeout}</value>
+		</property>
+	</bean>
+
+	<!-- 系统启动后，轮询所有数据库中状态为处理中的虚拟机,获取其当前的真正状态 -->
+	<bean id="vmProcessingStateQueryService" class="com.neusoft.mid.cloong.host.vm.impl.VMStateQueryService">
+		<property name="transactonGen" ref="transactonGen" />
+		<property name="sequenceGenerator" ref="sequenceGenerator" />
+		<property name="timeStampgen" ref="timeStampgen" />
+		<property name="vmStateQuery" ref="vmStateQuery" />
+		<property name="ibatisDao" ref="ibatisDAOProxy" />
+		<property name="vmStateQueue" ref="vmProcessingStateQueue" />
+		<property name="futureStatusSet">
+			<set>
+				<value>2</value>
+				<value>3</value>
+				<value>4</value>
+				<value>6</value>
+			</set>
+		</property>
+		<property name="currentStatus">
+			<set>
+				<value>15</value>
+				<value>16</value>
+			</set>
+		</property>
+		<property name="processOnBoot" value="true"></property>
+		<property name="retransInterval">
+			<value>${retransInterval}</value>
+		</property>
+		<property name="maxTransTime">
+			<value>${maxTransTime}</value>
+		</property>
+	</bean>
+
+	<bean id="vmStateQuery" class="com.neusoft.mid.cloong.host.vm.impl.VMStateQueryImpl">
+		<property name="common" ref="privateWebServiceClientFactory" />
+		<property name="timeout">
+			<value>${requestTimeout}</value>
+		</property>
+	</bean>
+
+	<bean id="lbCreateProcessor" class="com.neusoft.mid.cloong.lb.impl.LBCreateProcessor">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="transactonGen" ref="transactonGen" />
+		<property name="timeStampgen" ref="timeStampgen" />
+		<property name="resourcePoolCacheService" ref="resourcePoolCacheService" />
+		<property name="lbCreator" ref="lbCreator" />
+	</bean>
+
+	<bean id="lbCreator" class="com.neusoft.mid.cloong.lb.impl.LBCreateImpl">
+		<!-- <property name="common" ref="privateWebServiceClientFactory" /> -->
+		<property name="timeout">
+			<value>${requestTimeout}</value>
+		</property>
+		<property name="njrsLbUrl">
+			<value>${lbWsUrl}</value>
+		</property>
+		<property name="njrsLbUrlTwo">
+			<value>${lbWsUrltwo}</value>
+		</property>
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<!-- add by huxin beging -->
+	<bean id="ApplyVirfwOperatorProcessor"
+		class="com.neusoft.mid.cloong.virfw.impl.ApplyVirfwOperatorProcessor">
+		<property name="resourcePoolCacheService" ref="resourcePoolCacheService" />
+		<property name="common" ref="privateWebServiceClientFactory" />
+		<property name="transactonGen" ref="transactonGen" />
+		<property name="timeStampgen" ref="timeStampgen" />
+		<property name="timeout">
+			<value>${requestTimeout}</value>
+		</property>
+	</bean>
+
+	<bean id="CancelVirfwOperatorProcessor"
+		class="com.neusoft.mid.cloong.virfw.impl.CancelVirfwOperatorProcessor">
+		<property name="resourcePoolCacheService" ref="resourcePoolCacheService" />
+		<property name="common" ref="privateWebServiceClientFactory" />
+		<property name="transactonGen" ref="transactonGen" />
+		<property name="timeStampgen" ref="timeStampgen" />
+		<property name="timeout">
+			<value>${requestTimeout}</value>
+		</property>
+	</bean>
+
+	<bean id="AddVirfwStrategyOperatorProcessor"
+		class="com.neusoft.mid.cloong.virfw.impl.AddVirfwStrategyOperatorProcessor">
+		<property name="resourcePoolCacheService" ref="resourcePoolCacheService" />
+		<property name="common" ref="privateWebServiceClientFactory" />
+		<property name="transactonGen" ref="transactonGen" />
+		<property name="timeStampgen" ref="timeStampgen" />
+		<property name="timeout">
+			<value>${requestTimeout}</value>
+		</property>
+	</bean>
+
+	<bean id="DelVirfwStrategyOperatorProcessor"
+		class="com.neusoft.mid.cloong.virfw.impl.DelVirfwStrategyOperatorProcessor">
+		<property name="resourcePoolCacheService" ref="resourcePoolCacheService" />
+		<property name="common" ref="privateWebServiceClientFactory" />
+		<property name="transactonGen" ref="transactonGen" />
+		<property name="timeStampgen" ref="timeStampgen" />
+		<property name="timeout">
+			<value>${requestTimeout}</value>
+		</property>
+	</bean>
+
+	<bean id="FileStorageCreateProcessor"
+		class="com.neusoft.mid.cloong.filestorage.impl.FileStorageCreateProcessor">
+		<property name="resourcePoolCacheService" ref="resourcePoolCacheService" />
+		<!-- <property name="common" ref="privateWebServiceClientFactory" /> -->
+		<property name="transactonGen" ref="transactonGen" />
+		<property name="timeStampgen" ref="timeStampgen" />
+	</bean>
+	
+	<bean id="FileStorageDeleteProcessor"
+		class="com.neusoft.mid.cloong.filestorage.impl.FileStorageDeleteProcessor">
+		<property name="resourcePoolCacheService" ref="resourcePoolCacheService" />
+		<!-- <property name="common" ref="privateWebServiceClientFactory" /> -->
+		<property name="transactonGen" ref="transactonGen" />
+		<property name="timeStampgen" ref="timeStampgen" />
+	</bean>
+	
+	<bean id="PortMapOperatorProcessor"
+		class="com.neusoft.mid.cloong.host.vm.impl.PortMapOperatorProcessor">
+		
+		<property name="getPortMapService" ref="getPortMap" />
+		<property name="Url">
+			<value>${portMapWSUrl}</value>
+		</property>
+	</bean>
+	
+	<bean id="DeletePortMapOperatorProcessor"
+		class="com.neusoft.mid.cloong.host.vm.impl.DeletePortMapOperatorProcessor">
+		
+		<property name="getPortMapService" ref="getPortMap" />
+		<property name="Url">
+			<value>${portMapWSUrl}</value>
+		</property>
+	</bean>
+	<bean id="getPortMap" class="com.neusoft.mid.cloong.host.vm.impl.GetPortMapService"></bean>
+	<!-- add by huxin end -->
+	<!-- 创建VM发送到资源池后查询资源状态及IP、带宽线程池 -->
+	<bean id="vmCreateProcessor" class="com.neusoft.mid.cloong.host.vm.impl.VMCreateProcessor">
+		<property name="senderCreateVMTask">
+			<ref bean="senderCreateVMTaskExecutor" />
+		</property>
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="vmCreator" ref="vmCreator" />
+		<property name="resourcePoolCacheService" ref="resourcePoolCacheService" />
+		<property name="transactonGen" ref="transactonGen" />
+		<property name="timeStampgen" ref="timeStampgen" />
+		<property name="vmStateQuery" ref="vmStateQuery" />
+		<property name="interval">
+			<value>${nextQueryVMStatusInterval}
+			</value>
+		</property>
+		<property name="acquireStandardResPoolId">
+			<ref bean="acquireStandardResPoolId" />
+		</property>
+	</bean>
+	<bean id="vmCreator" class="com.neusoft.mid.cloong.host.vm.impl.VMCreateImpl">
+		<property name="common" ref="privateWebServiceClientFactory" />
+		<property name="timeout">
+			<value>${requestTimeout}</value>
+		</property>
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<bean id="senderCreateVMTaskExecutor"
+		class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<property name="corePoolSize" value="0" />
+		<property name="keepAliveSeconds" value="2000" />
+		<property name="maxPoolSize" value="10" />
+		<property name="queueCapacity" value="500" />
+	</bean>
+
+	<!-- 虚拟机操作 -->
+	<bean id="vmOperatorProcessor" class="com.neusoft.mid.cloong.host.vm.impl.VMOperatorProcessor">
+		<property name="vmOperator" ref="vmOperator" />
+		<property name="transactonGen" ref="transactonGen" />
+		<property name="timeStampgen" ref="timeStampgen" />
+		<property name="resourcePoolCacheService" ref="resourcePoolCacheService" />
+		<property name="vmStateQueue" ref="vmProcessingStateQueue" />
+	</bean>
+	<bean id="vmOperator" class="com.neusoft.mid.cloong.host.vm.impl.VMOperatorImpl">
+		<property name="common" ref="privateWebServiceClientFactory" />
+		<property name="timeout">
+			<value>${requestTimeout}</value>
+		</property>
+	</bean>
+
+	<!-- 虚拟机配置修改 -->
+	<bean id="vmModifyProcessor" class="com.neusoft.mid.cloong.host.vm.impl.VMModifyProcessor">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="vmModify" ref="vmModify" />
+		<property name="resourcePoolCacheService" ref="resourcePoolCacheService" />
+		<property name="transactonGen" ref="transactonGen" />
+		<property name="timeStampgen" ref="timeStampgen" />
+	</bean>
+	<bean id="vmModify" class="com.neusoft.mid.cloong.host.vm.impl.VMModifyImpl">
+		<property name="common" ref="privateWebServiceClientFactory" />
+		<property name="timeout">
+			<value>${requestTimeout}</value>
+		</property>
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<!-- 虚拟机删除操作 -->
+	<bean id="vmDeleteProcessor" class="com.neusoft.mid.cloong.host.vm.impl.VMDeleteProcessor">
+		<property name="vmDelete" ref="vmDelete" />
+		<property name="transactonGen" ref="transactonGen" />
+		<property name="timeStampgen" ref="timeStampgen" />
+		<property name="resourcePoolCacheService" ref="resourcePoolCacheService" />
+	</bean>
+	<bean id="vmDelete" class="com.neusoft.mid.cloong.host.vm.impl.VMDeleteImpl">
+		<property name="common" ref="privateWebServiceClientFactory" />
+		<property name="timeout">
+			<value>${requestTimeout}</value>
+		</property>
+	</bean>
+
+	<!-- 虚拟机状态查询 -->
+	<bean id="queryVMStateProcessor"
+		class="com.neusoft.mid.cloong.host.vm.impl.QueryVMStateProcessor">
+		<property name="resourcePoolCacheService" ref="resourcePoolCacheService" />
+		<property name="transactonGen" ref="transactonGen" />
+		<property name="timeStampgen" ref="timeStampgen" />
+		<property name="vmStateQuery" ref="vmStateQuery" />
+	</bean>
+
+
+	<!-- 创建中定时查询 -->
+	<bean id="createVMStateQueryService"
+		class="com.neusoft.mid.cloong.host.vm.impl.CreateVMStateQueryService">
+		<property name="senderCreateVMTask">
+			<ref bean="senderCreateVMTaskExecutor" />
+		</property>
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="transactonGen" ref="transactonGen" />
+		<property name="timeStampgen" ref="timeStampgen" />
+		<property name="vmStateQuery" ref="vmStateQuery" />
+		<property name="interval" value="${nextQueryVMStatusInterval}" />
+	</bean>
+
+
+</beans>

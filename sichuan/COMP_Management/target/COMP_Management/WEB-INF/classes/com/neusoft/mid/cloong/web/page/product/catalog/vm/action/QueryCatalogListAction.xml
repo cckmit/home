@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="CatalogInfo">
+	<typeAlias alias="CatalogInfo"
+		type="com.neusoft.mid.cloong.web.page.product.catalog.vm.info.CatalogInfo" />
+	<select id="queryCatalogInfo" resultClass="CatalogInfo" parameterClass="CatalogInfo">
+		SELECT
+		CATALOG_ID catalogId,
+		CATALOG_NAME catalogName,
+		CATALOG_TYPE catalogType,
+		DESCRIPTION description,
+		STATUS status,
+		CREATE_USER createUser,
+		CREATE_TIME createTime,
+		UPDATE_USER updateUser,
+		UPDATE_TIME updateTime
+		FROM
+		COMP_CATALOG_T
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="and" property="catalogType">
+				CATALOG_TYPE =#catalogType#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+		
+	<update id="updateCatalogInfo" parameterClass="CatalogInfo">
+		update
+		COMP_CATALOG_T
+		set
+		CATALOG_NAME=#catalogName# ,
+		DESCRIPTION=#description# ,
+		UPDATE_USER=#updateUser# ,
+		UPDATE_TIME=#updateTime# 	
+		where CATALOG_ID =#catalogId#
+	</update>
+	
+	
+	<insert id="createCatalogInfo" parameterClass="CatalogInfo">
+		insert into
+		COMP_CATALOG_T
+		(CATALOG_ID,
+		CATALOG_NAME,
+		CATALOG_TYPE,
+		DESCRIPTION,
+		STATUS,
+		CREATE_USER,
+		CREATE_TIME,
+		UPDATE_USER,
+		UPDATE_TIME 
+		)
+		values
+		(#catalogId#,#catalogName#,#catalogType#,#description#,#status#,#createUser#,#createTime#,#updateUser#,#updateTime#)
+	</insert>
+	<delete id="deleteCatalog" parameterClass="java.lang.String">
+	delete from COMP_CATALOG_T where CATALOG_ID =#catalogId#
+	</delete>
+	
+	<select id="queryCatalogIsUsed" resultClass="java.lang.Integer"  parameterClass="CatalogInfo">
+		SELECT
+		count(*)
+		FROM
+		COMP_ITEM_T
+		where CATALOG_ID =#catalogId#
+		and status!=8
+	</select>
+	
+	<select id="createCatalogIsUsed" resultClass="java.lang.Integer"  parameterClass="CatalogInfo">
+		SELECT
+		count(*)
+		FROM
+		COMP_CATALOG_T
+		where CATALOG_NAME =#catalogName#
+	</select>
+</sqlMap>

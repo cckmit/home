@@ -1,0 +1,971 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="VmInfo">
+	<typeAlias alias="EBSStandardInfo"
+		type="com.neusoft.mid.cloong.web.page.console.disk.info.EBSStandardInfo" />
+	<typeAlias alias="OsInfo"
+		type="com.neusoft.mid.cloong.web.page.host.vm.order.info.OsInfo" />
+	<typeAlias alias="StandardInfo"
+		type="com.neusoft.mid.cloong.web.page.host.vm.order.info.StandardInfo" />
+	<typeAlias alias="ItemInfo"
+		type="com.neusoft.mid.cloong.web.page.host.vm.order.info.ItemInfo" />
+	<typeAlias alias="OrderInfo"
+		type="com.neusoft.mid.cloong.web.page.host.vm.order.info.OrderInfo" />
+	<typeAlias alias="OrderQueryItem"
+		type="com.neusoft.mid.cloong.web.page.user.order.OrderQueryItem" />
+	<typeAlias alias="OrderAuditInfo"
+		type="com.neusoft.mid.cloong.web.page.user.order.OrderAuditInfo" />
+	<typeAlias alias="PMStandardInfo"
+		type="com.neusoft.mid.cloong.web.page.host.pm.order.info.PMStandardInfo" />
+	<typeAlias alias="VMBAKStandardInfo"
+		type="com.neusoft.mid.cloong.web.page.vmbak.order.info.VMBAKStandardInfo" />
+	<typeAlias alias="VMStandardInfo"
+		type="com.neusoft.mid.cloong.web.page.console.host.vm.info.VMStandardInfo" />
+
+	<typeAlias alias="OrderVMInstanceInfo"
+		type="com.neusoft.mid.cloong.web.page.user.order.VMInstanceInfo" />
+	<typeAlias alias="OrderPMInstanceInfo"
+		type="com.neusoft.mid.cloong.web.page.user.order.PMInstanceInfo" />
+	<typeAlias alias="OrderVmBakInstanceInfo"
+		type="com.neusoft.mid.cloong.web.page.user.order.VmBakInstanceInfo" />
+	<typeAlias alias="OrderEBSInstanceInfo"
+		type="com.neusoft.mid.cloong.web.page.user.order.EBSInstanceInfo" />
+	<typeAlias alias="OrderPipInstanceInfo"
+		type="com.neusoft.mid.cloong.web.page.user.order.PipInstanceInfo" />
+	<typeAlias alias="OrderVlanInstanceInfo"
+		type="com.neusoft.mid.cloong.web.page.user.order.VlanInstanceInfo" />
+	<typeAlias alias="publicIpInfo"
+		type="com.neusoft.mid.cloong.web.page.console.ip.info.PublicIpInfo" />
+    <typeAlias alias="LoadBalanceInfo"
+		type="com.neusoft.mid.cloong.web.page.console.host.vm.info.LoadBalanceInfo" />
+	<typeAlias alias="FileStoreInfo"
+		type="com.neusoft.mid.cloong.web.page.console.fileStore.info.FileStoreInfo" />
+    <typeAlias alias="VfirewallInfo"
+		type="com.neusoft.mid.cloong.web.page.console.vFirewall.info.VfirewallInfo" />
+
+	<select id="queryOrderInfoByUser" resultClass="OrderInfo"
+		parameterClass="OrderQueryItem">
+		select ORDER_ID
+		orderId,
+		PARENT_ID parentId,
+		o.STATUS status,
+		CASE_TYPE
+		caseType,
+		o.CREATE_TIME createTime,
+		o.UPDATE_TIME updateTime,
+		CASE_ID
+		caseId,
+		APP_NAME appName,
+		RES_POOL_NAME resPoolName
+		from COMP_ORDER_T o
+		LEFT OUTER JOIN comp_app_t a on o.APP_ID=a.APP_ID
+		LEFT OUTER JOIN
+		COMP_RES_POOL_T p on o.RES_POOL_ID=p.RES_POOL_ID
+		WHERE
+		o.app_id IN (
+		SELECT
+		app_id
+		FROM
+		comp_authority_user_app_t
+		WHERE
+		user_id = #userId#
+		)
+		<isNotNull property="status" prepend="and">
+			o.STATUS in
+			<iterate property="status" conjunction="," close=")" open="(">
+				#status[]#
+			</iterate>
+		</isNotNull>
+		<isNull property="status" prepend="and">
+			o.status is null
+		</isNull>
+		<isNotNull prepend="and" property="caseType">
+			CASE_TYPE =
+			#caseType#
+		</isNotNull>
+		<isNotEmpty prepend="and" property="resPoolId">
+			o.RES_POOL_ID=#resPoolId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="appName">
+			upper(APP_NAME) like
+			upper(CONCAT('%',trim(#appName#),'%'))
+		</isNotEmpty>
+		ORDER BY o.UPDATE_TIME DESC,ORDER_ID
+	</select>
+	<select id="queryOrderByUserNoStatus" resultClass="OrderInfo"
+		parameterClass="OrderQueryItem">
+		SELECT
+		ORDER_ID orderId,
+		PARENT_ID parentId,
+		o.STATUS STATUS,
+		o.CREATE_TIME createTime,
+		o.UPDATE_TIME updateTime,
+		CASE_ID caseId,
+		CASE_TYPE caseType,
+		APP_NAME appName,
+		RES_POOL_NAME resPoolName
+		FROM
+		COMP_ORDER_T o
+		LEFT OUTER JOIN comp_app_t a on o.APP_ID=a.APP_ID
+		LEFT
+		OUTER JOIN COMP_RES_POOL_T p on o.RES_POOL_ID=p.RES_POOL_ID
+		WHERE
+		o.app_id IN (
+		SELECT
+		app_id
+		FROM
+		comp_authority_user_app_t
+		WHERE
+		user_id =
+		#userId#
+		)
+		<isNotNull prepend="and" property="caseType">
+			CASE_TYPE =
+			#caseType#
+		</isNotNull>
+		<isNotEmpty prepend="and" property="resPoolId">
+			o.RES_POOL_ID=#resPoolId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="appName">
+			upper(APP_NAME) like
+			upper(CONCAT('%',trim(#appName#),'%'))
+		</isNotEmpty>
+		ORDER BY o.UPDATE_TIME DESC,ORDER_ID
+	</select>
+	<select id="queryOrderInfoCountByUser" resultClass="java.lang.Integer"
+		parameterClass="OrderQueryItem">
+		select COUNT(*)
+		from COMP_ORDER_T o
+		LEFT OUTER JOIN comp_app_t a on
+		o.APP_ID=a.APP_ID
+		LEFT OUTER JOIN COMP_RES_POOL_T p on
+		o.RES_POOL_ID=p.RES_POOL_ID
+		WHERE
+		o.app_id IN (
+		SELECT
+		app_id
+		FROM
+		comp_authority_user_app_t
+		WHERE
+		user_id = #userId#
+		)
+		<isNotNull property="status" prepend="and">
+			o.STATUS in
+			<iterate property="status" conjunction="," close=")" open="(">
+				#status[]#
+			</iterate>
+		</isNotNull>
+		<isNull property="status" prepend="and">
+			o.status is null
+		</isNull>
+		<isNotNull prepend="and" property="caseType">
+			CASE_TYPE =
+			#caseType#
+		</isNotNull>
+		<isNotEmpty prepend="and" property="resPoolId">
+			o.RES_POOL_ID=#resPoolId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="appName">
+			upper(APP_NAME) like
+			upper(CONCAT('%',trim(#appName#),'%'))
+		</isNotEmpty>
+	</select>
+	<select id="queryOrderCountByUserNoStatus" resultClass="java.lang.Integer"
+		parameterClass="OrderQueryItem">
+		select COUNT(*)
+		FROM
+		COMP_ORDER_T o
+		LEFT OUTER JOIN comp_app_t a on
+		o.APP_ID=a.APP_ID
+		LEFT
+		OUTER JOIN COMP_RES_POOL_T p on
+		o.RES_POOL_ID=p.RES_POOL_ID
+		WHERE
+		o.app_id IN (
+		SELECT
+		app_id
+		FROM
+		comp_authority_user_app_t
+		WHERE
+		user_id =
+		#userId#
+		)
+		<isNotNull prepend="and" property="caseType">
+			CASE_TYPE =
+			#caseType#
+		</isNotNull>
+		<isNotEmpty prepend="and" property="resPoolId">
+			o.RES_POOL_ID=#resPoolId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="appName">
+			upper(APP_NAME) like
+			upper(CONCAT('%',trim(#appName#),'%'))
+		</isNotEmpty>
+	</select>
+	<select id="queryVmStardInfo" parameterClass="java.lang.String"
+		resultClass="StandardInfo">
+		select
+		STANDARD_ID standardId,CPU_NUM cpuNum,RAM_SIZE
+		ramSize,DISC_SIZE discSize,DESCRIPTION
+		description from
+		COMP_STANDARD_VM_T where STANDARD_ID=#standardId#
+	</select>
+	<select id="queryOsInof" parameterClass="java.lang.String"
+		resultClass="OsInfo">
+		select OS_NAME
+		osName from COMP_OS_T where OS_ID = #osId#
+	</select>
+
+	<!-- 订单表详情 -->
+	<select id="queryOrderDetailInfo" parameterClass="OrderInfo"
+		resultClass="OrderInfo">
+		select
+		o.PARENT_ID parentId,
+		o.ORDER_ID orderId,
+		o.CASE_TYPE
+		caseType,
+		o.STATUS status,
+		RES_POOL_NAME resPoolName,
+		APP_NAME appName,
+		o.LENGTH_TIME lengthTime,
+		o.LENGTH_UNIT lengthUnit,
+		o.EFFECTIVE_TIME
+		effectiveTime,
+		o.EXPIRE_TIME expireTime,
+		o.CREATE_TIME createTime,
+		o.CREATE_USER createUser,
+		o.UPDATE_TIME updateTime,
+		o.UPDATE_USER
+		updateUser
+		from COMP_ORDER_T o
+		LEFT OUTER JOIN comp_app_t a on
+		o.APP_ID=a.APP_ID
+		LEFT OUTER JOIN
+		COMP_RES_POOL_T p on
+		o.RES_POOL_ID=p.RES_POOL_ID
+		where ORDER_ID=#orderId#
+	</select>
+
+	<select id="getNetByCaseIdForOrder" parameterClass="java.lang.String"
+		resultClass="NetInfo">
+		SELECT
+		eth,
+		n.vlan_id vlanId,
+		VLAN_NAME vlanName,
+		ip,
+		IP_DEFAULT_GATEWAY gateway,
+		i.START_IP startIp,
+		i.END_IP endIp,
+		i.IPSEGMENT_ID ipSegmentId,
+		"old" flag
+		FROM
+		comp_case_vm_net_t n
+		LEFT
+		OUTER JOIN comp_vlan_ipsegment_bind_t b ON n.VLAN_ID =
+		b.VLAN_ID and
+		b.`Status` != '1'
+		LEFT OUTER JOIN comp_case_vlan_t v ON
+		n.VLAN_ID =
+		v.VLAN_ID
+		LEFT OUTER JOIN comp_case_ipsegment_t i ON
+		i.IPSEGMENT_ID =
+		b.IPSEGMENT_ID
+		WHERE
+		n.CASE_ID = #caseId#
+		and i.RELEASED='0'
+		and
+		v.CANCELED = '0'
+	</select>
+	<select id="getNetByCaseIdForOrderPm" parameterClass="java.lang.String"
+		resultClass="NetInfo">
+		SELECT
+		eth,
+		n.vlan_id vlanId,
+		VLAN_NAME vlanName,
+		ip,
+		IP_DEFAULT_GATEWAY gateway,
+		i.START_IP startIp,
+		i.END_IP endIp,
+		i.IPSEGMENT_ID ipSegmentId,
+		"old" flag
+		FROM
+		comp_case_pm_net_t n
+		LEFT
+		OUTER JOIN comp_vlan_ipsegment_bind_t b ON n.VLAN_ID =
+		b.VLAN_ID and
+		b.`Status` != '1'
+		LEFT OUTER JOIN comp_case_vlan_t v ON
+		n.VLAN_ID =
+		v.VLAN_ID
+		LEFT OUTER JOIN comp_case_ipsegment_t i ON
+		i.IPSEGMENT_ID =
+		b.IPSEGMENT_ID
+		WHERE
+		n.CASE_ID = #caseId#
+		and i.RELEASED='0'
+		and
+		v.CANCELED = '0'
+	</select>
+	<select id="getNetByCaseIdEditForOrder" parameterClass="OrderVMInstanceInfo"
+		resultClass="NetInfo">
+		SELECT
+		eth,
+		n.vlan_id vlanId,
+		VLAN_NAME vlanName,
+		ip,
+		IP_DEFAULT_GATEWAY gateway,
+		i.START_IP startIp,
+		i.END_IP endIp,
+		i.IPSEGMENT_ID ipSegmentId,
+		flag
+		FROM
+		(select
+		eth,VLAN_ID,IP,IP_DEFAULT_GATEWAY,'old' flag
+		from comp_case_vm_net_t n
+		where n.VM_ID = #vmId#
+		and ETH not in(
+		select ETH
+		from
+		comp_case_vm_mod_net_t
+		WHERE VM_ID = #vmId#
+		and TIME_STAMP = #maxTime#
+		)
+		union all
+		select m.eth,m.VLAN_ID,m.IP,m.IP_DEFAULT_GATEWAY,'edit' flag
+		from comp_case_vm_mod_net_t m ,comp_case_vm_net_t n
+		where n.VM_ID =
+		m.VM_ID
+		and n.ETH=m.ETH
+		and m.VM_ID = #vmId#
+		and TIME_STAMP = #maxTime#
+		union all
+		select eth,VLAN_ID,IP,IP_DEFAULT_GATEWAY,'add' flag
+		from
+		comp_case_vm_mod_net_t
+		WHERE VM_ID = #vmId#
+		and TIME_STAMP = #maxTime#
+		and ETH not in(
+		select ETH
+		from comp_case_vm_net_t
+		WHERE VM_ID = #vmId#
+		)
+		) n
+		LEFT OUTER JOIN comp_vlan_ipsegment_bind_t b ON n.VLAN_ID =
+		b.VLAN_ID and b.`Status` != '1'
+		LEFT OUTER JOIN comp_case_vlan_t v ON
+		n.VLAN_ID = v.VLAN_ID
+		LEFT OUTER JOIN comp_case_ipsegment_t i ON
+		i.IPSEGMENT_ID = b.IPSEGMENT_ID
+		where i.RELEASED='0'
+		and v.CANCELED =
+		'0'
+		order by eth
+	</select>
+	<select id="getNetByCaseIdEditForOrderPm" parameterClass="OrderPMInstanceInfo"
+		resultClass="NetInfo">
+		SELECT
+		eth,
+		n.vlan_id vlanId,
+		VLAN_NAME vlanName,
+		ip,
+		IP_DEFAULT_GATEWAY gateway,
+		i.START_IP startIp,
+		i.END_IP endIp,
+		i.IPSEGMENT_ID ipSegmentId,
+		flag
+		FROM
+		(select
+		eth,VLAN_ID,IP,IP_DEFAULT_GATEWAY,'old' flag
+		from comp_case_pm_net_t n
+		where n.PM_ID = #pmId#
+		and ETH not in(
+		select ETH
+		from
+		comp_case_pm_mod_net_t
+		WHERE PM_ID = #pmId#
+		and TIME_STAMP = #maxTime#
+		)
+		union all
+		select m.eth,m.VLAN_ID,m.IP,m.IP_DEFAULT_GATEWAY,'edit' flag
+		from comp_case_pm_mod_net_t m ,comp_case_pm_net_t n
+		where n.PM_ID =
+		m.PM_ID
+		and n.ETH=m.ETH
+		and m.PM_ID = #pmId#
+		and TIME_STAMP = #maxTime#
+		union all
+		select eth,VLAN_ID,IP,IP_DEFAULT_GATEWAY,'add' flag
+		from
+		comp_case_pm_mod_net_t
+		WHERE PM_ID = #pmId#
+		and TIME_STAMP = #maxTime#
+		and ETH not in(
+		select ETH
+		from comp_case_pm_net_t
+		WHERE PM_ID = #pmId#
+		)
+		) n
+		LEFT OUTER JOIN comp_vlan_ipsegment_bind_t b ON n.VLAN_ID =
+		b.VLAN_ID and b.`Status` != '1'
+		LEFT OUTER JOIN comp_case_vlan_t v ON
+		n.VLAN_ID = v.VLAN_ID
+		LEFT OUTER JOIN comp_case_ipsegment_t i ON
+		i.IPSEGMENT_ID = b.IPSEGMENT_ID
+		where i.RELEASED='0'
+		and v.CANCELED =
+		'0'
+		order by eth
+	</select>
+	<!--查询实例信息 -->
+	<select id="queryVmInstanceInfo" parameterClass="java.lang.String"
+		resultClass="OrderVMInstanceInfo">
+		SELECT
+		case1.CASE_ID caseId,
+		case1.PARAM_FLAG paramFlag,
+		case1.PM_ID pmId,
+		case1.VM_ID vmId,
+		case1.VM_NAME vmName,
+		case1.VM_PASSWORD vmPassword,
+		case1.STANDARD_ID standardId,
+		case1.STATUS status,
+		case1.RES_POOL_ID
+		resPoolId,
+		case1.RES_POOL_NAME
+		resPoolName,
+		case1.RES_POOL_PART_NAME
+		resPoolPartName,
+		case1.RES_POOL_PART_ID resPoolPartId,
+		case1.ORDER_ID
+		orderId,
+		case1.CPU_NUM cpuNum,
+		case1.RAM_SIZE ramSize,
+		case1.DISC_SIZE
+		discSize,
+		case1.ISO_ID isoId,
+		case1.ISO_DESCRIPTION isoDescription,
+		case1.ISO_NAME isoName,
+		case1.DESCRIPTION description,
+		item.ITEM_NAME
+		itemName,
+		item.ITEM_ID itemId
+		FROM
+		COMP_CASE_VM_T case1
+		LEFT JOIN
+		COMP_ITEM_T item ON
+		case1.ITEM_ID = item.ITEM_ID
+		WHERE
+		case1.ORDER_ID=#orderId#
+	</select>
+	<select id="queryPmInstanceInfo" parameterClass="java.lang.String"
+		resultClass="OrderPMInstanceInfo">
+		SELECT
+		o.CASE_ID caseId,
+		o.PARAM_FLAG paramFlag,
+		o.PM_ID
+		pmId,
+		o.PM_NAME pmName,
+		o.PM_PASSWORD pmPassword,
+		o.STANDARD_ID
+		standardId,
+		o.STATUS status,
+		o.RES_POOL_ID resPoolId,
+		o.RES_POOL_NAME
+		resPoolName,
+		o.RES_POOL_PART_NAME resPoolPartName,
+		o.RES_POOL_PART_ID
+		resPoolPartId,
+		o.ORDER_ID orderId,
+		o.CPU_TYPE cpuType,
+		o.RAM_SIZE
+		ramSize,
+		o.DISC_SIZE discSize,
+		o.ISO_ID isoId,
+		os.DESCRIPTION
+		isoDescription,
+		os.OS_NAME isoName,
+		o.DESCRIPTION description,
+		item.ITEM_NAME itemName,
+		item.ITEM_ID itemId,
+		o.APP_ID appId,
+		APP_NAME
+		appName,
+		o.UPDATE_TIME updateTime,
+		o.UPDATE_USER updateUser,
+		SERVER_TYPE
+		serverType
+		FROM
+		COMP_CASE_PM_T o
+		LEFT JOIN COMP_ITEM_T item ON o.ITEM_ID
+		= item.ITEM_ID
+		LEFT OUTER
+		JOIN comp_app_t a on o.APP_ID=a.APP_ID
+		LEFT
+		OUTER JOIN comp_os_t os on
+		o.ISO_ID=os.OS_ID
+		WHERE o.ORDER_ID=#orderId#
+	</select>
+	<!-- ?? -->
+	<select id="getMaxTime" parameterClass="java.lang.String"
+		resultClass="java.lang.String">
+		SELECT
+		MAX(TIME_STAMP) maxTime
+		FROM
+		(
+		SELECT
+		MAX(TIME_STAMP)
+		TIME_STAMP
+		FROM
+		comp_case_vm_mod_t
+		WHERE
+		VM_ID = #vmId#
+		UNION ALL
+		SELECT
+		MAX(TIME_STAMP) TIME_STAMP
+		FROM
+		comp_case_vm_mod_net_t
+		WHERE
+		VM_ID =
+		#vmId#
+		) t
+	</select>
+	<select id="getMaxTimePm" parameterClass="java.lang.String"
+		resultClass="java.lang.String">
+		SELECT
+		MAX(TIME_STAMP) maxTime
+		FROM
+		(
+		SELECT
+		MAX(TIME_STAMP)
+		TIME_STAMP
+		FROM
+		comp_case_pm_mod_t
+		WHERE
+		PM_ID = #pmId#
+		UNION ALL
+		SELECT
+		MAX(TIME_STAMP) TIME_STAMP
+		FROM
+		comp_case_pm_mod_net_t
+		WHERE
+		PM_ID =
+		#pmId#
+		) t
+	</select>
+	<select id="queryVmInstanceInfoEdit" parameterClass="OrderVMInstanceInfo"
+		resultClass="OrderVMInstanceInfo">
+		SELECT
+		VM_NAME vmName,
+		CPU_NUM cpuNum,
+		RAM_SIZE ramSize,
+		DISC_SIZE discSize
+		FROM
+		COMP_CASE_VM_MOD_T
+		WHERE
+		VM_ID=#vmId#
+		and
+		TIME_STAMP = #maxTime#
+	</select>
+	<select id="queryPmInstanceInfoEdit" parameterClass="OrderPMInstanceInfo"
+		resultClass="OrderPMInstanceInfo">
+		SELECT
+		PM_NAME pmName
+		FROM
+		COMP_CASE_PM_MOD_T
+		WHERE
+		PM_ID=#pmId#
+		and TIME_STAMP =
+		#maxTime#
+	</select>
+	<!-- 获取订单对应的虚拟机备份实例信息 -->
+	<select id="queryBkInstanceInfo" parameterClass="java.lang.String"
+		resultClass="OrderVmBakInstanceInfo">
+		SELECT
+		o.CASE_ID caseId,
+		o.VM_ID vmId,
+		VM_NAME vmName,
+		VMBAK_NAME vmBakName,
+		BACKUP_CYC backupCyc,
+		BACK_STORE_TIME
+		backStoreTime,
+		BACKUP_START_TIME backupStartTime,
+		o.DESCRIPTION
+		description,
+		o.RES_POOL_ID resPoolId,
+		o.RES_POOL_PART_ID resPoolPartId,
+		p.RES_POOL_PART_NAME resPoolPartName
+		FROM
+		COMP_CASE_VMBAK_T o
+		INNER JOIN
+		COMP_CASE_VM_T v on o.VM_ID=v.VM_ID
+		LEFT OUTER JOIN
+		COMP_RES_POOL_PART_T p on o.RES_POOL_ID=p.RES_POOL_ID and
+		o.RES_POOL_PART_ID=p.RES_POOL_PART_ID
+		WHERE
+		o.ORDER_ID=#orderId#
+	</select>
+
+	<!-- 获取订单对应的块实例信息 -->
+	<select id="queryEBSInstanceInfo" parameterClass="java.lang.String"
+		resultClass="OrderEBSInstanceInfo">
+		SELECT
+		CASE_ID caseId,
+		EBS_ID ebsId,
+		EBS_NAME ebsName,
+		o.APP_ID appId,
+		APP_NAME appName,
+		o.STANDARD_ID
+		standardId,
+		o.ITEM_ID
+		itemId,
+		ITEM_NAME itemName,
+		DISK_SIZE diskSize,
+		resourceType,
+		ORDER_ID
+		orderId,
+		ACCEPT_TIME acceptTime,
+		o.RES_POOL_ID resPoolId,
+		o.RES_POOL_PART_ID resPoolPartId,
+		RES_POOL_PART_NAME resPoolPartName,
+		HOST_ID hostId,
+		o.DESCRIPTION description,
+		o.CREATE_TIME
+		createTime,
+		o.CREATE_USER createUser,
+		o.UPDATE_TIME updateTime,
+		o.UPDATE_USER
+		updateUser
+		FROM
+		COMP_CASE_EBS_T o
+		LEFT OUTER JOIN COMP_RES_POOL_PART_T p
+		on o.RES_POOL_ID=p.RES_POOL_ID and
+		o.RES_POOL_PART_ID=p.RES_POOL_PART_ID
+		LEFT OUTER JOIN COMP_ITEM_T i on
+		o.ITEM_ID=i.ITEM_ID
+		LEFT
+		OUTER JOIN comp_app_t a on o.APP_ID=a.APP_ID
+		WHERE
+		ORDER_ID=#orderId#
+	</select>
+
+	<select id="queryEBSInstanceInfoEdit" parameterClass="java.lang.String"
+		resultClass="OrderEBSInstanceInfo">
+		SELECT
+		DISK_SIZE diskSize
+		FROM
+		COMP_CASE_EBS_MOD_T
+		WHERE
+		EBS_ID=#ebsId#
+		and UPDATE_TIME = (SELECT MAX(UPDATE_TIME)
+		FROM
+		COMP_CASE_EBS_MOD_T where EBS_ID=#ebsId#)
+	</select>
+	<select id="queryPipInstanceInfo" parameterClass="java.lang.String"
+		resultClass="OrderPipInstanceInfo">
+		SELECT
+		CASE_ID caseId,
+		IPSEGMENT_DESC ipsegmentDesc,
+		START_IP startIp,
+		END_IP endIp,
+		CONCAT(START_IP," -
+		",END_IP)
+		startToEndIp,
+		IP_TOTAL ipTotal,
+		o.RES_POOL_PART_ID resPoolPartId,
+		RES_POOL_PART_NAME
+		resPoolPartName,
+		o.APP_ID appId,
+		APP_NAME appName,
+		IPSEGMENT_ID ipsegmentId,
+		o.RES_POOL_ID
+		resPoolId
+		FROM
+		COMP_CASE_IPSEGMENT_T o
+		LEFT OUTER JOIN COMP_RES_POOL_PART_T p on
+		o.RES_POOL_ID=p.RES_POOL_ID and o.RES_POOL_PART_ID=p.RES_POOL_PART_ID
+		LEFT OUTER JOIN
+		comp_app_t a on o.APP_ID=a.APP_ID
+		WHERE
+		ORDER_ID=#orderId#
+	</select>
+	<select id="queryVlanInstanceInfo" parameterClass="java.lang.String"
+		resultClass="OrderVlanInstanceInfo">
+		SELECT
+		CASE_ID caseId,
+		VLAN_ID vlanId,
+		VLAN_NAME vlanName,
+		o.RES_POOL_ID resPoolId,
+		o.RES_POOL_PART_ID
+		resPoolPartId,
+		RES_POOL_PART_NAME resPoolPartName,
+		o.APP_ID appId,
+		APP_NAME appName
+		FROM
+		COMP_CASE_VLAN_T o
+		LEFT OUTER JOIN COMP_RES_POOL_PART_T p on
+		o.RES_POOL_ID=p.RES_POOL_ID and
+		o.RES_POOL_PART_ID=p.RES_POOL_PART_ID
+		LEFT OUTER JOIN comp_app_t a on o.APP_ID=a.APP_ID
+		WHERE
+		ORDER_ID=#orderId#
+	</select>
+
+	<select id="queryEBSStardInfo" parameterClass="java.lang.String"
+		resultClass="EBSStandardInfo">
+		SELECT
+		STANDARD_ID standardId,
+		DISC_SIZE discSize,
+		DESCRIPTION description
+		FROM
+		COMP_STANDARD_EBS_T
+		WHERE
+		STANDARD_ID=#standardId#
+	</select>
+	<select id="queryOrderAuditInfo" parameterClass="java.lang.String"
+		resultClass="OrderAuditInfo">
+		select
+		ORDER_ID orderId,
+		STATUS status,
+		AUDIT_TIME auditTime,
+		AUDIT_USER auditUser,
+		AUDIT_INFO auditInfo
+		from
+		COMP_ORDER_AUDIT_LOG_T
+		where
+		ORDER_ID=#orderId#
+		and AUDIT_TIME = (SELECT MAX(AUDIT_TIME) FROM
+		COMP_ORDER_AUDIT_LOG_T)
+	</select>
+	<!--订单审批 查询物理机规格信息 -->
+	<select id="queryPMStardInfo" parameterClass="java.lang.String"
+		resultClass="PMStandardInfo">
+		SELECT
+		STANDARD_ID standardId,
+		STANDARD_NAME standardName,
+		SERVER_TYPE serverType,
+		CPU_NUM cpuNum,
+		RAM_SIZE ramSize,
+		DISC_SIZE
+		discSize,
+		DESCRIPTION description
+		FROM
+		comp_standard_pm_t
+		WHERE
+		STANDARD_ID=#standardId#
+	</select>
+	<!--订单审批 查询虚拟机备份规格信息 -->
+	<select id="queryBKStardInfo" parameterClass="java.lang.String"
+		resultClass="VMBAKStandardInfo">
+		SELECT
+		STANDARD_ID standardId,
+		SPACE_SIZE spaceSize,
+		DESCRIPTION description
+		FROM
+		COMP_STANDARD_VMBAK_T
+		WHERE
+		STANDARD_ID=#standardId#
+	</select>
+	<select id="queryModifyOrderDetailInfo" parameterClass="OrderInfo"
+		resultClass="OrderInfo">
+		select
+		o.ORDER_ID orderId,
+		o.STATUS status,
+		o.CASE_TYPE
+		caseType,
+		o.CASE_ID caseId,
+		o.LENGTH_TIME lengthTime,
+		o.LENGTH_UNIT
+		lengthUnit,
+		o.CREATE_TIME createTime,
+		o.CREATE_USER createUser,
+		o.EFFECTIVE_TIME effectiveTime,
+		o.EXPIRE_TIME expireTime,
+		i.ITEM_NAME
+		itemName,
+		i.ITEM_ID itemId,
+		h.TIME_STAMP
+		from COMP_ORDER_T o,
+		comp_case_vm_mod_t h, comp_item_t i
+		where h.ITEM_ID = i.ITEM_ID
+		and
+		ORDER_ID=#orderId#
+		and h.TIME_STAMP = (SELECT MAX(TIME_STAMP) FROM
+		comp_case_vm_mod_t)
+	</select>
+	<select id="queryVmModifyStardInfo" parameterClass="java.lang.String"
+		resultClass="VMStandardInfo">
+		select a.STANDARD_ID standardId,a.CPU_NUM
+		cpuNum,a.RAM_SIZE
+		ramSize,a.DISC_SIZE
+		discSize,a.DESCRIPTION
+		description, max(b.TIME_STAMP)
+		from COMP_STANDARD_VM_T a,
+		COMP_CASE_VM_MOD_T b
+		where a.STANDARD_ID = b.STANDARD_ID
+		AND
+		a.STANDARD_ID=#standardId#
+	</select>
+	<!-- 查询待修改的虚拟机信息 -->
+	<select id="selectVMModifyInfo" parameterClass="java.lang.String"
+		resultClass="OrderVMInstanceInfo">
+		select
+		b.ORDER_ID orderId, a.VM_ID vmId,a.CPU_NUM
+		cpuNum,a.RAM_SIZE ramSize,a.DISC_SIZE_ADD
+		discSizeAdd, b.DISC_SIZE
+		discSize, a.ITEM_ID itemId ,
+		a.STANDARD_ID standardId, a.RES_POOL_ID
+		resPoolId, a.RES_POOL_PART_ID resPoolPartId,TIME_STAMP
+		from
+		COMP_CASE_VM_MOD_T a,
+		COMP_CASE_VM_T b
+		where a.VM_ID=b.VM_ID
+		AND
+		b.ORDER_ID=#orderId#
+		and a.TIME_STAMP = (SELECT
+		MAX(TIME_STAMP) FROM
+		comp_case_vm_mod_t)
+	</select>
+
+	<!-- 资源池查询条件 -->
+	<select id="getResPoolList" resultClass="OrderQueryItem">
+		SELECT RES_POOL_ID
+		resPoolId, RES_POOL_NAME resPoolName
+		FROM COMP_RES_POOL_T
+		WHERE STATUS =
+		'1'
+	</select>
+	<!-- 通过pmId查物理机名称 -->
+	<select id="queryPmNameByPmId" parameterClass="java.lang.String"
+		resultClass="java.lang.String">
+		SELECT PM_NAME FROM `comp_rm_pm_t` WHERE PM_ID=#pmId#
+	</select>
+
+	<select id="queryPublicIpInstanceInfo" parameterClass="java.lang.String"
+		resultClass="publicIpInfo">
+		SELECT
+		o.CASE_ID AS caseId,
+		o.PUBLIC_IP AS publicIp,
+		o.HOST_ID AS hostId,
+		o.APP_ID AS appId,
+		o.`STATUS` AS status,
+		o.ORDER_ID AS orderId,
+		o.CREATE_TIME AS createTime,
+		o.CREATE_USER AS createUser,
+		o.UPDATE_TIME AS updateTime,
+		o.UPDATE_USER AS updateUser,
+		o.DESCRIPTION AS description,
+		o.RES_POOL_ID AS resPoolId,
+		o.RES_POOL_PART_ID AS resPoolPartId,
+		p.RES_POOL_PART_NAME AS resPoolPartName
+		FROM
+		comp_case_publicip_t o
+		LEFT OUTER JOIN COMP_RES_POOL_PART_T p ON o.RES_POOL_ID = p.RES_POOL_ID
+		AND o.RES_POOL_PART_ID = p.RES_POOL_PART_ID
+		WHERE
+		o.ORDER_ID = #orderId#
+	</select>
+	
+	<select id="queryLoadBalanceInstanceInfo" parameterClass="java.lang.String"
+		resultClass="loadbalanceInfo">
+		SELECT
+	    l.LBID AS LBid,
+	    l.lb_name AS lbname,
+	    l.LBIP AS lbip,
+	    l.LBPort AS lbport,
+	    l.Protocal AS protocal,
+	    l.LBStrategy AS Strategy,
+	    l.Throughput AS Throughput,
+	    l.ConnectNum AS KbpsConnectNum,
+	    l.NewConnectNum AS NewConnectNum,
+	    l.virtual_name AS virtualname,
+	    l.group_name AS group_name,
+	    l.LBTemplateID AS LBTemplateID,
+	    l.LBDeviceID AS LBDeviceID,
+	    l.create_user AS createuser,
+	    l.create_time AS createtime,
+	    l.create_status AS STATUS,
+	    l.vlb_obj_id AS vlb_obj_id,
+	    l.AppId AS appid,
+	    a.APP_NAME AS appname,
+	    l.LBType AS LBType,
+	    l.VlanId AS vlanId,
+	    l.IPSEGMENT_ID AS IPSEGMENT_ID,
+	    p.RES_POOL_ID AS respoolId,
+	    p.RES_POOL_NAME AS respoolname,
+	    p.RES_POOL_PART_ID AS respoolPartId,
+	    p.RES_POOL_PART_NAME AS respoolPartname,
+	    o.ORDER_ID AS orderId
+        FROM
+	    comp_load_balance_service_tab l
+        LEFT JOIN comp_app_t a ON l.AppId = a.APP_ID
+        LEFT JOIN comp_res_pool_part_t p ON l.respoolId = p.RES_POOL_ID
+        LEFT JOIN comp_order_t o ON o.CASE_ID = l.LBID
+		WHERE
+		o.ORDER_ID = #orderId#
+	</select>
+
+    <select id="queryFileStoreInstanceInfo" parameterClass="java.lang.String"
+		resultClass="fileStoreInfo">
+		SELECT
+	    f.CASE_ID AS caseId,
+	    f.ORDER_ID AS orderId,
+	    f.FS_TEMPLATE_ID AS fsTemplateId,
+	    f.FS_QUOTASIZE AS fsQuotaSize,
+	    f.FS_ADMIN_USER AS fsAdminUser,
+	    f.FS_ADMIN_PASSWORD AS fsAdminPassword,
+	    f.FS_URL AS fsUrl,
+	    f.RES_POOL_ID AS resPoolId,
+	    f.RES_POOL_PART_ID AS resPoolPartId,
+	    p.RES_POOL_NAME AS resPoolName,
+	    p.RES_POOL_PART_NAME AS resPoolPartName,
+	    f.`STATUS` AS STATUS,
+	    f.FS_ID AS fsId,
+	    f.FS_NAME AS fsName,
+	    f.CREATE_TYPE AS createType,
+	    f.CREATE_USER AS createUser,
+	    f.CREATE_TIME AS updateTime,
+	    f.DESCRIPTION AS description,
+	    f.UPDATE_USER AS updateUser,
+	    f.UPDATE_TIME AS updateTime,
+	    f.APP_ID AS appId,
+	    a.APP_NAME AS appName
+        FROM
+	    comp_case_fs_t f
+        LEFT JOIN comp_app_t a ON a.APP_ID = f.APP_ID
+        LEFT JOIN comp_res_pool_part_t p ON f.RES_POOL_PART_ID = p.RES_POOL_PART_ID
+        AND f.RES_POOL_ID = p.RES_POOL_ID
+        WHERE
+	    f.ORDER_ID = #orderId#
+	</select>
+
+    <select id="queryVFireWallInstanceInfo" parameterClass="java.lang.String"
+		resultClass="vfireWallInfo">
+		SELECT
+	    f.CASE_ID AS caseId,
+	    f.FW_ID AS fwId,
+	    f.FW_NAME AS fwName,
+	    f.ORDER_ID AS orderId,
+	    f.APP_ID AS appId,
+	    a.APP_NAME AS appName,
+	    f.RES_POOL_ID AS resPoolId,
+	    pool.RES_POOL_NAME AS resPoolName,
+	    f.RES_POOL_PART_ID AS resPoolPartId,
+	    part.RES_POOL_PART_NAME AS resPoolPartName,
+	    f.CREATE_USER AS createUser,
+	    f.CREATE_TIME AS createTime,
+	    f.`STATUS` AS STATUS,
+	    f.DESCRIPTION AS description,
+	    f.UPDATE_USER AS updateUser,
+	    f.UPDATE_TIME AS updateTime
+        FROM
+	    comp_case_fw_t f
+        LEFT JOIN comp_app_t a ON a.APP_ID = f.APP_ID
+        LEFT JOIN comp_res_pool_t pool ON pool.RES_POOL_ID = f.RES_POOL_ID
+        LEFT JOIN comp_res_pool_part_t part ON part.RES_POOL_PART_ID = f.RES_POOL_PART_ID
+        WHERE
+	    f.ORDER_ID = #orderId#		
+	</select>
+
+</sqlMap>

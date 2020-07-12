@@ -1,0 +1,64 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.neusoft.mid.cloong</groupId>
+		<artifactId>COMP_Parent</artifactId>
+		<version>0.0.0.1-SNAPSHOT</version>
+	</parent>
+	<artifactId>COMP_Common</artifactId>
+	<!--添加以下内容，该段表示工程发布版本和快照版本到指定的仓库位置 -->
+	<distributionManagement>
+		<repository>
+			<uniqueVersion>true</uniqueVersion>
+			<id>MID-Maven-Releases</id>
+			<name>MID Maven Releases Repository</name>
+			<url>http://10.100.22.192:8081/nexus/content/repositories/releases/</url>
+		</repository>
+		<snapshotRepository>
+			<uniqueVersion>true</uniqueVersion>
+			<id>MID-Maven-Snapshots</id>
+			<name>MID Maven Snapshots Repository</name>
+			<url>http://10.100.22.192:18888/nexus/content/repositories/snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
+	<!-- END -->
+
+	<!--添加以下内容，该段表示工程发布到SVN的trunk目录 -->
+	<scm>
+		<connection>scm:svn:http://10.10.125.150/svn2/COMP/COMP/src/trunk/COMP_Parent/COMP_Common</connection>
+		<developerConnection>scm:svn:http://10.10.125.150/svn2/COMP/COMP/src/trunk/COMP_Parent/COMP_Common</developerConnection>
+		<url>scm:svn:http://10.10.125.150/svn2/COMP/COMP/src/trunk/COMP_Parent/COMP_Common</url>
+	</scm>
+	<!-- END -->
+	<build />
+
+	<dependencies>
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+			<version>1.4.7</version>
+		</dependency>
+	<dependency>
+  <groupId>commons-codec</groupId>
+  <artifactId>commons-codec</artifactId>
+  <version>1.5</version>
+</dependency>
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.3</version>
+		</dependency>
+		<dependency>
+			<groupId>com.neusoft.iamp</groupId>
+			<artifactId>iamp-api</artifactId>
+			<version>0.3.0.2</version>
+			<exclusions>
+				<exclusion>
+					<groupId>ognl</groupId>
+					<artifactId>ognl</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+	</dependencies>
+</project>

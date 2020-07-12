@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="VMBAKResCount">
+	<typeAlias alias="VMBAKResCountInfo"
+		type="com.neusoft.mid.cloong.resourcePool.businessOpt.resStat.notify.bean.VMBAKResCountBean" />
+	<select id="getCountVMBAKById" parameterClass="java.util.HashMap"
+		resultClass="java.lang.String">
+		select t.vmbak_id
+		from comp_vmbak_res_count_t t
+		where t.vmbak_id in (
+		<iterate property="consume" conjunction=",">
+			#consume[].netWorkResouseID#
+		</iterate>
+		<![CDATA[
+			)
+			and t.res_pool_id = #poolId#
+			and t.res_pool_part_id = #partId#
+			and ((t.start_time >= #startTime# and t.end_time <= #endTime#)
+			or (t.start_time<= #startTime# and t.end_time >= #endTime#)
+			or (t.start_time > #startTime# and t.start_time < #endTime# and
+			t.end_time > #endTime#)
+			or (t.start_time < #startTime# and t.end_time > #endTime# and t.end_time
+			< #endTime#)
+			)
+		]]>
+	</select>
+
+	<select id="getExistVMBAKId" parameterClass="java.util.HashMap"
+		resultClass="java.lang.String">
+		select vmbak_id from(
+		<iterate property="consume" conjunction="UNION">
+			select
+			#consume[].netWorkResouseID# vmbak_id
+			from dual
+		</iterate>
+		) a
+		where (vmbak_id) not in 
+		(SELECT
+		vmbak_id
+		FROM
+		COMP_CASE_VMBAK_T
+		WHERE
+		res_pool_id = #resPoolId#
+		AND res_pool_part_id = #resPoolPartId#)
+	</select>
+
+	<insert id="insertVMBAKCount" parameterClass="VMBAKResCountInfo">
+		insert into
+		comp_vmbak_res_count_t
+		(VMBAK_ID,
+		START_TIME,
+		END_TIME,
+		PERIOD_TIME,
+		SIZE_USED,
+		STANDARD_ID,
+		STANDARD_NAME,
+		OWN_USER,
+		RES_POOL_ID,
+		RES_POOL_PART_ID,
+		CREATE_TIME)
+		select
+		#vmbakId#,
+		#startTime#,
+		#endTime#,
+		#periodTime#,
+		#sizeUsed#,
+		caset.standard_id,
+		standt.standard_name,
+		caset.own_user,
+		caset.res_pool_id,
+		caset.res_pool_part_id,
+		#createTime#
+		from
+		comp_case_vmbak_t caset
+		left join
+		comp_standard_vmbak_t standt
+		on
+		caset.standard_id = standt.standard_id
+		where
+		caset.vmbak_id = #vmbakId# and caset.res_pool_id
+		= #resPoolId# and
+		caset.res_pool_part_id = #resPoolPartId#
+	</insert>
+</sqlMap>

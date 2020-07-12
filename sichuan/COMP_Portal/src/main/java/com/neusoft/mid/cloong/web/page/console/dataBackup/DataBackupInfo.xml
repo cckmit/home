@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="dataBackup">
+	<!-- <typeAlias alias="diskDetail"
+		type="com.neusoft.mid.cloong.web.page.console.disk.info.DiskInfo" />
+	<typeAlias alias="instanceInfo"
+		type="com.neusoft.mid.cloong.web.page.ebs.order.info.EBSInstanceInfo" />
+	<typeAlias alias="orderInfo"
+		type="com.neusoft.mid.cloong.web.page.host.vm.order.info.OrderInfo" />
+ -->
+	<!-- <select id="queryDiskDetail" parameterClass="diskDetail"
+		resultClass="diskDetail">
+		SELECT
+		c.CASE_ID caseId,
+		c.EBS_ID diskId,
+		c.HOST_ID hostId,
+		c.EBS_NAME diskName,
+		c.ResourceType,
+		c.EFFECTIVE_TIME createTime,
+		c.EXPIRE_TIME
+		expireTime,
+		c.DISK_SIZE diskSize,
+		c.LENGTH_TIME diskLength,
+		c.LENGTH_UNIT timeUnit,
+		vm.VM_NAME mountVmName,
+		c. STATUS diskStatus,
+		c.CREATE_USER createUser,
+		c.RES_POOL_ID resourcePoolId,
+		c.RES_POOL_PART_ID resourcePoolPartId,
+		app_name appName,
+		c.app_id
+		businessId
+		FROM
+		(
+		SELECT
+		ebs.CASE_ID,
+		ebs. STATUS,
+		ebs.EBS_ID,
+		ebs.EBS_NAME,
+		ebs.ResourceType,
+		order1.EFFECTIVE_TIME,
+		order1.EXPIRE_TIME,
+		ebs.DISK_SIZE,
+		order1.LENGTH_TIME,
+		order1.LENGTH_UNIT,
+		ebs.HOST_ID,
+		ebs.CREATE_USER,
+		ebs.RES_POOL_ID,
+		ebs.RES_POOL_PART_ID,
+		ebs.app_id
+		FROM
+		COMP_CASE_EBS_T ebs
+		LEFT JOIN
+		COMP_ORDER_T order1
+		ON
+		ebs.ORDER_ID = order1.ORDER_ID
+		LEFT JOIN
+		COMP_STANDARD_EBS_T stand
+		ON
+		ebs.STANDARD_ID = stand.STANDARD_ID
+		WHERE
+		order1. STATUS != '2'
+		<isNotEmpty prepend="AND" property="diskId">
+			ebs.EBS_ID = #diskId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="caseId">
+			ebs.CASE_ID = #caseId#
+		</isNotEmpty>
+		) c
+		LEFT OUTER JOIN
+		COMP_CASE_VM_T vm ON c.HOST_ID = vm.VM_ID
+		LEFT JOIN comp_app_t app ON
+		c.app_id = app.APP_ID
+	</select>
+	<select id="queryDiskOwner" parameterClass="java.lang.String"
+		resultClass="java.lang.String">
+		select CREATE_USER from COMP_CASE_EBS_T where
+		EBS_ID=#diskId#
+	</select>
+	<update id="updateDiskName" parameterClass="instanceInfo">
+		update
+		COMP_CASE_EBS_T set EBS_NAME=#ebsName# where EBS_ID=#ebsId# and
+		STATUS!='10'
+	</update>
+
+	<insert id="ebsModifyDiskSize" parameterClass="diskDetail">
+		insert into
+		comp_case_ebs_mod_t values
+		(#diskId#,#resourcePoolId#,#resourcePoolPartId#,#diskSize#,#createTime#)
+	</insert>
+
+	<update id="deleteDisk" parameterClass="java.lang.String">
+		update
+		COMP_CASE_EBS_T set
+		STATUS='10' where EBS_ID=#diskId# and STATUS!='10'
+	</update>
+	<select id="qureyDiskInfo" parameterClass="java.lang.String"
+		resultClass="diskDetail">
+		select ebs.EBS_ID diskId,ebs.STATUS diskStatus,ebs.APP_ID businessId,
+		ebs.CREATE_USER createUser,vm.VM_NAME mountVmName from (select * from
+		COMP_CASE_EBS_T where EBS_ID=#diskId#) ebs left
+		outer join
+		COMP_CASE_VM_T vm on
+		ebs.HOST_ID = vm.VM_ID
+	</select>
+
+	<select id="queryEBSUserList" parameterClass="diskDetail"
+		resultClass="diskDetail">
+		SELECT
+		ce.case_id caseId,
+		ce.order_id orderId,
+		ebs_id diskId,
+		ce.resourceType,
+		ebs_name
+		diskName,
+		ce.res_pool_id resourcePoolId,
+		ce.res_pool_part_id
+		resourcePoolPartId,
+		ce.status
+		diskStatus,
+		ce.CREATE_USER
+		createUser,
+		o.EFFECTIVE_TIME
+		createTime,
+		length_time
+		diskLength,
+		o.EXPIRE_TIME
+		expireTime,
+		ce.disk_size
+		diskSize,
+		ce.app_id businessId,
+		app_name appName,
+		ce.CREATE_TIME orderTime
+		FROM
+		comp_case_ebs_t ce
+		LEFT JOIN comp_order_t o ON
+		ce.order_id=o.order_id
+		LEFT JOIN
+		comp_standard_ebs_t se on
+		ce.standard_id=se.standard_id
+		LEFT JOIN
+		comp_app_t app on ce.app_id =
+		app.app_id
+		WHERE
+		ce.status !='10'
+		AND
+		o.order_id IS NOT NULL
+		AND
+		o.status != '2'
+		<isNotEmpty prepend="and" property="hostId">
+			ce.host_id = #hostId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="diskId">
+			ce.ebs_id = #diskId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="diskName">
+			ce.ebs_name = #diskName#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="diskSize">
+			se.disc_size =
+			#diskSize#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="resourceType">
+			ce.resourceType = #resourceType# 
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="businessList">
+			ce.app_id in
+			<iterate property="businessList" open="(" conjunction=","
+				close=")">
+				#businessList[]#
+			</iterate>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="businessId">
+			ce.app_id = #businessId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="statusList">
+			ce.status in
+			<iterate property="statusList" open="(" conjunction=","
+				close=")">
+				#statusList[]#
+			</iterate>
+		</isNotEmpty>
+		order by orderTime DESC
+	</select>
+
+	<select id="queryEBSUserCount" parameterClass="diskDetail"
+		resultClass="java.lang.Integer">
+		SELECT
+		count(*)
+		FROM
+		comp_case_ebs_t ce
+		LEFT JOIN comp_order_t o ON
+		ce.order_id=o.order_id
+		LEFT JOIN
+		comp_standard_ebs_t se on
+		ce.standard_id=se.standard_id
+		LEFT JOIN
+		comp_app_t app on ce.app_id =
+		app.app_id
+		WHERE
+		ce.status !='10'
+		AND
+		o.order_id IS NOT NULL
+		AND
+		o.status != '2'
+		<isNotEmpty prepend="and" property="hostId">
+			ce.host_id = #hostId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="diskId">
+			ce.ebs_id = #diskId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="diskName">
+			ce.ebs_name = #diskName#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="resourceType">
+			ce.resourceType = #resourceType# 
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="diskSize">
+			se.disc_size = #diskSize#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="businessList">
+			ce.app_id in
+			<iterate property="businessList" open="(" conjunction=","
+				close=")">
+				#businessList[]#
+			</iterate>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="businessId">
+			ce.app_id = #businessId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="statusList">
+			ce.status in
+			<iterate property="statusList" open="(" conjunction=","
+				close=")">
+				#statusList[]#
+			</iterate>
+		</isNotEmpty>
+	</select>
+
+
+	<select id="queryEBSUserListByBusinessId" parameterClass="diskDetail"
+		resultClass="diskDetail">
+		SELECT
+		ce.case_id caseId,
+		ebs_id diskId,
+		ebs_name diskName,
+		ce. STATUS
+		diskStatus,
+		ce.CREATE_USER createUser,
+		o.EFFECTIVE_TIME createTime,
+		length_time diskLength,
+		o.EXPIRE_TIME expireTime,
+		ce.disk_size diskSize,
+		ce.app_id businessId,
+		APP_NAME appName
+		FROM
+		comp_case_ebs_t ce
+		LEFT JOIN
+		comp_order_t o ON ce.order_id = o.order_id
+		LEFT JOIN
+		comp_standard_ebs_t se ON ce.standard_id = se.standard_id
+		INNER JOIN
+		comp_app_t app ON ce.app_id = app.app_id
+		WHERE
+		ce. STATUS != '10'
+		AND
+		o.order_id IS NOT NULL
+		AND o. STATUS != '2'
+		AND
+		ce.app_id in
+		<iterate property="businessList" open="(" conjunction=","
+			close=")">
+			#businessList[]#
+		</iterate>
+		<isNotEmpty prepend="and" property="statusList">
+			ce.status in
+			<iterate property="statusList" open="(" conjunction=","
+				close=")">
+				#statusList[]#
+			</iterate>
+		</isNotEmpty>
+	</select>
+
+	<select id="queryEBSUserListCountByBusinessId" parameterClass="diskDetail"
+		resultClass="java.lang.Integer">
+		SELECT
+		count(*)
+		FROM
+		comp_case_ebs_t ce
+		LEFT JOIN
+		comp_order_t o ON
+		ce.order_id = o.order_id
+		LEFT JOIN
+		comp_standard_ebs_t se ON
+		ce.standard_id = se.standard_id
+		INNER JOIN
+		comp_app_t app ON ce.app_id =
+		app.app_id
+		WHERE
+		ce. STATUS != '10'
+		AND
+		o.order_id IS NOT NULL
+		AND o. STATUS != '2'
+		AND
+		ce.app_id in
+		<iterate property="businessList" open="(" conjunction=","
+			close=")">
+			#businessList[]#
+		</iterate>
+		<isNotEmpty prepend="and" property="statusList">
+			ce.status in
+			<iterate property="statusList" open="(" conjunction=","
+				close=")">
+				#statusList[]#
+			</iterate>
+		</isNotEmpty>
+	</select>
+
+	<select id="queryStatusByEBSIdOwner" parameterClass="java.util.Map"
+		resultClass="diskDetail">
+		SELECT
+		ce.case_id caseId,
+		ebs_id diskId,
+		ebs_name diskName,
+		ce.status
+		diskStatus,
+		ce.CREATE_USER
+		createUser,
+		o.EFFECTIVE_TIME createTime,
+		length_time
+		diskLength,
+		o.EXPIRE_TIME expireTime,
+		se.disc_size diskSize
+		FROM
+		comp_case_ebs_t ce LEFT JOIN comp_order_t o ON
+		ce.order_id=o.order_id
+		LEFT JOIN comp_standard_ebs_t se on
+		ce.standard_id=se.standard_id
+		<isNotEmpty prepend="where" property="diskIds">
+			<iterate property="diskIds" open="(" close=")" conjunction="OR">
+				ebs_id=#diskIds[]#
+			</iterate>
+		</isNotEmpty>
+	</select>
+	<update id="updateMountDisk" parameterClass="diskDetail">
+		UPDATE
+		COMP_CASE_EBS_T
+		SET STATUS = #diskStatus#, HOST_ID =#hostId#
+		WHERE
+		EBS_ID = #diskId#
+	</update>
+	<select id="getEBSStandardSizeList" resultClass="java.lang.String">
+		select disc_size
+		from comp_item_t
+		item,COMP_STANDARD_EBS_T stand where
+		item.standard_type='5' and
+		item.status='5' and stand.STANDARD_ID =
+		item.STANDARD_ID
+	</select>
+
+	<update id="updateDiskOrderStatus" parameterClass="orderInfo">
+		UPDATE
+		`comp_order_t`
+		SET
+		<isNotEmpty property="status">
+			`STATUS` = #status#,
+		</isNotEmpty>
+		UPDATE_USER = #updateUser#,
+		UPDATE_TIME = #updateTime#
+		WHERE
+		ORDER_ID =
+		#orderId#
+	</update>
+
+	<update id="updateDiskSize" parameterClass="diskDetail">
+		update
+		comp_case_ebs_t
+		set
+		DISK_SIZE = #diskSize#,
+		UPDATE_USER = #updateUser#,
+		UPDATE_TIME = #updateTime#
+		where
+		CASE_ID = #caseId#
+	</update> -->
+</sqlMap>

@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="EbsInfo">
+	<typeAlias alias="RespoolInfo"
+		type="com.neusoft.mid.cloong.web.page.host.vm.order.info.RespoolInfo" />
+	<typeAlias alias="RespoolPartInfo"
+		type="com.neusoft.mid.cloong.web.page.host.vm.order.info.RespoolPartInfo" />
+	<typeAlias alias="StandardInfo"
+		type="com.neusoft.mid.cloong.web.page.host.vm.order.info.StandardInfo" />
+	<typeAlias alias="ItemInfo"
+		type="com.neusoft.mid.cloong.web.page.host.vm.order.info.ItemInfo" />
+	<typeAlias alias="OrderInfo"
+		type="com.neusoft.mid.cloong.web.page.host.vm.order.info.OrderInfo" />
+	<typeAlias alias="EBSInstanceInfo"
+		type="com.neusoft.mid.cloong.web.page.ebs.order.info.EBSInstanceInfo" />
+	<typeAlias alias="EBSCreateFail"
+		type="com.neusoft.mid.cloong.ebs.core.EBSCreateFail" />
+
+	<select id="queryStandardsByEbs" parameterClass="RespoolPartInfo"
+		resultClass="StandardInfo">
+		SELECT
+		STANDARD_ID standardId,
+		STANDARD_NAME standardName,
+		DISC_SIZE discSize,
+		ResourceType,
+		DESCRIPTION description,
+		CREATE_TIME createTime,
+		CREATE_USER createUser,
+		UPDATE_TIME updateTime,
+		UPDATE_USER updateUser
+		FROM
+		COMP_STANDARD_EBS_T
+		WHERE
+		STANDARD_ID IN (
+		SELECT
+		STANDARD_ID
+		FROM
+		COMP_STANDARD_SYN_T
+		WHERE
+		STANDARD_TYPE = '5'
+		AND STATUS = '2'
+		<isNotEmpty prepend="and" property="respoolId">
+			RES_POOL_ID = #respoolId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="respoolPartId">
+			RES_POOL_PART_ID = #respoolPartId#
+		</isNotEmpty>
+		)
+	</select>
+
+	<!-- 查询 推荐规格-->
+	<select id="queryEbsRecommendStandards" parameterClass="RespoolPartInfo"
+		resultClass="StandardInfo">
+		SELECT
+		t.STANDARD_ID standardId,
+		t.DISC_SIZE discSize,
+		t.DESCRIPTION description,
+		t.CREATE_TIME createTime,
+		t.CREATE_USER createUser,
+		t.UPDATE_TIME updateTime,
+		t.UPDATE_USER updateUser,
+		t4.hour_price hourPrice,
+		t4.month_price monthPrice
+		FROM
+		COMP_STANDARD_EBS_T t
+		LEFT JOIN COMP_STANDARD_SYN_T t2 ON t.STANDARD_ID = t2.STANDARD_ID
+		LEFT JOIN comp_item_t t3 ON t3.STANDARD_ID = t2.STANDARD_ID
+		,comp_charges_t t4
+		WHERE
+		t3.RECOMMEND = '1'
+		AND t2.STANDARD_TYPE = '5'
+		AND t2. STATUS = '2' AND t4.charges_type='1'
+		<isNotEmpty prepend="and" property="respoolId">
+			t2.RES_POOL_ID =
+			#respoolId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="respoolPartId">
+			t2.RES_POOL_PART_ID =
+			#respoolPartId#
+		</isNotEmpty>
+	</select>
+
+	<select id="queryItemsByEbs" parameterClass="StandardInfo"
+		resultClass="ItemInfo">
+		SELECT
+		ITEM_ID itemId,
+		ITEM_NAME itemName,
+		DESCRIPTION DESCRIPTION
+		FROM
+		comp_item_t
+		WHERE
+		ITEM_TYPE = '5'
+		AND STATUS = '5'
+		AND STANDARD_TYPE = '5'
+		AND STANDARD_ID =
+		#standardId#
+	</select>
+
+
+
+	<insert id="createEBSOrder" parameterClass="OrderInfo">
+		insert into
+		COMP_ORDER_T(ORDER_ID,
+		STATUS,
+		EFFECTIVE_TIME,
+		EXPIRE_TIME,
+		LENGTH_TIME,
+		LENGTH_UNIT,
+		CREATE_TIME,
+		CREATE_USER,
+		UPDATE_TIME,
+		UPDATE_USER,
+		CASE_TYPE,
+		PARENT_ID,
+		CASE_ID,
+		APP_ID,
+		RES_POOL_ID
+		)
+		values
+		(#orderId#,#status#,#effectiveTime#,#expireTime#,#lengthTime#,#lengthUnit#,#createTime#,#createUser#,#updateTime#,#updateUser#,#caseType#,#parentId#,#caseId#,#appId#,#resPoolId#)
+	</insert>
+
+
+	<insert id="createEBSInstanceInfo" parameterClass="EBSInstanceInfo">
+		insert into
+		COMP_CASE_EBS_T
+		(CASE_ID,EBS_ID,EBS_NAME,APP_ID,STATUS,
+		RES_POOL_ID,RES_POOL_PART_ID,ITEM_ID,
+		STANDARD_ID,ORDER_ID,HOST_ID,
+		DESCRIPTION ,
+		CREATE_TIME ,
+		CREATE_USER,
+		UPDATE_TIME,
+		UPDATE_USER ,
+		ACCEPT_TIME,
+		DISK_SIZE,
+		ResourceType,
+		BOSS_ORDER_ID
+		)
+		values
+		(#caseId#,#ebsId#,#ebsName#,#appId#,#status#,
+		#resPoolId#,#resPoolPartId#,#itemId#,
+		#standardId#,#orderId#,#hostId#,
+		#description#,
+		#createTime#,
+		#createUser#,#updateTime#,#updateUser#,#acceptTime#,
+		#diskSize#,#resourceType#,#ebsBossOrderId#)
+	</insert>
+
+	<insert id="insertEBSFail" parameterClass="EBSCreateFail">
+		insert into
+		COMP_EBS_CREATE_FAIL_T(
+		FAIL_CAUSE,
+		FAIL_CODE,
+		RES_POOL_ID,
+		RES_POOL_PART_ID,
+		STANDARD_ID,
+		EBS_NAME,
+		CREATE_USER,
+		CREATE_TIME)
+		values
+		(#failCause#,#failCode#,#resPoolId#,#resPoolPartId#,#standardId#,#ebsName#,#createUser#,#createTime#)
+	</insert>
+
+
+</sqlMap>

@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="staCapacityInfo">
+
+	<typeAlias alias="staCapacityInfo"
+		type="com.neusoft.mid.cloong.web.page.resourceManagement.info.StaCapacityInfo" />
+	
+	<select id="getResPools" resultClass="staCapacityInfo">
+		SELECT
+			RES_POOL_ID resPoolId, RES_POOL_NAME resPoolName
+		FROM
+			COMP_RES_POOL_T
+		WHERE
+			STATUS = '1'
+	</select>
+	
+	<select id="queryDeviceNum" resultClass="String"
+		parameterClass="String">
+		SELECT
+			ifnull(COUNT(PM_ID),0) count
+		FROM
+			COMP_RM_PM_T
+		WHERE
+			RES_POOL_ID = #resPoolId#
+		UNION ALL
+			SELECT
+				ifnull(COUNT(VM_ID),0) count
+			FROM
+				COMP_RM_VM_T
+			WHERE
+				RES_POOL_ID = #resPoolId#
+			UNION ALL
+				SELECT
+					ifnull(COUNT(EBS_ID),0) count
+				FROM
+					COMP_RM_EBS_T
+				WHERE
+					RES_POOL_ID = #resPoolId#
+				UNION ALL
+					SELECT
+						ifnull(COUNT(MINIPM_ID),0) count
+					FROM
+						COMP_RM_MINIPM_T
+					WHERE
+						RES_POOL_ID = #resPoolId#
+					UNION ALL
+						SELECT
+							ifnull(COUNT(MINIPMPAR_ID),0) count
+						FROM
+							COMP_RM_MINIPMPAR_T
+						WHERE
+							RES_POOL_ID = #resPoolId#
+						UNION ALL
+							SELECT
+								ifnull(COUNT(RAID_ID),0) count
+							FROM
+								COMP_RM_RAID_T
+							WHERE
+								RES_POOL_ID = #resPoolId#
+							UNION ALL
+								SELECT
+									ifnull(COUNT(SWITCH_ID),0) count
+								FROM
+									COMP_RM_SWITCH_T
+								WHERE
+									RES_POOL_ID = #resPoolId#
+								UNION ALL
+									SELECT
+										ifnull(COUNT(ROUTER_ID),0) count
+									FROM
+										COMP_RM_ROUTER_T
+									WHERE
+										RES_POOL_ID = #resPoolId#
+									UNION ALL
+										SELECT
+											ifnull(COUNT(FIREWALL_ID),0) count
+										FROM
+											COMP_RM_FIREWALL_T
+										WHERE
+											RES_POOL_ID = #resPoolId#
+	</select>
+	<!-- 查询各分区列表-->
+	<select id="queryPartsList" resultClass="staCapacityInfo"
+		parameterClass="String">
+		SELECT
+			RES_POOL_PART_ID poolPartId,
+			RES_POOL_PART_NAME poolPartName
+		FROM
+			COMP_RES_POOL_PART_T
+		WHERE
+			RES_POOL_ID = #resPoolId#
+		  AND 
+		    RES_POOL_PART_ID != 'CPC-Z-01-SVI-003'
+		  AND STATUS = '1'
+		GROUP BY
+			RES_POOL_PART_ID
+	</select>
+	
+	<select id="queryCapacityforNum" resultClass="staCapacityInfo"
+		parameterClass="staCapacityInfo">
+		SELECT
+			a.sum resUsed,
+			RES_TOTAL resTotal
+		FROM
+			(
+				SELECT
+					max(CREATE_TIME) CREATE_TIME
+				FROM
+					comp_sta_capacity_t
+				WHERE RES_POOL_ID = #resPoolId#
+				AND RES_TYPE = #resType#
+				<dynamic prepend="">
+					<isNotEmpty prepend="and" property="poolPartId">
+						RES_POOL_PART_ID = #poolPartId#
+					</isNotEmpty>
+				</dynamic>
+			) res,(select SUM(ct.CPU_NUM) sum from comp_rm_vm_t ct) a,
+			comp_sta_capacity_t capacity
+		WHERE
+			res.CREATE_TIME = capacity.CREATE_TIME
+		AND RES_POOL_ID = #resPoolId#
+		AND RES_TYPE = #resType#
+		<dynamic prepend="">
+			<isNotEmpty prepend="and" property="poolPartId">
+				RES_POOL_PART_ID = #poolPartId#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<select id="queryCapacityforGB" resultClass="staCapacityInfo"
+		parameterClass="staCapacityInfo">
+		SELECT
+			a.sum resUsed,
+			ROUND(RES_TOTAL / 1024,0) resTotal
+		FROM
+			(
+				SELECT
+					max(CREATE_TIME) CREATE_TIME
+				FROM
+					comp_sta_capacity_t
+				WHERE RES_POOL_ID = #resPoolId#
+				AND RES_TYPE = #resType#
+				<dynamic prepend="">
+					<isNotEmpty prepend="and" property="poolPartId">
+						RES_POOL_PART_ID = #poolPartId#
+					</isNotEmpty>
+				</dynamic>
+			) res,(select SUM(ct.MEMORY_SIZE) sum from comp_rm_vm_t ct) a,
+			comp_sta_capacity_t capacity
+		WHERE
+			res.CREATE_TIME = capacity.CREATE_TIME
+		AND RES_POOL_ID = #resPoolId#
+		AND RES_TYPE = #resType#
+		<dynamic prepend="">
+			<isNotEmpty prepend="and" property="poolPartId">
+				RES_POOL_PART_ID = #poolPartId#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<select id="queryCapacityforDiskGB" resultClass="staCapacityInfo"
+		parameterClass="staCapacityInfo">
+		SELECT
+			a.sum+b.sum1 resUsed,
+			ROUND(RES_TOTAL / 1024,0) resTotal
+		FROM
+			(
+				SELECT
+					max(CREATE_TIME) CREATE_TIME
+				FROM
+					comp_sta_capacity_t
+				WHERE RES_POOL_ID = #resPoolId#
+				AND RES_TYPE = #resType#
+				<dynamic prepend="">
+					<isNotEmpty prepend="and" property="poolPartId">
+						RES_POOL_PART_ID = #poolPartId#
+					</isNotEmpty>
+				</dynamic>
+			) res,(select SUM(ct.DISK_SIZE) sum from comp_rm_vm_t ct) a, (select IFNULL(SUM(et.DISK_SIZE), 0) sum1 from comp_rm_ebs_t et where CUR_STATUS = '2') b,
+			comp_sta_capacity_t capacity
+		WHERE
+			res.CREATE_TIME = capacity.CREATE_TIME
+		AND RES_POOL_ID = #resPoolId#
+		AND RES_TYPE = #resType#
+		<dynamic prepend="">
+			<isNotEmpty prepend="and" property="poolPartId">
+				RES_POOL_PART_ID = #poolPartId#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<!-- 查询资源分区下的CPU 使用数  【未使用容量上报接口时使用，无用】 
+	<select id="queryCapacityforNum" resultClass="staCapacityInfo"
+		parameterClass="staCapacityInfo">
+		SELECT
+			SUM(CPU_NUM) resUsed,
+			'512' resTotal
+		FROM
+			COMP_RM_VM_T
+	    where RES_POOL_ID = #resPoolId#
+	    <dynamic prepend="">
+			<isNotEmpty prepend="and" property="poolPartId">
+				RES_POOL_PART_ID = #poolPartId#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	-->
+	<!-- 查询资源分区下的内存 使用  【未使用容量上报接口时使用，无用】 
+	<select id="queryCapacityforMem" resultClass="staCapacityInfo"
+		parameterClass="staCapacityInfo">
+		SELECT
+			ROUND(SUM(MEMORY_SIZE) / 1024, 0) resUsed,
+			'2112' resTotal
+		FROM
+			COMP_RM_VM_T
+		where RES_POOL_ID = #resPoolId#
+	    <dynamic prepend="">
+			<isNotEmpty prepend="and" property="poolPartId">
+				RES_POOL_PART_ID = #poolPartId#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	-->
+	<!-- 查询资源分区下的磁盘使用   【未使用容量上报接口时使用，无用】 
+	<select id="queryCapacityforDisk" resultClass="staCapacityInfo"
+		parameterClass="staCapacityInfo">
+		SELECT
+			SUM(resUsed) resUsed,
+			'4096' resTotal
+		FROM
+			(
+				SELECT
+					SUM(DISK_SIZE) + COUNT(VM_ID)*50 resUsed
+				FROM
+					COMP_RM_VM_T
+				where RES_POOL_ID = #resPoolId#
+	              <dynamic prepend="">
+					<isNotEmpty prepend="and" property="poolPartId">
+						RES_POOL_PART_ID = #poolPartId#
+					</isNotEmpty>
+				</dynamic>
+				UNION ALL
+					SELECT
+						SUM(DISK_SIZE) resUsed
+					FROM
+						COMP_RM_EBS_T
+				    WHERE RES_POOL_ID = #resPoolId#
+			) res
+	</select>
+	-->
+</sqlMap>

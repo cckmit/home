@@ -1,0 +1,53 @@
+@charset "utf-8";
+/* CSS Document */
+
+.header{ background: url(../images/headerBg.jpg); height:82px; width:100%;}
+.logo{ float:left;  height:82px; width:300px; margin:0; padding:0;}
+.menu{ float:right; height:70px; list-style:none; margin:8px 0 0 0; padding:0; width:837px; }
+.menu li{ float:left; height:70px; text-align:center; width:93px; }
+.menu a{ color:#FFF; display:block; height:23px; padding-top:47px; width:93px;}
+.nav1{ background:url(../images/menu1.jpg) no-repeat center top;}
+.nav1:hover { background:url(../images/menu1Hover.jpg) no-repeat center top;}
+.focus1 { background:url(../images/menu1focus.jpg) no-repeat center top;}
+.nav2{ background:url(../images/menu2.jpg) no-repeat center top;}
+.nav2:hover { background:url(../images/menu2Hover.jpg) no-repeat center top;}
+.focus2 { background:url(../images/menu2focus.jpg) no-repeat center top;}
+.nav3{ background:url(../images/menu3.jpg) no-repeat center top;}
+.nav3:hover { background:url(../images/menu3Hover.jpg) no-repeat center top;}
+.focus3 { background:url(../images/menu3focus.jpg) no-repeat center top;}
+.nav4{ background:url(../images/menu4.jpg) no-repeat center top;}
+.nav4:hover { background:url(../images/menu4Hover.jpg) no-repeat center top;}
+.focus4 { background:url(../images/menu4focus.jpg) no-repeat center top;}
+.nav5{ background:url(../images/menu5.jpg) no-repeat center top;}
+.nav5:hover { background:url(../images/menu5Hover.jpg) no-repeat center top;}
+.focus5 { background:url(../images/menu5focus.jpg) no-repeat center top;}
+.nav6{ background:url(../images/menu6.jpg) no-repeat center top;}
+.nav6:hover { background:url(../images/menu6Hover.jpg) no-repeat center top;}
+.focus6 { background:url(../images/menu6focus.jpg) no-repeat center top;}
+.nav7{ background:url(../images/menu7.jpg) no-repeat center top;}
+.nav7:hover { background:url(../images/menu7Hover.jpg) no-repeat center top;}
+.focus7 { background:url(../images/menu7focus.jpg) no-repeat center top;}
+.nav8{ background:url(../images/menu8.jpg) no-repeat center top;}
+.nav8:hover { background:url(../images/menu8Hover.jpg) no-repeat center top;}
+.focus8 { background:url(../images/menu8focus.jpg) no-repeat center top;}
+.nav9{ background:url(../images/menu9.jpg) no-repeat center top;}
+.nav9:hover { background:url(../images/menu9Hover.jpg) no-repeat center top;}
+.focus9 { background:url(../images/menu9focus.jpg) no-repeat center top;}
+.userAndTab { background:url(../images/userBg.jpg) repeat-x;height:25px; width:100%;}
+.user{float:left; line-height:25px; width:232px;}
+.tabPro{ border-left:1px solid #a2a2a2; float:left; line-height:25px;}
+.arrowsRight { float:right;}
+.arrowsLeft{ float:left;}
+.tabLi{ float:left;}
+.tabsLu{ padding:0; margin:0; float:left; width:100%; line-height:25px; text-align:center;}
+.tabsLu li{ border:1px solid #a2a2a2; display:block; float:left; width:100px; margin:0; padding:0; height:23px}
+.tabsLiFocus{ background:url(../images/tabsButtonFocus.jpg) no-repeat;}
+.tabsLi{ border:1px solid #a2a2a2; display:block; float:left; width:100px; background:url(../images/tabsButton.jpg) no-repeat; margin:0; padding:0; height:23px}
+.tabsLu img{ margin-top:3px;}
+.tabsLi a{ display:block; width:70px; line-height:24px;}
+.tabsLi img{float:right; margin:-17px 5px 0 0; padding:0}
+.tabsLiFocus a{ display:block; width:70px; line-height:24px;}
+.tabsLiFocus img{ float:right; margin:-17px 5px 0 0; padding:0}
+.user img{ display:block; float:left; margin:5px 0 0 20px;}
+.user p{ display:block; float:left; font-size:11px; font-weight:bold; padding:0; margin:0 0 0 8px;}
+.user span{ color:#0078c8; margin-left:5px;}

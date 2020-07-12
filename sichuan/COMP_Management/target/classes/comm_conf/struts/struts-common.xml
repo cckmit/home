@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<!-- 这只浏览器时候缓存静态内容，默认值为true(生产环境下使用),开发阶段最好关闭 -->
+	<constant name="struts.serve.static.vrowserCache" value="false"></constant>
+	<!-- 当struts的配置文件修改后，系统是否自动重新加载该文件，默认为false(生产环境下使用),开发阶段最好打开 -->
+	<constant name="struts.serve.static.vrowserCache" value="true"></constant>
+	<constant name="struts.ui.theme" value="simple"></constant>
+
+
+
+	<package name="com.neusoft.mid.cloong.web.login" extends="struts-default">
+			
+		<global-results>
+			<result name="error" type="chain">exceptionIntercepor</result>
+		</global-results>
+		<global-exception-mappings>
+			<exception-mapping exception="java.lang.Exception"
+				result="error" />
+		</global-exception-mappings>
+
+		< name="login" class="loginAction">
+			<result name="SUCCESS" type="redirectAction">
+				<param name="actionName">task/taskOverviewAction</param>
+			</result>
+			<result name="INVALID">/login.jsp</result>
+			<result name="FAILURE">/login.jsp</result>
+		</>
+		
+		<!-- 4A 票据认证   -->
+		<action name="ssoLogin" class="fourALoginAction">
+			<result name="SUCCESS" type="redirectAction">
+				<param name="actionName">task/taskOverviewAction</param>
+			</result>
+			<result name="FAILURE">/login.jsp</result>
+		</action>
+		<!-- 4A 票据认证   -->
+		
+		<action name="visit" class="visitAction">
+			<result name="SUCCESS" type="redirectAction">
+				<param name="actionName">report/cpuDeviceTop10PerformanceAction.action</param>
+				<param name="devicePerformanceInfo.deviceType">0</param>
+				<param name="devicePerformanceInfo.timeType">1</param>
+			</result>
+			<result name="INVALID">/login.jsp</result>
+			<result name="FAILURE">/login.jsp</result>
+		</action>
+		
+		<action name="logout" class="logoutAction">
+			<result name="SUCCESS" type="redirect">/login.jsp</result>
+		</action>
+		<!-- 资源视图概况 -->
+		<action name="taskOverviewAction" class="EmptyAction">
+			<result name="SUCCESS">/WEB-INF/pages/task/task_overview.jsp</result>
+		</action>
+<!-- 		<action name="forgetPassword" class="forgetPasswordAction">
+			<result name="SHORTMESSAGE">/inputShortMessage.jsp</result>
+			<result name="EMAIL">/inputEmailMessage.jsp</result>
+			<result name="error">/forgetPassword.jsp</result>
+		</action> -->
+		<action name="shortMessageConfirm" class="shortMessageConfirmAction">
+			<result name="success">/resetPassword.jsp</result>
+			<result name="REPEATSHORTMESSAGE">/forgetPassword.jsp</result>
+			<result name="error">/inputShortMessage.jsp</result>
+		</action>
+		<action name="emailConfirm" class="emailConfirmAction">
+			<result name="success">/resetPassword.jsp</result>
+			<result name="error">/badEmailurl.jsp</result>
+		</action>
+		<action name="resetPassword" class="resetPasswordAction">
+			<result name="success">/resetPasswordBack.jsp</result>
+			<result name="error">/resetPasswordBack.jsp</result>
+		</action>
+	</package>
+</struts>

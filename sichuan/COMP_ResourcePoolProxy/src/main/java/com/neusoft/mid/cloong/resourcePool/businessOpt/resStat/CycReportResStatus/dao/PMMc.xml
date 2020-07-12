@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="PMMC">
+	<typeAlias alias="MCPerfPo"
+		type="com.neusoft.mid.cloong.resourcePool.businessOpt.resStat.CycReportResStatus.dao.MCPerfPo" />
+
+
+	<insert id="insertMCPerformance" parameterClass="MCPerfPo">
+		INSERT INTO `comp_sta_minipmpar_rt_t` (
+			`MINIPMPAR_ID`,
+			`CPU_PROCESSOR_UTILIZATION`,
+			`CPU_SYS_TIME`,
+			`CPU_USER_TIME`,
+			`CPU_IDLE_TIME`,
+			`MEM_USED_PER`,
+			`SYS_MEM_USED_PER`,
+			`USER_MEM_USED_PER`,
+			`MEM_FREE`,
+			`DISK_USED_PER`,
+			`CREATE_TIME`,
+			`RES_POOL_ID`
+		)
+		VALUES
+			(
+				#instanceId#,
+				#processorUtilization#,
+				#cpuSysTime#,
+				#cpuUserTime#,
+				#cpuIdleTime#,
+				#memUsedPer#,
+				#sysMemUsedPer#,
+				#userMemUsedPer#,
+				#memFree#,
+				#diskUsedPer#,
+				#collectTime#,
+				#resPoolId#
+			);
+
+
+		
+	</insert>
+	
+</sqlMap>

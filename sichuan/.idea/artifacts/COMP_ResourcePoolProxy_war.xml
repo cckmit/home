@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="COMP_ResourcePoolProxy:war">
+    <output-path>$PROJECT_DIR$/COMP_ResourcePoolProxy/target</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <module>COMP_ResourcePoolProxy</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="archive" name="COMP_ResourcePoolProxy.war">
+      <element id="artifact" artifact-name="COMP_ResourcePoolProxy:war exploded" />
+    </root>
+  </artifact>
+</component>

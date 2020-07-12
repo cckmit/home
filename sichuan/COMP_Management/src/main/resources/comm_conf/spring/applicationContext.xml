@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+	 <import resource="classpath:comm_conf/mybatis/comm_base.xml" />
+	<bean id="propertyConfigurer"
+		class="com.neusoft.mid.cloong.common.TrimPropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:jdbc_config.properties</value>
+				<value>classpath:comm_conf/other/*.properties</value>
+			</list>
+		</property>
+	</bean>
+	<!-- 翻页 -->
+	<bean id="turnPageInterceptor" class="com.neusoft.mid.cloong.web.page.common.TurnPageInterceptor">
+		<property name="paramFilter">
+			<value>${paramFilter}</value>
+		</property>
+	</bean>
+	<bean id="abstractAction" abstract="true">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+</beans>

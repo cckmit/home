@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<decorators defaultdir="/decorators">
+	<!-- 定义那些不使用sitemesh的模板效果 -->
+	<excludes>
+		<pattern>/logout.action*</pattern>  
+		<pattern>/login.action*</pattern>
+		<pattern>/WEB-INF/pages/exception/404.jsp</pattern>
+		<pattern>/WEB-INF/pages/exception/500.jsp</pattern>
+		<pattern>/login.jsp</pattern>
+		<pattern>/register_byQuestion.jsp</pattern>
+		<!-- 主机下资源性能展示 -->
+		<pattern>/console/hostRealTimePerformance.action*</pattern>
+		<pattern>/performance_console/vmPerformanceDetailAction.action*</pattern>  
+	</excludes>
+	<!-- decorator结点指定了模板的位置和文件名，通过pattern来指定哪些路径引用这个模板 -->
+	<decorator name="business_console" page="business_console.jsp">
+		<pattern>/business_console/*</pattern>
+	</decorator>
+	<decorator name="console" page="console.jsp">
+		<pattern>/console/*</pattern>
+	</decorator>
+	<decorator name="product" page="product.jsp">
+		<pattern>/product/*</pattern>
+	</decorator>
+	<decorator name="userCenter" page="userCenter.jsp">
+		<pattern>/userCenter/*</pattern>
+	</decorator>
+	<decorator name="business" page="business.jsp">
+		<pattern>/business/*</pattern>
+	</decorator>
+	<decorator name="performance_console" page="performance_console.jsp">
+		<pattern>/performance_console/*</pattern>
+	</decorator>
+	 <!-- add by huxin 2019 0219 -->
+	<decorator name="alarm" page="alarm.jsp">  
+		<pattern>/alarmCenter/*</pattern>
+	</decorator>
+</decorators>

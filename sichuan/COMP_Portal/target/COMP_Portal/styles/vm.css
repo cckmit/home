@@ -1,0 +1,135 @@
+@charset "utf-8";
+/* CSS Document */
+/*****************************
+*        控制台 物理机申请      *
+******************************/
+/* 按钮ul悬浮 */
+.vm-apply-btn{
+	float:right;
+	padding:20px 20px 0 0;
+}
+/* li按钮样式 */
+.vm-apply-btn li{
+	line-height:20px;
+	float:left;
+	background-color:#ebeef0;
+	border:1px solid #c0c2c3;
+	/*圆角*/
+	-moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius:3px;
+	margin-left:15px;
+}
+/* 按钮a字体样式 */
+.vm-apply-btn a{
+	display:block;
+	color:#222222;
+	line-height:20px;
+	text-align:center;
+	padding: 1px 10px;
+	/*font-weight:bold;
+	/*margin: 0 8px 0 8px;*/
+}
+.vm-apply-btn li.vm-apply-se{
+	background-color:#3cb4f0;
+	border:1px solid #349dd2;
+}
+.vm-apply-se a{
+	color:#fff;
+}
+
+/* 按钮ul悬浮 推荐机型列表 */
+/*.vm-apply-listbtn{
+	float:left;
+	padding:1px 0 0 0;
+}*/
+/*
+.vm-apply-listbtn li{
+	line-height:20px;
+	float:left;
+	background-color:#ebeef0;
+	border:1px solid #c0c2c3;
+	color:#FFF;
+	/*圆角*//*
+	-moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius:3px;
+	margin-right:35px;
+	margin-bottom:15px;
+}*/
+/*
+.vm-apply-listbtn a{
+	padding: 1px 20px;
+	display:block;
+	color:#222222;
+	line-height:20px;
+	text-align:center;
+	text-decoration:none;
+}
+*/
+/* 推荐机型被选中颜色 */
+/*
+.vm-apply-listbtn li.vm-apply-listbtn-se{
+	background-color:#c8e8ff;
+	border:1px solid #3cb4f0;
+}
+*/
+/* 左侧  详细中 表格样式*/
+.vm-apply-detail-l{
+	height:auto;
+}
+.vm-apply-detail-l div{
+	float:left;
+	/*width:49%; 物理机申请页*/
+	width:56%;
+}
+.vm-apply-detail-l span{
+	font-size:14px;
+}
+.vm-apply-detail-r-title{
+	color:#222222;
+	font-size:14px;
+}
+/* 申请 值 宽度及样式*/
+.vm-span-value{
+	float:left;
+	width:90px;
+	font-size:14px;
+	margin-right:10px;
+	color:#222222;
+}
+/* 申请 值 文本样式*/
+.vm-span-text{
+	border:1px solid #d2d3d4;
+	background-color:#FFF;
+}
+/* 申请 右侧头下面详细 名称类型宽度*/
+.apply-detail-r-status span.vm-r-det-span-name{
+	float:left;
+	width:50px;
+	font-size:14px;
+}
+/* 左侧 详细中滚动条位置 */
+.vm-slide{
+	float:left;
+	width:250px;
+}
+.vm-apply-detail-l div#osTerms{
+	width:auto;
+}
+.apply-info .itmes-height{
+	height: auto;
+}
+.mask{
+	color:#C7EDCC;
+    background-color:#eee;
+    position:absolute;
+    top:0px;
+    left:0px;
+    width:100%;
+    height:100%;
+    opacity: 0.65;
+    -moz-opacity: 0.65;
+    filter:alpha(opacity=65);
+    z-index:9988;
+}

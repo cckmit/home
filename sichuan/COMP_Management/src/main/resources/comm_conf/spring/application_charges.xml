@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
+    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+    
+    <!-- 列表 -->
+    <bean id="queryChargesListAction" class="com.neusoft.mid.cloong.web.page.charges.action.ChargesListAction"  scope="prototype">
+    		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+    </bean>
+    
+    <!-- 添加 -->
+    <bean id="chargesAddAction" class="com.neusoft.mid.cloong.web.page.charges.action.ChargesAddAction" scope="prototype">
+    		<property name="chargesService" ref="chargesService"></property>
+    </bean>
+    <!-- 详细 -->
+    <bean id="chargesDetailAction" class="com.neusoft.mid.cloong.web.page.charges.action.ChargesDetailAction" scope="prototype">
+    		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+    </bean>
+    <!-- 修改 -->
+    <bean id="chargesEditAction" class="com.neusoft.mid.cloong.web.page.charges.action.ChargesEditAction" scope="prototype">
+    		<property name="chargesService" ref="chargesService"></property>
+    </bean>
+    <!-- 删除 -->
+    <bean id="chargesDeleteAction" class="com.neusoft.mid.cloong.web.page.charges.action.ChargesDeteleAction" scope="prototype">
+    		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+    </bean>
+    
+    <bean id="chargesService" class="com.neusoft.mid.cloong.web.page.charges.service.ChargesService" scope="prototype">
+    		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+    </bean>
+</beans>

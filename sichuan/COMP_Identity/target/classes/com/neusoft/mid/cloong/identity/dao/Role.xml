@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="Role">
+	<typeAlias alias="roleInfo"
+		type="com.neusoft.mid.cloong.identity.bean.RoleBean" />
+	<typeAlias alias="permissionInfo"
+		type="com.neusoft.mid.cloong.identity.bean.PermissionBean" />
+	<select id="queryRoleInfoByName" resultClass="roleInfo">
+		SELECT
+		ROLE_ID roleId,
+		NAME roleName,
+		STATUS status,
+		DESCRIPTION description,
+		CREATE_TIME createTime,
+		CREATE_USER createUserId
+		FROM
+		COMP_AUTHORITY_ROLE_T
+		WHERE
+		NAME=#roleName#
+	</select>
+	<select id="countRole" parameterClass="roleInfo" resultClass="Integer">
+		select count(*) as count
+		FROM COMP_AUTHORITY_ROLE_T
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="and" property="roleName">
+				NAME like CONCAT('%',#roleName#,'%') 
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="status">
+				STATUS = #status#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<insert id="insertRoleInfo" parameterClass="roleInfo">
+		insert into COMP_AUTHORITY_ROLE_T 
+		(ROLE_ID,
+		NAME,
+		STATUS,
+		DESCRIPTION,
+		CREATE_TIME,
+		CREATE_USER  )
+		 values 
+		 (#roleId#,
+		#roleName#,
+		#status#,
+		#description#,
+		#createTime#,
+		#createUserId#
+		 )
+	</insert>
+	<select id="queryRoleInfoList" resultClass="roleInfo">
+		SELECT
+		ROLE_ID roleId,
+		NAME roleName,
+		STATUS status,
+		DESCRIPTION description,
+		CREATE_TIME createTime,
+		CREATE_USER createUserId
+		FROM
+		COMP_AUTHORITY_ROLE_T
+	</select>
+	<select id="searchRoleList" resultClass="roleInfo">
+		SELECT
+		ROLE_ID roleId,
+		NAME roleName,
+		STATUS status,
+		DESCRIPTION description,
+		CREATE_TIME createTime,
+		CREATE_USER createUserId
+		FROM
+		COMP_AUTHORITY_ROLE_T
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="and" property="roleId">
+				ROLE_ID =#roleId# 
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="roleName">
+				NAME like CONCAT('%',#roleName#,'%') 
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="status">
+				STATUS = #status#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<delete id="deleteRoleById" parameterClass="String">
+		DELETE 
+		FROM
+		COMP_AUTHORITY_ROLE_T 
+		WHERE
+		ROLE_ID = #roleId#
+	</delete>
+	<update id="updateRoleInfo" parameterClass="roleInfo">
+		UPDATE
+		COMP_AUTHORITY_ROLE_T 
+		SET
+		NAME=#roleName#,
+		DESCRIPTION=#description#,
+		STATUS=#status#
+		WHERE
+		ROLE_ID=#roleId#
+	</update>
+	<select id="queryRoleAuth" resultClass="permissionInfo" parameterClass="roleInfo">
+		SELECT 
+		B.PERMISSION_ID permissionId,
+		B.PARENT_ID parentId,
+		B.NAME name,
+		B.ENGLISH_NAME englishName
+		from COMP_AUTHORITY_ROLE_PERM_T a,COMP_AUTHORITY_PERMISSION_T b 
+		WHERE 
+		A.ROLE_ID = #roleId#
+		and A.PERMISSION_ID=B.PERMISSION_ID
+	</select>
+	<delete id="deleteRolePermissionRelation" parameterClass="roleInfo">
+		DELETE FROM COMP_AUTHORITY_ROLE_PERM_T
+		WHERE ROLE_ID = #roleId#
+	</delete>
+	<insert id="insertRolePermissionRelation" parameterClass="java.util.HashMap">
+		INSERT INTO COMP_AUTHORITY_ROLE_PERM_T
+		(ROLE_ID,PERMISSION_ID) VALUES(#roleId#,#permissionId#)
+	</insert>
+	
+</sqlMap>

@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="alarmInfo">
+    <typeAlias alias="AlarmInfo"
+               type="com.neusoft.mid.cloong.mail.AlarmInfo" />
+    <typeAlias alias="VMInstanceInfo"
+               type="com.neusoft.mid.cloong.web.page.console.host.vm.info.VMInstanceInfo" />
+
+    <!--<sql id="baseCol">
+        alarm.alarmID alarmID,
+        alarm.alarmIdentify alarmIdentify,
+        alarm.alarmGrade alarmGrade,
+        alarm.originalAlarmGrade originalAlarmGrade,
+        alarm.alarmType alarmType,
+        alarm.alarmTitle alarmTitle,
+        alarm.alarmTime alarmTime,
+        alarm.alarmIP alarmIP,
+        alarm.confirmStatus confirmStatus,
+        alarm.count count,
+        alarm.deviceType deviceType,
+        alarm.deviceTypeName deviceTypeName,
+        alarm.firstAlarmTime firstAlarmTime,
+        alarm.alarmContent alarmContent,
+        alarm.objectID objectID,
+        alarm.status status
+    </sql>-->
+
+    <select id="getAlarmInfo" resultClass="AlarmInfo">
+        SELECT
+        <!--<include refid="baseCol" />-->
+        alarm.alarmID alarmID,
+        alarm.alarmIdentify alarmIdentify,
+        alarm.alarmGrade alarmGrade,
+        alarm.originalAlarmGrade originalAlarmGrade,
+        alarm.alarmType alarmType,
+        alarm.alarmTitle alarmTitle,
+        alarm.alarmTime alarmTime,
+        alarm.alarmIP alarmIP,
+        alarm.confirmStatus confirmStatus,
+        alarm.count count,
+        alarm.deviceType deviceType,
+        alarm.deviceTypeName deviceTypeName,
+        alarm.firstAlarmTime firstAlarmTime,
+        alarm.alarmContent alarmContent,
+        alarm.objectID objectID,
+        alarm.status status
+        FROM
+        alarm_syn_t alarm
+    </select>
+
+    <select id="getAlarmInfoNmsdb" resultClass="AlarmInfo">
+        SELECT
+                alarm.id as alarmID,
+                alarm.nid as alarmIdentify,
+                alarm.lid as alarmGrade,
+                alarm.original as originalAlarmGrade,
+                alarm.type as alarmType,
+                alarm.title as alarmTitle,
+                alarm.maxEventTime as alarmTime,
+                alarm.rid as alarmIP,
+                alarm.confirmStatus as confirmStatus,
+                alarm.count as count,
+                alarm.deviceType as deviceType,
+                type.agent_name as deviceTypeName,
+                alarm.eventTime as firstAlarmTime,
+                alarm.text as alarmContent,
+								alarm.objectID as objectID
+        from nmsDB.t_alarm_temp alarm
+              LEFT JOIN njdb.mals_nm_agent_type_t type ON alarm.deviceType = type.TYPE_ID
+        where (alarm.pid is null or alarm.pid='')
+            AND (alarm.clearStatus = '1' or alarm.clearStatus is null)
+						AND type.TYPE_ID = '2'
+    </select>
+
+    <select id="getAlarmInfoYc" resultClass="AlarmInfo">
+        SELECT
+                alarm.id as alarmID,
+                alarm.nid as alarmIdentify,
+                alarm.lid as alarmGrade,
+                alarm.original as originalAlarmGrade,
+                alarm.type as alarmType,
+                alarm.title as alarmTitle,
+                alarm.maxEventTime as alarmTime,
+                alarm.rid as alarmIP,
+                alarm.confirmStatus as confirmStatus,
+                alarm.count as count,
+                alarm.deviceType as deviceType,
+                type.agent_name as deviceTypeName,
+                alarm.eventTime as firstAlarmTime,
+                alarm.text as alarmContent,
+								alarm.objectID as objectID
+        from t_alarm_temp alarm
+              LEFT JOIN mals_nm_agent_type_t type ON alarm.deviceType = type.TYPE_ID
+        where (alarm.pid is null or alarm.pid='')
+            AND (alarm.clearStatus = '1' or alarm.clearStatus is null)
+						AND type.TYPE_ID = '2'
+    </select>
+
+    <insert id="insertAlarm" parameterClass="AlarmInfo">
+		insert into
+		alarm_syn_t
+		(alarmID,alarmIdentify,alarmGrade,originalAlarmGrade,alarmType,alarmTitle,
+		alarmTime,alarmIP,confirmStatus,count,deviceType,deviceTypeName,
+		firstAlarmTime,alarmContent,objectID,status
+		)
+		values
+		(#alarmID#,#alarmIdentify#,#alarmGrade#,#originalAlarmGrade#,#alarmType#,#alarmTitle#,
+		#alarmTime#,#alarmIP#,#confirmStatus#,#count#,#deviceType#,#deviceTypeName#,
+		#firstAlarmTime#,#alarmContent#,#objectID#,#status#)
+	</insert>
+
+    <select id="queryVMAppId" resultClass="VMInstanceInfo"
+            parameterClass="java.lang.String">
+		SELECT
+		APP_ID appId
+		FROM
+		COMP_CASE_VM_T
+		WHERE VM_ID=#vmId#
+	</select>
+
+    <update id="updateAlarmStatus" parameterClass="java.lang.String">
+		update
+		alarm_syn_t
+		set
+		STATUS="1"
+		where objectID=#vmId#
+	</update>
+
+    <!--<select id="getAlarmCount" resultClass="java.lang.Integer">
+        SELECT
+        count(b.id)
+        FROM
+        comp_batch_vm_t b
+        left join comp_case_vm_t v on
+        b.vm_id=v.VM_ID
+        left join comp_rm_vm_t r on b.vm_id=r.vm_id
+        <dynamic prepend="where ">
+            <isNotEmpty prepend="and" property="id">
+                id=#id#
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="vmName">
+                v.vm_name like
+                CONCAT('%',#vmName#,'%')
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="vmModifyFlag">
+                vmModifyFlag=#vmModifyFlag#
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="vmIP">
+                r.PRIVATE_IP like
+                CONCAT('%',#vmIP#,'%')
+            </isNotEmpty>
+        </dynamic>
+    </select>
+
+    <select id="getVmDetail" parameterClass="java.lang.String"
+            resultClass="VMInstanceInfo">
+        SELECT
+        <include refid="baseCol" />
+        FROM
+        COMP_CASE_VM_T case1
+        LEFT JOIN comp_app_t app ON case1.APP_ID =
+        app.APP_ID
+        LEFT JOIN COMP_ORDER_T order1 ON case1.ORDER_ID =
+        order1.ORDER_ID AND
+        order1. STATUS != '2'
+        LEFT JOIN COMP_ITEM_T item ON
+        case1.ITEM_ID =
+        item.ITEM_ID
+        WHERE
+        VM_ID=#vmId#
+    </select>-->
+</sqlMap>

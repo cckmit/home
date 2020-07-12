@@ -1,0 +1,2 @@
+针对SSL过期问题:
+./keytool -genkey -alias tomcat -keyalg RSA -keystore /home/cm/master/COMP/bin/.keystore -validity 365

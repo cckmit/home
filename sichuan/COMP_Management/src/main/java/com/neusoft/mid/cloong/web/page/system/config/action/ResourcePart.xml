@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="ResourcePart">
+	<typeAlias alias="ResourcePartInfo"
+		type="com.neusoft.mid.cloong.web.page.system.config.info.ResourcePartInfo" />
+	<!-- 资源池分区 -->
+	<select id="queryResourcePartInfos" resultClass="ResourcePartInfo">
+		SELECT
+		RES_POOL_PART_ID resPoolPartId,
+		RES_POOL_PART_NAME resPoolPartName,
+		comp_res_pool_part_t.RES_POOL_ID resPoolId,
+		COMP_RES_POOL_T.RES_POOL_NAME resPoolName,
+		comp_res_pool_part_t.STATUS status,
+		comp_res_pool_part_t.DESCRIPTION description,
+		comp_res_pool_part_t.CPU_NUM_TOTAL cpuNumTotal,
+		comp_res_pool_part_t.RAM_SIZE_TOTAL ramSizeTotal,
+		comp_res_pool_part_t.DISC_SIZE_TOTAL discSizeTotal,
+		comp_res_pool_part_t.CREATE_TIME createTime,
+		comp_res_pool_part_t.CREATE_USER createUser,
+		comp_res_pool_part_t.UPDATE_TIME updateTime,
+		comp_res_pool_part_t.UPDATE_USER updateUser
+		FROM
+		comp_res_pool_part_t LEFT JOIN COMP_RES_POOL_T
+		ON comp_res_pool_part_t.RES_POOL_ID=COMP_RES_POOL_T.RES_POOL_ID
+		WHERE
+		comp_res_pool_part_t.STATUS!='0'
+	</select>
+	<select id="queryNormalResourcePartInfos" resultClass="ResourcePartInfo">
+		SELECT
+		RES_POOL_PART_ID resPoolPartId,
+		RES_POOL_PART_NAME resPoolPartName,
+		comp_res_pool_part_t.RES_POOL_ID resPoolId,
+		COMP_RES_POOL_T.RES_POOL_NAME resPoolName,
+		comp_res_pool_part_t.STATUS status,
+		comp_res_pool_part_t.DESCRIPTION description,
+		comp_res_pool_part_t.CPU_NUM_TOTAL cpuNumTotal,
+		comp_res_pool_part_t.RAM_SIZE_TOTAL ramSizeTotal,
+		comp_res_pool_part_t.DISC_SIZE_TOTAL discSizeTotal,
+		comp_res_pool_part_t.CREATE_TIME createTime,
+		comp_res_pool_part_t.CREATE_USER createUser,
+		comp_res_pool_part_t.UPDATE_TIME updateTime,
+		comp_res_pool_part_t.UPDATE_USER updateUser
+		FROM
+		comp_res_pool_part_t LEFT JOIN COMP_RES_POOL_T
+		ON comp_res_pool_part_t.RES_POOL_ID=COMP_RES_POOL_T.RES_POOL_ID
+		WHERE
+		comp_res_pool_part_t.STATUS='1'
+	</select>
+		<select id="queryNormalResourcePartInfosByPoolId" parameterClass="String" resultClass="ResourcePartInfo">
+		SELECT
+		RES_POOL_PART_ID resPoolPartId,
+		RES_POOL_PART_NAME resPoolPartName,
+		comp_res_pool_part_t.RES_POOL_ID resPoolId,
+		COMP_RES_POOL_T.RES_POOL_NAME resPoolName,
+		comp_res_pool_part_t.STATUS status,
+		comp_res_pool_part_t.DESCRIPTION description,
+		comp_res_pool_part_t.CPU_NUM_TOTAL cpuNumTotal,
+		comp_res_pool_part_t.RAM_SIZE_TOTAL ramSizeTotal,
+		comp_res_pool_part_t.DISC_SIZE_TOTAL discSizeTotal,
+		comp_res_pool_part_t.CREATE_TIME createTime,
+		comp_res_pool_part_t.CREATE_USER createUser,
+		comp_res_pool_part_t.UPDATE_TIME updateTime,
+		comp_res_pool_part_t.UPDATE_USER updateUser
+		FROM
+		comp_res_pool_part_t LEFT JOIN COMP_RES_POOL_T
+		ON comp_res_pool_part_t.RES_POOL_ID=COMP_RES_POOL_T.RES_POOL_ID
+		WHERE
+		comp_res_pool_part_t.STATUS='1'
+			AND comp_res_pool_part_t.RES_POOL_ID=#resPoolId#
+	</select>
+	<select id="queryResPartSaveById" resultClass="ResourcePartInfo">
+		SELECT
+		RES_POOL_PART_ID resPoolPartId,
+		RES_POOL_PART_NAME resPoolPartName,
+		RES_POOL_ID resPoolId,
+		STATUS status,
+		DESCRIPTION description,
+		CPU_NUM_TOTAL cpuNumTotal,
+		RAM_SIZE_TOTAL ramSizeTotal,
+		DISC_SIZE_TOTAL discSizeTotal,
+		CREATE_TIME createTime,
+		CREATE_USER createUser,
+		UPDATE_TIME updateTime,
+		UPDATE_USER updateUser
+		FROM
+		comp_res_pool_part_t
+		WHERE
+		RES_POOL_PART_ID=#resPoolPartId#
+		<isNotEmpty property="oldResPoolId">
+			AND RES_POOL_ID=#resPoolId#
+		</isNotEmpty>
+		<isEmpty property="oldResPoolId">
+			AND RES_POOL_ID=#oldResPoolId#
+		</isEmpty>
+	</select>
+	<!-- 查询资源池 资源池分区是否被使用 -->
+	<select id="countStandardSynByResIdAndPartId" resultClass="int">
+		SELECT
+		COUNT(*)
+		FROM
+		COMP_STANDARD_SYN_T
+		WHERE
+		STATUS !='1'
+		AND STATUS !='3'
+		<isNotEmpty property="resPoolPartId">
+			AND RES_POOL_PART_ID=#resPoolPartId#
+		</isNotEmpty>
+		AND RES_POOL_ID=#oldResPoolId#
+	</select>
+	<!-- 创建资源池分区 -->
+	<insert id="insertResourcePartInfo" parameterClass="ResourcePartInfo">
+		insert into comp_res_pool_part_t 
+		(RES_POOL_PART_ID ,
+		RES_POOL_PART_NAME ,
+		RES_POOL_ID ,
+		STATUS ,
+		DESCRIPTION ,
+		CPU_NUM_TOTAL,
+		RAM_SIZE_TOTAL,
+		DISC_SIZE_TOTAL,
+		CREATE_TIME ,
+		CREATE_USER ,
+		UPDATE_TIME ,
+		UPDATE_USER )
+		 values 
+		 (#resPoolPartId#,
+		#resPoolPartName#,
+		#resPoolId#,
+		#status#,
+		#description#,
+		#cpuNumTotal#,
+		#ramSizeTotal#,
+		#discSizeTotal#,
+		#createTime#,
+		#createUser#,
+		#updateTime#,
+		#updateUser#
+		 )
+	</insert>
+	<!-- 更新资源池分区 信息  -->
+	<update id="updateResourcePartInfo" parameterClass="ResourcePartInfo">
+		UPDATE
+		comp_res_pool_part_t 
+		SET
+		RES_POOL_ID=#resPoolId#,
+		RES_POOL_PART_NAME=#resPoolPartName#,
+		DESCRIPTION=#description#,
+		CPU_NUM_TOTAL=#cpuNumTotal#,
+		RAM_SIZE_TOTAL=#ramSizeTotal#,
+		DISC_SIZE_TOTAL=#discSizeTotal#,
+		UPDATE_TIME=#updateTime#,
+		UPDATE_USER=#updateUser#
+		WHERE
+		RES_POOL_ID=#resPoolId#
+		AND RES_POOL_PART_ID=#resPoolPartId#
+	</update>
+	<!-- 删除资源池分区 -->
+	<update id="updateResPartStatusDel" parameterClass="ResourcePartInfo">
+		UPDATE
+		COMP_RES_POOL_PART_T 
+		SET
+		STATUS=#status#,
+		UPDATE_TIME=#updateTime#,
+		UPDATE_USER=#updateUser#
+		WHERE
+		RES_POOL_PART_ID=#resPoolPartId#
+		AND RES_POOL_ID=#resPoolId#
+	</update>
+</sqlMap>

@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="BusinessView">
+	<typeAlias alias="BusinessInfo"
+		type="com.neusoft.mid.cloong.web.page.console.business.info.BusinessInfo" />
+	<typeAlias alias="ResourceInfo"
+		type="com.neusoft.mid.cloong.web.page.console.business.info.ResourceInfo" />
+		
+	<typeAlias alias="treeInfo" type="com.neusoft.mid.cloong.web.page.console.business.CreateTreeInfo"/>
+	
+	<select id="queryBusinessByUserId" parameterClass="java.util.List"
+		resultClass="BusinessInfo">
+		SELECT 
+			APP_ID businessId, APP_NAME name, DESCRIPTION description,
+			CREATE_TIME createTime,  CREATE_USER createUserId, 
+			UPDATE_TIME updateTime, UPDATE_USER updateUserId
+		FROM
+			COMP_APP_T 
+		WHERE APP_ID in
+			<iterate conjunction="," close=")" open="(">
+				#appIdList[]#
+			</iterate>
+		ORDER BY APP_ID
+	</select>
+
+	<select id="queryBusinessByCaseId" resultClass="BusinessInfo" parameterClass="java.lang.String">
+		Select T2.BUSINESS_ID businessId, T2.BUSINESS_NAME name
+		from COMP_BUSINESS_CASE_T T, COMP_BUSINESS_T T2
+		WHERE T.BUSINESS_ID = T2.BUSINESS_ID
+		AND T.CASE_ID = #caseId#
+
+	</select>
+	
+	<select id="queryBusinessByAppId" resultClass="BusinessInfo" parameterClass="java.lang.String">
+			SELECT 
+			APP_ID businessId, APP_NAME name, DESCRIPTION description,
+			CREATE_TIME createTime,  CREATE_USER createUserId, 
+			UPDATE_TIME updateTime, UPDATE_USER updateUserId
+			FROM
+			COMP_APP_T 
+			WHERE APP_ID=#appId#
+	</select>
+
+	<select id="queryVMResourceByUserId" parameterClass="java.util.HashMap"
+		resultClass="ResourceInfo">
+		SELECT
+			comp_case_vm_t.CASE_ID resourceId,
+			vm_name NAME,
+			comp_case_vm_t. STATUS STATUS,
+			'0' type,
+			comp_case_vm_t.UPDATE_TIME,
+			comp_order_t.EFFECTIVE_TIME effectiveTime,
+			comp_order_t.EXPIRE_TIME overTime,
+			comp_case_vm_t.ISO_NAME isoName,
+			vm_id vmId,
+			comp_case_vm_t.app_id appId,
+			app_name appName
+		FROM
+			comp_case_vm_t
+		LEFT JOIN comp_order_t ON comp_case_vm_t.order_id = comp_order_t.order_id
+		LEFT JOIN comp_app_t on comp_case_vm_t.app_id = comp_app_t.app_id
+		WHERE
+			comp_case_vm_t. STATUS != '3'
+		AND comp_order_t.order_id IS NOT NULL
+		AND comp_order_t. STATUS != '2'
+		AND comp_case_vm_t.APP_ID = #businessId#
+		ORDER BY comp_order_t.EFFECTIVE_TIME desc,vm_name
+	</select>
+	
+	<select id="queryPMResourceByUserId" parameterClass="java.util.HashMap"
+		resultClass="ResourceInfo">
+		SELECT
+			comp_case_pm_t.CASE_ID resourceId,
+			pm_name NAME,
+			comp_case_pm_t. STATUS STATUS,
+			'1' type,
+			comp_case_pm_t.UPDATE_TIME,
+			comp_order_t.EFFECTIVE_TIME effectiveTime,
+			comp_order_t.EXPIRE_TIME overTime,
+			comp_os_t.OS_NAME isoName,
+			pm_id pmId,
+			comp_case_pm_t.app_id appId,
+			app_name appName
+		FROM
+			comp_case_pm_t
+		LEFT JOIN comp_order_t ON comp_case_pm_t.order_id = comp_order_t.order_id
+		LEFT JOIN comp_app_t ON comp_case_pm_t.app_id = comp_app_t.app_id
+		LEFT JOIN comp_os_t ON comp_case_pm_t.ISO_ID = comp_os_t.OS_ID AND Resource_TYPE ='1'
+		WHERE
+			comp_case_pm_t. STATUS != '3'
+		AND comp_order_t.order_id IS NOT NULL
+		AND comp_order_t. STATUS != '2'
+		AND comp_case_pm_t.APP_ID = #businessId#
+		ORDER BY
+			comp_order_t.EFFECTIVE_TIME DESC,
+			pm_name
+	</select>
+
+	<select id="queryEBSResourceByUserId" parameterClass="java.util.HashMap"
+		resultClass="ResourceInfo">
+		SELECT
+			comp_case_ebs_t.CASE_ID resourceId,
+			ebs_name NAME,
+			comp_case_ebs_t. STATUS STATUS,
+			'2' type,
+			comp_case_ebs_t.update_time
+		FROM
+			comp_case_ebs_t
+		LEFT JOIN comp_order_t ON comp_case_ebs_t.order_id = comp_order_t.order_id
+		WHERE
+			comp_case_ebs_t. STATUS != '10'
+		AND comp_order_t.order_id IS NOT NULL
+		AND comp_order_t. STATUS != '2'
+		AND comp_case_ebs_t.APP_ID = #businessId#
+		ORDER BY comp_case_ebs_t.create_time DESC
+	</select>
+	
+	<!-- 业务视图-概况-查询虚拟机备份任务 -->
+	<select id="queryVmBakResourceByAppId" parameterClass="java.util.HashMap"
+		resultClass="ResourceInfo">
+		SELECT
+			comp_case_vmbak_t.case_id resourceId,
+			comp_case_vmbak_t.vmBak_id vmBakId,
+			comp_case_vmbak_t.vmBak_name NAME,
+			comp_case_vmbak_t. STATUS STATUS,
+			'5' type
+		FROM comp_case_vmbak_t
+		LEFT JOIN comp_order_t ON comp_case_vmbak_t.order_id = comp_order_t.order_id
+		LEFT JOIN comp_case_vm_t ON comp_case_vmbak_t.vm_id = comp_case_vm_t.vm_id
+		LEFT JOIN comp_app_t ON comp_case_vm_t.app_id = comp_app_t.app_id
+		WHERE comp_case_vmbak_t. STATUS != '3'
+		AND comp_order_t.order_id IS NOT NULL
+		AND comp_order_t. STATUS != '2'
+		AND comp_case_vm_t. STATUS != '3'
+		AND comp_app_t.app_id = #businessId#
+		ORDER BY comp_case_vmbak_t.create_time DESC
+	</select>
+
+	<!-- 查询业务视图树节点 -->
+	<select id="queryAppInfoByUserId" parameterClass="treeInfo" resultClass="treeInfo">
+		SELECT 
+			USER_ID as userId, 
+			a.APP_ID as appId,
+			APP_NAME as appName
+		FROM comp_authority_user_app_t u,comp_app_t a
+		WHERE u.APP_ID = a.APP_ID
+		AND u.USER_ID=#userId# AND u.APPBIND_STATUS='2'
+		ORDER BY a.APP_ID
+	</select>
+</sqlMap>

@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
+    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+
+	<!-- 业务性能统计-CPU使用率统计 -->
+	<bean id="cpuHistoryPerformanceAction"
+		class="com.neusoft.mid.cloong.web.page.report.historyPerformance.action.CpuHistoryPerformanceAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<!-- 业务性能统计-CPU使用率超标设备统计 -->
+	<bean id="cpuHistoryPerformanceOverAction"
+		class="com.neusoft.mid.cloong.web.page.report.historyPerformance.action.CpuHistoryPerformanceOverAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<!-- 业务性能统计-内存使用率统计 -->
+	<bean id="memHistoryPerformanceAction"
+		class="com.neusoft.mid.cloong.web.page.report.historyPerformance.action.MemHistoryPerformanceAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<!-- 业务性能统计-内存使用率超标设备统计 -->
+	<bean id="memHistoryPerformanceOverAction"
+		class="com.neusoft.mid.cloong.web.page.report.historyPerformance.action.MemHistoryPerformanceOverAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<!-- 业务性能统计-磁盘使用率统计 -->
+	<bean id="diskHistoryPerformanceAction"
+		class="com.neusoft.mid.cloong.web.page.report.historyPerformance.action.DiskHistoryPerformanceAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<!-- 业务性能统计-磁盘使用率统计 -->
+	<bean id="diskHistoryPerformanceOverAction"
+		class="com.neusoft.mid.cloong.web.page.report.historyPerformance.action.DiskHistoryPerformanceOverAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<!-- 业务性能统计-导出 -->
+	<bean id="exportHistoryReportAction"
+		class="com.neusoft.mid.cloong.web.page.report.historyPerformance.action.ExportHistoryReportAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<!-- 设备性能统计-CPUTop10统计 -->
+	<bean id="cpuDeviceTop10PerformanceAction"
+		class="com.neusoft.mid.cloong.web.page.report.devicePerformance.action.CpuDeviceTop10PerformanceAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<!-- 设备性能统计-内存Top10统计 -->
+	<bean id="memDeviceTop10PerformanceAction"
+		class="com.neusoft.mid.cloong.web.page.report.devicePerformance.action.MemDeviceTop10PerformanceAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<!-- 月度性能统计-CPU统计 -->
+	<bean id="cpuDevicePerformanceAction"
+		class="com.neusoft.mid.cloong.web.page.report.monthPerformance.action.CpuDevicePerformanceAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<!-- 月度性能统计-内存统计 -->
+	<bean id="memDevicePerformanceAction"
+		class="com.neusoft.mid.cloong.web.page.report.monthPerformance.action.MemDevicePerformanceAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	
+	<!-- 月度性能统计-pagespace统计 -->
+	<bean id="pageDevicePerformanceAction"
+		class="com.neusoft.mid.cloong.web.page.report.monthPerformance.action.PageSpaceDevicePerformanceAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	
+	<!-- 月度性能统计-io统计 -->
+	<bean id="ioDevicePerformanceAction"
+		class="com.neusoft.mid.cloong.web.page.report.monthPerformance.action.IODevicePerformanceAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<!-- 设备性能统计- 吞吐量Top10统计 -->
+	<bean id="hstDeviceTop10PerformanceAction"
+		class="com.neusoft.mid.cloong.web.page.report.devicePerformance.action.HstDeviceTop10PerformanceAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+
+	<!-- 设备性能统计-性能统计查询 -->
+	<bean id="performanceSearchAction"
+		class="com.neusoft.mid.cloong.web.page.report.devicePerformance.action.PerformanceSearchAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<!-- 设备性能统计-导出统计数据 -->
+	<bean id="exportDeviceReportAction"
+		class="com.neusoft.mid.cloong.web.page.report.devicePerformance.action.ExportDeviceReportAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	
+	<!-- 月度性能统计-导出统计数据 -->
+	<bean id="exportMonthReportAction"
+		class="com.neusoft.mid.cloong.web.page.report.monthPerformance.action.ExportMonthReportAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	
+	<!-- 设备性能统计-实时性能统计 -->
+	<bean id="deviceformanceRTDetailAction"
+		class="com.neusoft.mid.cloong.web.page.report.devicePerformance.action.DevicePerformanceRTDetailAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+</beans>

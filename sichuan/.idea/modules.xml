@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/COMP_Common/COMP_Common.iml" filepath="$PROJECT_DIR$/COMP_Common/COMP_Common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/COMP_Identity/COMP_Identity.iml" filepath="$PROJECT_DIR$/COMP_Identity/COMP_Identity.iml" />
+      <module fileurl="file://$PROJECT_DIR$/COMP_Management/COMP_Management.iml" filepath="$PROJECT_DIR$/COMP_Management/COMP_Management.iml" />
+      <module fileurl="file://$PROJECT_DIR$/COMP_Parent.iml" filepath="$PROJECT_DIR$/COMP_Parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/COMP_Portal/COMP_Portal.iml" filepath="$PROJECT_DIR$/COMP_Portal/COMP_Portal.iml" />
+      <module fileurl="file://$PROJECT_DIR$/COMP_RPProxy_Interface/COMP_RPProxy_Interface.iml" filepath="$PROJECT_DIR$/COMP_RPProxy_Interface/COMP_RPProxy_Interface.iml" />
+      <module fileurl="file://$PROJECT_DIR$/COMP_ResourcePoolProxy/COMP_ResourcePoolProxy.iml" filepath="$PROJECT_DIR$/COMP_ResourcePoolProxy/COMP_ResourcePoolProxy.iml" />
+    </modules>
+  </component>
+</project>

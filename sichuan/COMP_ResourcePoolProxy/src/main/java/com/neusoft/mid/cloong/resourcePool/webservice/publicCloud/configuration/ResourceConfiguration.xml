@@ -1,0 +1,427 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="idc">
+
+	<insert id="insertTheSinglePmRecordByData" parameterClass="java.util.HashMap">
+		replace 
+		into COMP_RM_PM_T 
+		(PM_ID,PM_NAME,PM_INSTANCE_ID,IP,NETMASK,CLUSTER_IP,SERVER_TYPE,CPU_NUM,CPU_TYPE,
+		CPU_FREQUENCY,NUC_NUM_PER_CPU,MEMORY_SIZE,MEMORY_NUM,DISK_SIZE,DISK_NUM,IF_NUM,
+		MAINBORD_NUM,POWERMODULE_NUM,FAN_NUM,VENDOR_NAME,RUN_TIME,CUR_STATUS,SERIALNUM,
+			APP_ID,
+		RES_POOL_ID,RES_POOL_PART_ID,OS_TYPE,ETHADA_NUM,ETHADA_TYPE,SCSIADA_NUM,HBA_NUM,
+		HBA_TYPE,USED_FLAG,HV_INFO,HVPOOL_ID,SWITCH_IF_RELATIONS,ASSET_ORIGIN_TYPE,
+		ASSET_STATE,ASSET_SLA_TYPE,MACHINEROOM_ID,CABINET_ID,CPU_MODEL,NTP_IP,
+		MAINTENANCE_FACTORY,GATEWAY,HB_DESCRIPTION,BK_PM,BUSINESS_CONTACT,
+		SYS_EXCHANGE_AREA_SIZE,ONLINE_TIME,TCPP_VALUE,APPLICATION_DESCRIBE,PORT_LABEL,
+		CPUEQP_SERIALNUM,PM_STATE,CREATE_FLAG,UPDATE_TIME)
+		values 
+		(#eqp_id#,#eqp_name#,#instance_id#,#eqp_ip#,#eqp_netmask#,#cluster_ip#,#server_type#,
+		#cpu_num#,#cpu_type#,#cpu_frequency#,#nuc_num_per_cpu#,#memory_size#,#memory_num#,
+		#disk_size#,#disk_num#,#if_num#,#mainbord_num#,#powermodule_num#,#fan_num#,#vendor_name#,
+		#run_time#,#cur_status#,#eqp_serialnum#,
+		<isNotEmpty property="app_id">
+			#app_id#,
+		</isNotEmpty>
+		<isEmpty property="app_id">
+			(
+				select 
+					app_id
+				from
+					comp_rm_pm_t p 
+				where
+					p.PM_ID = #eqp_id#
+			),
+		</isEmpty>
+		#rc_id#,
+		<isNotEmpty property="zone_id">
+			#zone_id#,
+		</isNotEmpty>
+		<isEmpty property="zone_id">
+			(
+				select 
+					RES_POOL_PART_ID
+				from
+					comp_rm_pm_t p 
+				where
+					p.PM_ID = #eqp_id#
+			),
+		</isEmpty>
+		#os_type#,#ethada_num#,
+		#ethada_type#,#scsiada_num#,#hba_num#,#hba_type#,#used_flag#,#hv_info#,#hvpool_id#,
+		#switch_if_relations#,#asset_origin_type#,#asset_state#,#asset_sla_type#,#Object_Zone_ID#,
+		#Object_Cluster_ID#,#cpu_model#,#ntp_ip#,#maintenance_factory#,#gateway#,
+		#hb_description#,#bk_pm#,#business_contact#,#sys_exchange_area_size#,
+		<isNotEmpty property="online_time">
+			#online_time#,
+		</isNotEmpty>
+		<isEmpty property="online_time">
+			(
+				select 
+					online_time
+				from
+					comp_rm_pm_t p 
+				where
+					p.PM_ID = #eqp_id#
+			),
+		</isEmpty>
+		#tcpp_value#,#application_describe#,#port_label#,#cpueqp_serialnum#,#pm_state#,null,DATE_FORMAT(NOW(),'%Y%m%d%H%i%S'));
+	</insert>
+	
+	<insert id="insertTheSingleVmRecordByData" parameterClass="java.util.HashMap">
+	
+		replace
+		into comp_rm_vm_t
+		values
+		(#instance_id#,#eqp_name#,#eqp_id#,#vm_ip#,#vm_netmask#,#cluster_ip#,#cpu_num#,#cpu_frequency#,
+		#memory_size#,#disk_size#,#run_time#,#cur_status#,#app_id#,#rc_id#,#zone_id#,#v_ethada_num#,
+		#v_scsiada_num#,#v_fchba_num#,#os_type#,#vm_os#,#parent_id#,#CREAT_FLAG#,DATE_FORMAT(NOW(),'%Y%m%d%H%i%S'));
+	
+	</insert>
+	
+	<insert id="insertTheSingleEbsRecordByData" parameterClass="java.util.HashMap">
+	
+		replace
+		into comp_rm_ebs_t
+		values
+		(#instance_id#,#eqp_name#,#eqp_id#,#tier#,#vol_size#,#vol_status#,#app_id#,#rc_id#,
+		#parent_type#,#parent_id#,#CREAT_FLAG#,DATE_FORMAT(NOW(),'%Y%m%d%H%i%S'));
+	
+	</insert>
+	
+	<insert id="insertTheSingleMiniPmRecordByData" parameterClass="java.util.HashMap">
+	
+		replace
+		into comp_rm_minipm_t
+		values
+		(#instance_id#,#eqp_name#,#eqp_id#,#eqp_ip#,#eqp_netmask#,#cluster_ip#,#server_type#,
+		#cpu_num#,#cpu_type#,#cpu_frequency#,#memory_size#,#memory_num#,
+		#disk_size#,#disk_num#,#if_num#,#mainbord_num#,#powermodule_num#,#fan_num#,#vendor_name#,
+		#run_time#,#cur_status#,#eqp_serialnum#,
+		<isNotEmpty property="app_id">
+			#app_id#,
+		</isNotEmpty>
+		<isEmpty property="app_id">
+			(
+				select 
+					app_id
+				from
+					comp_rm_minipm_t p 
+				where
+					p.MINIPM_ID = #instance_id#
+			),
+		</isEmpty>
+		#rc_id#,#zone_id#,#os_type#,#switch_if_relations#,
+		#asset_origin_type#,#asset_state#,#asset_sla_type#,#Object_Zone_ID#,#Object_Cluster_ID#,null,
+		DATE_FORMAT(NOW(),'%Y%m%d%H%i%S'));
+	
+	</insert>
+	
+	<insert id="insertTheSingleMiniPmPartRecordByData" parameterClass="java.util.HashMap">
+	
+		replace
+		into comp_rm_minipmpar_t
+		values
+		(#instance_id#,#eqp_name#,#eqp_id#,#eqp_ip#,#eqp_netmask#,#cluster_ip#,#v_processor_num#,
+		#v_processor_frequency#,#mem_size#,#disk_size#,
+		#run_time#,#cur_status#,
+		<isNotEmpty property="app_id">
+			#app_id#,
+		</isNotEmpty>
+		<isEmpty property="app_id">
+			(
+				select 
+					app_id
+				from
+					comp_rm_minipmpar_t p 
+				where
+					p.MINIPMPAR_ID = #instance_id#
+			),
+		</isEmpty>
+		#rc_id#,#zone_id#,#v_ethada_num#,#v_scsiada_num#,
+		#v_fchba_num#,#os_type#,#vm_os#,#parent_id#,#switch_if_relations#,
+		#swap_capacity#,null,DATE_FORMAT(NOW(),'%Y%m%d%H%i%S'));
+		
+	</insert>
+	
+	<insert id="insertTheSingleRaidRecordByData" parameterClass="java.util.HashMap">
+	
+		replace
+		into comp_rm_raid_t
+		values
+		(#eqp_id#,#instance_id#,#eqp_name#,#vendor_name#,#sa_type#,#sa_microcode_ver#,#sa_capacity#,#sa_ip#,
+		#related_eqp_id#,#cache_capacity#,#disk_ids#,#disk_specification#,#hba_ids#,#rc_id#,#hba_types#,#hba_num#,
+		#disk_adaptor_id#,#disk_adaptor_type#,#eqp_serialnum#,#asset_state#,#asset_sla_type#,null,DATE_FORMAT(NOW(),'%Y%m%d%H%i%S'));
+	
+	</insert>
+	
+	<insert id="insertTheSingleSwRecordByData" parameterClass="java.util.HashMap">
+	
+		replace
+		into comp_rm_switch_t
+		values
+		(#eqp_id#,#eqp_name#,#switch_type#,#sw_version#,#vendor_name#,#switch_ip#,#cur_status#,
+		#switch_serialnum#,#asset_origin_type#,#asset_state#,#asset_sla_type#,#rc_id#,null,DATE_FORMAT(NOW(),'%Y%m%d%H%i%S'));
+	
+	</insert>
+	
+	<insert id="insertTheSingleSwIfRecordByData" parameterClass="java.util.HashMap">
+	
+		replace
+		into comp_rm_switch_if_t
+		values
+		(#eqp_id#,#eqp_name#,#parent_id#,#if_description#,#if_status#,#if_type#,#if_set_mac_addr#,
+		#if_real_mac_addr#,#if_connect_eqp_ip#,#vlan_id#,#if_speed#,#dest_if_id#,#rc_id#,null,DATE_FORMAT(NOW(),'%Y%m%d%H%i%S'));
+	
+	</insert>
+	
+	<insert id="insertTheSingleRtRecordByData" parameterClass="java.util.HashMap">
+	
+		replace
+		into comp_rm_router_t
+		values
+		(#eqp_id#,#eqp_name#,#router_type#,#sw_version#,#vendor_name#,#router_ip#,#cur_status#,#router_serialnum#,
+		#asset_origin_type#,#asset_state#,#asset_sla_type#,#rc_id#,null,DATE_FORMAT(NOW(),'%Y%m%d%H%i%S'));
+	
+	</insert>
+	
+	<insert id="insertTheSingleRtIfRecordByData" parameterClass="java.util.HashMap">
+	
+		replace
+		into comp_rm_router_if_t
+		values
+		(#eqp_id#,#eqp_name#,#parent_id#,#if_description#,#if_status#,#if_type#,#if_set_local_ip#,#ip_sub_netmask#,
+		#if_connect_eqp_ip#,#if_phy_address#,#if_speed#,#dest_if_id#,#rc_id#,null,DATE_FORMAT(NOW(),'%Y%m%d%H%i%S'));
+	
+	</insert>
+	
+	<insert id="insertTheSingleFwRecordByData" parameterClass="java.util.HashMap">
+	
+		replace
+		into comp_rm_firewall_t
+		values
+		(#eqp_id#,#eqp_name#,#fw_type#,#sw_version#,#vendor_name#,#fw_ip#,#cur_status#,#fw_serialnum#,
+		#throughput#,#app_ids#,#connect_num#,#new_connect_num#,
+		#asset_origin_type#,#asset_state#,#asset_sla_type#,#port_num#,#firewall_policy#,#rc_id#,null,DATE_FORMAT(NOW(),'%Y%m%d%H%i%S'));
+	
+	</insert>
+	
+	<select id="getVmOwnership" parameterClass="java.lang.String" resultClass="java.lang.Integer">
+		SELECT
+			count(*)
+		FROM
+			`comp_case_vm_t` v
+		WHERE
+			v.VM_ID = #instance_id#;
+	</select>
+	
+	<select id="getEbsOwnership" parameterClass="java.lang.String" resultClass="java.lang.Integer">
+		SELECT
+			count(*)
+		FROM
+			`comp_case_ebs_t` v
+		WHERE
+			v.EBS_ID = #instance_id#;
+	</select>
+
+	<select id="validatePmEqp" parameterClass="java.lang.String" resultClass="java.lang.Integer">
+	
+		SELECT
+			count(*)
+		FROM
+			`comp_rm_pm_t` v
+		WHERE
+			v.PM_ID = #pm_id#;
+	
+	</select>
+	
+	<select id="validatePmInstance" parameterClass="java.lang.String" resultClass="java.lang.Integer">
+	
+		SELECT
+			count(*)
+		FROM
+			`comp_rm_pm_t` v
+		WHERE
+			v.PM_INSTANCE_ID = #pm_id#;
+	
+	</select>
+	
+	<select id="validateVmInstance" parameterClass="java.lang.String" resultClass="java.lang.Integer">
+	
+		SELECT
+			count(*)
+		FROM
+			`comp_rm_vm_t` v
+		WHERE
+			v.VM_ID = #vm_id#;
+	
+	</select>
+	
+	<select id="validateEbsInstance" parameterClass="java.lang.String" resultClass="java.lang.Integer">
+	
+		SELECT
+			count(*)
+		FROM
+			`comp_rm_ebs_t` v
+		WHERE
+			v.EBS_ID = #EBS_ID#;
+	
+	</select>
+	
+	<select id="validateMiniPmInstance" parameterClass="java.lang.String" resultClass="java.lang.Integer">
+	
+		SELECT
+			count(*)
+		FROM
+			`comp_rm_minipm_t` v
+		WHERE
+			v.MINIPM_ID = #minipm_id#;
+	
+	</select>
+	
+	<select id="validateMiniPmPartInstance" parameterClass="java.lang.String" resultClass="java.lang.Integer">
+	
+		SELECT
+			count(*)
+		FROM
+			`comp_rm_minipmpar_t` v
+		WHERE
+			v.MINIPMPAR_ID = #minipmpart_id#;
+	
+	</select>
+	
+	<select id="validateRaidInstance" parameterClass="java.lang.String" resultClass="java.lang.Integer">
+	
+		SELECT
+			count(*)
+		FROM
+			`comp_rm_raid_t` v
+		WHERE
+			v.raid_ID = #raid_id#;
+	
+	</select>
+	
+	<select id="validateSwInstance" parameterClass="java.lang.String" resultClass="java.lang.Integer">
+	
+		SELECT
+			count(*)
+		FROM
+			`comp_rm_switch_t` v
+		WHERE
+			v.switch_ID = #switch_id#;
+	
+	</select>
+	
+	<select id="validateSwIfInstance" parameterClass="java.lang.String" resultClass="java.lang.Integer">
+	
+		SELECT
+			count(*)
+		FROM
+			`comp_rm_switch_if_t` v
+		WHERE
+			v.SWITCH_IF_ID = #switch_if_id#;
+	
+	</select>
+	
+	<select id="validateRtInstance" parameterClass="java.lang.String" resultClass="java.lang.Integer">
+	
+		SELECT
+			count(*)
+		FROM
+			`comp_rm_router_t` v
+		WHERE
+			v.ROUTER_ID = #router_id#;
+	
+	</select>
+	
+	<select id="validateRtIfInstance" parameterClass="java.lang.String" resultClass="java.lang.Integer">
+	
+		SELECT
+			count(*)
+		FROM
+			`comp_rm_router_if_t` v
+		WHERE
+			v.ROUTER_IF_ID = #router_if_id#;
+	
+	</select>
+	
+	<select id="validateFwInstance" parameterClass="java.lang.String" resultClass="java.lang.Integer">
+	
+		SELECT
+			count(*)
+		FROM
+			`comp_rm_firewall_t` v
+		WHERE
+			v.FIREWALL_ID = #firewall_id#;
+	
+	</select>
+	
+	<delete id="deletePm" parameterClass="java.lang.String">
+		delete from comp_rm_pm_t
+		where
+			PM_ID = #pm_id#;
+	</delete>
+
+	<delete id="deleteVm" parameterClass="java.lang.String">
+		delete from comp_rm_vm_t
+		where
+			VM_ID = #vm_id#;
+	</delete>
+	
+	<delete id="deleteEbs" parameterClass="java.lang.String">
+		delete from comp_rm_ebs_t
+		where 
+			EBS_ID = #ebs_id#;
+	</delete>
+	
+	<delete id="deleteMiniPm" parameterClass="java.lang.String">
+		delete from comp_rm_minipm_t
+		where 
+			MINIPM_ID = #minipm_id#;
+	</delete>
+	
+	<delete id="deleteMiniPmPart" parameterClass="java.lang.String">
+		delete from comp_rm_minipmpar_t
+		where 
+			MINIPMPAR_ID = #minipm_id#;
+	</delete>
+	
+	<delete id="deleteRaid" parameterClass="java.lang.String">
+		delete from comp_rm_raid_t
+		where
+			RAID_ID = #raid_id#;
+	</delete>
+	
+	<delete id="deleteSw" parameterClass="java.lang.String">
+		delete from comp_rm_switch_t
+		where
+			SWITCH_ID = #switch_id#;
+	</delete>
+	
+	<delete id="deleteSwIf" parameterClass="java.lang.String">
+		delete from comp_rm_switch_if_t
+		where
+			SWITCH_IF_ID = #switch_if_id#;
+	</delete>
+
+	<delete id="deleteRt" parameterClass="java.lang.String">
+		delete from comp_rm_router_t
+		where
+			ROUTER_ID = #router_id#;
+	</delete>
+	
+	<delete id="deleteRtIf" parameterClass="java.lang.String">
+		delete from comp_rm_router_if_t
+		where
+			ROUTER_IF_ID = #router_if_id#;
+	</delete>
+	
+	<delete id="deleteFwd" parameterClass="java.lang.String">
+		delete from comp_rm_firewall_t
+		where
+			FIREWALL_ID = #firewall_id#;
+	</delete>
+</sqlMap>

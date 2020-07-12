@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
+    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+    
+    <!-- 业务管理 -->
+    
+    <!-- 业务信息查询 -->
+	<bean id="appListAction" 
+	      class="com.neusoft.mid.cloong.web.page.app.action.AppListAction"
+		  scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+   
+	
+	<!-- 业务详情-->
+	<bean id="appDetailAction"
+		class="com.neusoft.mid.cloong.web.page.app.action.AppDetailAction"
+		scope="prototype">
+		<property name="appDetailService" ref="appDetailService"></property>
+	</bean>
+	
+    <!-- 业务详情Service-->
+	<bean id="appDetailService"
+		class="com.neusoft.mid.cloong.web.page.app.service.AppDetailService"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+	
+	<!--  修改业务-->
+	<bean id="appUpdateAction"
+		class="com.neusoft.mid.cloong.web.page.app.action.AppUpdateAction"
+		scope="prototype">
+		<property name="appUpdateService" ref="appUpdateService"></property>
+	</bean>
+    <!--  修改业务Service-->
+	<bean id="appUpdateService"
+		class="com.neusoft.mid.cloong.web.page.app.service.AppUpdateService"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+	
+	<!--  创建业务-->
+	<bean id="appAddAction"
+		class="com.neusoft.mid.cloong.web.page.app.action.AppAddAction"
+		scope="prototype">
+		<property name="appAddService" ref="appAddService"></property>
+	</bean>
+	
+	<!--  创建业务Service-->
+	<bean id="appAddService"
+	      class="com.neusoft.mid.cloong.web.page.app.service.AppAddService">
+		<property name="ibatisDAO" ref="ibatisDAOProxy" />
+		<property name="seqCen">
+			<bean class="com.neusoft.mid.cloong.common.util.CommonSequenceGenerator">
+				<property name="prefix" value="app-"></property>
+			</bean>
+		</property>
+	</bean>
+	
+	    <!--  删除业务-->
+	<bean id="appDeleteAction"
+		class="com.neusoft.mid.cloong.web.page.app.action.AppDeleteAction"
+		scope="prototype">
+		<property name="appDeleteService" ref="appDeleteService"></property>
+	</bean>
+	
+	<!--  删除业务Service-->
+	<bean id="appDeleteService"
+		class="com.neusoft.mid.cloong.web.page.app.service.AppDeleteService">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+	
+	<!-- 业务绑定用户 -->
+	 <bean id="queryAppUserListAction" class="com.neusoft.mid.cloong.web.page.app.action.QueryAppUserListAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+	<!-- 业务绑定资源池 -->
+	<bean id="queryResPoolListAction" class="com.neusoft.mid.cloong.web.page.app.action.QueryResPoolListAction"
+		  scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+</beans>

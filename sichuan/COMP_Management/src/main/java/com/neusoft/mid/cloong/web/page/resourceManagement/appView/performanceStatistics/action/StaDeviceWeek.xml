@@ -1,0 +1,776 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+    
+<sqlMap namespace="StaDeviceWeek">
+
+	<typeAlias alias="staDeviceWeek" type="com.neusoft.mid.cloong.web.page.resourceManagement.info.StaDeviceWeek"/>
+	
+	<!-- 业务下的设备数 -->
+	 <select id="queryDeviceNumbyAppId" resultClass="staDeviceWeek" parameterClass="java.lang.String">
+			SELECT AWT.APP_ID,
+				   IFNULL(SUM( CASE AWT.DEVICE_TYPE WHEN 0 THEN AWT.DEVICE_NUM ELSE 0 END ),0) MINIPM_NUM,
+				   IFNULL(SUM( CASE AWT.DEVICE_TYPE WHEN 1 THEN AWT.DEVICE_NUM ELSE 0 END ),0) MINIPMPAR_NUM,
+				   IFNULL(SUM( CASE AWT.DEVICE_TYPE WHEN 2 THEN AWT.DEVICE_NUM ELSE 0 END ),0) PM_NUM,
+				   IFNULL(SUM( CASE AWT.DEVICE_TYPE WHEN 3 THEN AWT.DEVICE_NUM ELSE 0 END ),0) VM_NUM,
+				   IFNULL(SUM( CASE AWT.DEVICE_TYPE WHEN 4 THEN AWT.DEVICE_NUM ELSE 0 END ),0) EBS_NUM
+			  FROM COMP_STA_DEVICE_APP_WEEK_T AWT
+		     WHERE AWT.REPORT_DATE = DATE_FORMAT(CURDATE(), '%Y%m%d')
+               AND AWT.APP_ID = #app_id#
+	</select>
+	
+	
+	<!-- 业务下的性能统计之虚拟机-->
+    <!-- Cpu性能 列表 -->
+    <select id="queryVmCpuUsedPerList" resultClass="staDeviceWeek" parameterClass="staDeviceWeek">
+         SELECT  IFNULL(CASE_VM.VM_NAME,V.VM_NAME) DEVICE_NAME,
+                 ROUND(WT.cpu_processor_utilization,2) USED_PER
+           FROM  COMP_STA_DEVICE_WEEK_T WT
+		   INNER JOIN COMP_RM_VM_T V ON WT.DEVICE_ID = V.VM_ID
+		   LEFT JOIN COMP_CASE_VM_T CASE_VM ON V.VM_ID = CASE_VM.VM_ID
+           WHERE  WT.REPORT_DATE = DATE_FORMAT(CURDATE(),'%Y%m%d')
+             AND WT.DEVICE_TYPE = #device_type#
+			<dynamic prepend="">
+				<isNotEmpty prepend="and" property="app_id">
+					V.APP_ID = #app_id#
+				</isNotEmpty>
+				<![CDATA[ 
+				and WT.CPU_PROCESSOR_UTILIZATION <> '' 
+				 ]]>
+			</dynamic>
+			
+			ORDER BY USED_PER DESC,DEVICE_NAME DESC
+	</select>
+	
+	<!-- Cpu性能列表数目 -->
+	<select id="queryVmCpuUsedPerListCount"  resultClass="java.lang.Integer" parameterClass="staDeviceWeek">
+	   SELECT COUNT(*)
+		 FROM COMP_STA_DEVICE_WEEK_T WT,COMP_RM_VM_T V
+		WHERE WT.DEVICE_ID = V.VM_ID
+		  AND WT.REPORT_DATE = DATE_FORMAT(CURDATE(),'%Y%m%d')
+		  AND WT.DEVICE_TYPE = #device_type#
+		 <dynamic prepend="">
+		     <isNotEmpty prepend="and" property="app_id">
+			     V.APP_ID = #app_id#
+			 </isNotEmpty>
+			 <![CDATA[ 
+				and WT.CPU_PROCESSOR_UTILIZATION <> '' 
+				 ]]>
+		 </dynamic>
+	</select>
+	
+	<!-- Cpu性能图 toP10-->
+    <select id="getVmCpuUsedPerListTop10" resultClass="staDeviceWeek">
+         SELECT  IFNULL(CASE_VM.VM_NAME,V.VM_NAME) DEVICE_NAME,
+                 ROUND(WT.cpu_processor_utilization,2) cpu_processor_utilization
+           FROM  COMP_STA_DEVICE_WEEK_T WT
+           INNER JOIN COMP_RM_VM_T V ON WT.DEVICE_ID = V.VM_ID
+           LEFT JOIN COMP_CASE_VM_T CASE_VM ON CASE_VM.VM_ID = V.VM_ID
+           WHERE WT.REPORT_DATE = DATE_FORMAT(CURDATE(),'%Y%m%d')
+             AND WT.DEVICE_TYPE = #device_type#
+			<dynamic prepend="">
+				<isNotEmpty prepend="and" property="app_id">
+					V.APP_ID = #app_id#
+				</isNotEmpty>
+				<![CDATA[ 
+				and WT.CPU_PROCESSOR_UTILIZATION <> '' 
+				 ]]>
+			</dynamic>
+			ORDER BY cpu_processor_utilization DESC,DEVICE_NAME DESC
+			LIMIT 10
+	</select>
+	<!-- 内存性能列表 -->
+    <select id="queryVmMemUsedPerList" resultClass="staDeviceWeek" parameterClass="staDeviceWeek">
+          SELECT IFNULL(CASE_VM.VM_NAME,V.VM_NAME) DEVICE_NAME,
+                 ROUND(WT.MEM_USED_PER,2) USED_PER
+           FROM  COMP_STA_DEVICE_WEEK_T WT
+           INNER JOIN COMP_RM_VM_T V ON WT.DEVICE_ID = V.VM_ID
+           LEFT JOIN COMP_CASE_VM_T CASE_VM ON CASE_VM.VM_ID = V.VM_ID
+           WHERE WT.REPORT_DATE = DATE_FORMAT(CURDATE(),'%Y%m%d')
+             AND WT.DEVICE_TYPE = #device_type#
+			<dynamic prepend="">
+				<isNotEmpty prepend="and" property="app_id">
+					V.APP_ID = #app_id#
+				</isNotEmpty>
+				<![CDATA[ 
+				and WT.MEM_USED_PER <> '' 
+				 ]]>
+			</dynamic>
+			ORDER BY USED_PER DESC,DEVICE_NAME DESC
+	</select> 
+	
+	<!-- 内存性能列表数目 -->
+	<select id="queryVmMemUsedPerListCount"  resultClass="java.lang.Integer" parameterClass="staDeviceWeek">
+		SELECT COUNT(*)
+		FROM COMP_STA_DEVICE_WEEK_T WT,COMP_RM_VM_T V
+		WHERE WT.DEVICE_ID = V.VM_ID
+		  AND WT.REPORT_DATE = DATE_FORMAT(CURDATE(),'%Y%m%d')
+		  AND WT.DEVICE_TYPE = #device_type#
+		 <dynamic prepend="">
+		     <isNotEmpty prepend="and" property="app_id">
+			     V.APP_ID = #app_id#
+			 </isNotEmpty>
+			 <![CDATA[ 
+				and WT.MEM_USED_PER <> '' 
+				 ]]>
+		 </dynamic>
+	</select>
+	
+	<!-- 内存性能图  toP10 -->
+    <select id="getVmMemUsedPerListTop10" resultClass="staDeviceWeek">
+        SELECT IFNULL(CASE_VM.VM_NAME,V.VM_NAME) DEVICE_NAME,
+               ROUND(WT.MEM_USED_PER,2) mem_used_per
+         FROM  COMP_STA_DEVICE_WEEK_T WT
+         INNER JOIN COMP_RM_VM_T V ON WT.DEVICE_ID = V.VM_ID
+         LEFT JOIN COMP_CASE_VM_T CASE_VM ON CASE_VM.VM_ID = V.VM_ID
+         WHERE WT.REPORT_DATE = DATE_FORMAT(CURDATE(),'%Y%m%d')
+           AND WT.DEVICE_TYPE = #device_type#
+		<dynamic prepend="">
+			<isNotEmpty prepend="and" property="app_id">
+				V.APP_ID = #app_id#
+			</isNotEmpty>
+			<![CDATA[ 
+				and WT.MEM_USED_PER <> '' 
+				 ]]>
+		</dynamic>
+		ORDER BY MEM_USED_PER DESC,DEVICE_NAME DESC
+		LIMIT 10
+	</select>
+	<!-- 磁盘性能列表 -->
+    <select id="queryVmDiskUsedPerList" resultClass="staDeviceWeek" parameterClass="staDeviceWeek">
+          SELECT IFNULL(CASE_VM.VM_NAME,V.VM_NAME) DEVICE_NAME,
+                 ROUND(WT.DISK_USED_PER,2) USED_PER
+           FROM  COMP_STA_DEVICE_WEEK_T WT
+           INNER JOIN COMP_RM_VM_T V ON WT.DEVICE_ID = V.VM_ID
+           LEFT JOIN COMP_CASE_VM_T CASE_VM ON CASE_VM.VM_ID = V.VM_ID
+           WHERE WT.REPORT_DATE = DATE_FORMAT(CURDATE(),'%Y%m%d')
+             AND WT.DEVICE_TYPE = #device_type#
+			<dynamic prepend="">
+				<isNotEmpty prepend="and" property="app_id">
+					V.APP_ID = #app_id#
+				</isNotEmpty>
+				<![CDATA[ 
+				and WT.DISK_USED_PER <> '' 
+				 ]]>
+			</dynamic>
+			ORDER BY USED_PER DESC,DEVICE_NAME DESC
+	</select>
+	
+	<!-- 磁盘性能列表数目 -->
+	<select id="queryVmDiskUsedPerListCount"  resultClass="java.lang.Integer" parameterClass="staDeviceWeek">
+		SELECT COUNT(*)
+		FROM COMP_STA_DEVICE_WEEK_T WT,COMP_RM_VM_T V
+		WHERE WT.DEVICE_ID = V.VM_ID
+		  AND WT.REPORT_DATE = DATE_FORMAT(CURDATE(),'%Y%m%d')
+		  AND WT.DEVICE_TYPE = #device_type#
+		 <dynamic prepend="">
+		     <isNotEmpty prepend="and" property="app_id">
+			     V.APP_ID = #app_id#
+			 </isNotEmpty>
+			 <![CDATA[ 
+				and WT.DISK_USED_PER <> '' 
+				 ]]>
+		 </dynamic>
+	</select>
+	
+	<!-- 磁盘性能图  toP10 -->
+    <select id="getVmDiskUsedPerListTop10" resultClass="staDeviceWeek">
+          SELECT IFNULL(CASE_VM.VM_NAME,V.VM_NAME) DEVICE_NAME,
+                 ROUND(WT.DISK_USED_PER,2) DISK_USED_PER
+           FROM  COMP_STA_DEVICE_WEEK_T WT
+           INNER JOIN COMP_RM_VM_T V ON WT.DEVICE_ID = V.VM_ID
+           LEFT JOIN COMP_CASE_VM_T CASE_VM ON CASE_VM.VM_ID = V.VM_ID
+           WHERE WT.REPORT_DATE = DATE_FORMAT(CURDATE(),'%Y%m%d')
+             AND WT.DEVICE_TYPE = #device_type#
+		<dynamic prepend="">
+			<isNotEmpty prepend="and" property="app_id">
+				V.APP_ID = #app_id#
+			</isNotEmpty>
+			<![CDATA[ 
+				and WT.DISK_USED_PER <> '' 
+				 ]]>
+		</dynamic>
+		ORDER BY DISK_USED_PER DESC,DEVICE_NAME DESC
+		LIMIT 10
+	</select>
+	
+	<select id="queryVmPerList" resultClass="staDeviceWeek" parameterClass="String">
+         SELECT  IFNULL(CASE_VM.VM_NAME,V.VM_NAME) DEVICE_NAME,
+                 ROUND(WT.cpu_processor_utilization,2) cpu_processor_utilization,
+                 ROUND(WT.MEM_USED_PER,2) mem_used_per,
+                 ROUND(WT.DISK_USED_PER,2) disk_used_per
+           FROM  COMP_STA_DEVICE_WEEK_T WT
+           INNER JOIN COMP_RM_VM_T V ON WT.DEVICE_ID = V.VM_ID
+           LEFT JOIN COMP_CASE_VM_T CASE_VM ON CASE_VM.VM_ID = V.VM_ID
+           WHERE WT.REPORT_DATE = DATE_FORMAT(CURDATE(),'%Y%m%d')
+             AND WT.DEVICE_TYPE = '3'
+			<dynamic prepend="">
+				and	V.APP_ID = #app_id#
+				and (   <![CDATA[ WT.CPU_PROCESSOR_UTILIZATION <> '' ]]>
+					 or <![CDATA[ WT.MEM_USED_PER <> '' ]]>
+				 	 or <![CDATA[ WT.DISK_USED_PER <> '' ]]>)
+			</dynamic>
+			ORDER BY WT.CPU_PROCESSOR_UTILIZATION DESC,WT.MEM_USED_PER DESC,WT.DISK_USED_PER DESC,DEVICE_NAME DESC
+	</select>
+				
+	
+	<!-- 业务下的性能统计之物理机-->
+	<!-- Cpu性能列表 -->
+    <select id="queryPmCpuUsedPerList" resultClass="staDeviceWeek" parameterClass="staDeviceWeek">
+         SELECT  P.PM_NAME DEVICE_NAME,
+                 ROUND(WT.cpu_processor_utilization,2) USED_PER
+           FROM  COMP_STA_DEVICE_WEEK_T WT,COMP_RM_PM_T P
+           WHERE WT.DEVICE_ID = P.PM_ID
+             AND WT.REPORT_DATE = DATE_FORMAT(CURDATE(),'%Y%m%d')
+             AND WT.DEVICE_TYPE = #device_type#
+			<dynamic prepend="">
+				<isNotEmpty prepend="and" property="app_id">
+					P.APP_ID = #app_id#
+				</isNotEmpty>
+				<![CDATA[ 
+				and WT.cpu_processor_utilization <> '' 
+				 ]]>
+			</dynamic>
+			ORDER BY USED_PER DESC,DEVICE_NAME DESC
+	</select>
+	
+	<!-- Cpu性能列表数目 -->
+	<select id="queryPmCpuUsedPerListCount"  resultClass="java.lang.Integer" parameterClass="staDeviceWeek">
+	   SELECT COUNT(*)
+		 FROM COMP_STA_DEVICE_WEEK_T WT,COMP_RM_PM_T P
+		WHERE WT.DEVICE_ID = P.PM_ID
+		  AND WT.REPORT_DATE = DATE_FORMAT(CURDATE(),'%Y%m%d')
+		  AND WT.DEVICE_TYPE = #device_type#
+		 <dynamic prepend="">
+		     <isNotEmpty prepend="and" property="app_id">
+			     P.APP_ID = #app_id#
+			 </isNotEmpty>
+			 <![CDATA[ 
+				and WT.cpu_processor_utilization <> '' 
+				 ]]>
+		 </dynamic>
+	</select>
+	
+	<!-- Cpu性能图  toP10-->
+    <select id="getPmCpuUsedPerListTop10" resultClass="staDeviceWeek">
+         SELECT  P.PM_NAME DEVICE_NAME,
+                 ROUND(WT.cpu_processor_utilization,2) cpu_processor_utilization
+           FROM  COMP_STA_DEVICE_WEEK_T WT,COMP_RM_PM_T P
+           WHERE WT.DEVICE_ID = P.PM_ID
+             AND WT.REPORT_DATE = DATE_FORMAT(CURDATE(),'%Y%m%d')
+             AND WT.DEVICE_TYPE = #device_type#
+			<dynamic prepend="">
+				<isNotEmpty prepend="and" property="app_id">
+					P.APP_ID = #app_id#
+				</isNotEmpty>
+				<![CDATA[ 
+				and WT.cpu_processor_utilization <> '' 
+				 ]]>
+			</dynamic>
+			ORDER BY cpu_processor_utilization DESC,DEVICE_NAME DESC
+			LIMIT 10
+	</select>
+	<!-- 内存性能列表 -->
+    <select id="queryPmMemUsedPerList" resultClass="staDeviceWeek" parameterClass="staDeviceWeek">
+          SELECT P.PM_NAME DEVICE_NAME,
+                 ROUND(WT.MEM_USED_PER,2) USED_PER
+           FROM  COMP_STA_DEVICE_WEEK_T WT,COMP_RM_PM_T P
+           WHERE WT.DEVICE_ID = P.PM_ID
+             AND WT.REPORT_DATE = DATE_FORMAT(CURDATE(),'%Y%m%d')
+             AND WT.DEVICE_TYPE = #device_type#
+			<dynamic prepend="">
+				<isNotEmpty prepend="and" property="app_id">
+					P.APP_ID = #app_id#
+				</isNotEmpty>
+				<![CDATA[ 
+				and WT.MEM_USED_PER <> '' 
+				 ]]>
+			</dynamic>
+			ORDER BY USED_PER DESC,DEVICE_NAME DESC
+	</select> 
+	
+	<!-- 内存性能列表数目 -->
+	<select id="queryPmMemUsedPerListCount"  resultClass="java.lang.Integer" parameterClass="staDeviceWeek">
+		SELECT COUNT(*)
+		FROM COMP_STA_DEVICE_WEEK_T WT,COMP_RM_PM_T P
+		WHERE WT.DEVICE_ID = P.PM_ID
+		  AND WT.REPORT_DATE = DATE_FORMAT(CURDATE(),'%Y%m%d')
+		  AND WT.DEVICE_TYPE = #device_type#
+		 <dynamic prepend="">
+		     <isNotEmpty prepend="and" property="app_id">
+			     P.APP_ID = #app_id#
+			 </isNotEmpty>
+			 <![CDATA[ 
+				and WT.MEM_USED_PER <> '' 
+				 ]]>
+		 </dynamic>
+	</select>
+	
+	<!-- 内存性能图  toP10 -->
+    <select id="getPmMemUsedPerListTop10" resultClass="staDeviceWeek">
+        SELECT P.PM_NAME DEVICE_NAME,
+               ROUND(WT.MEM_USED_PER,2) mem_used_per
+         FROM  COMP_STA_DEVICE_WEEK_T WT,COMP_RM_PM_T P
+         WHERE WT.DEVICE_ID = P.PM_ID
+           AND WT.REPORT_DATE = DATE_FORMAT(CURDATE(),'%Y%m%d')
+           AND WT.DEVICE_TYPE = #device_type#
+		<dynamic prepend="">
+			<isNotEmpty prepend="and" property="app_id">
+				P.APP_ID = #app_id#
+			</isNotEmpty>
+			<![CDATA[ 
+				and WT.MEM_USED_PER <> '' 
+				 ]]>
+		</dynamic>
+		ORDER BY MEM_USED_PER DESC,DEVICE_NAME DESC
+		LIMIT 10
+	</select>
+	<!-- 磁盘性能列表 -->
+    <select id="queryPmDiskUsedPerList" resultClass="staDeviceWeek" parameterClass="staDeviceWeek">
+          SELECT P.PM_NAME DEVICE_NAME,
+                 ROUND(WT.DISK_USED_PER,2) USED_PER
+           FROM  COMP_STA_DEVICE_WEEK_T WT,COMP_RM_PM_T P
+           WHERE WT.DEVICE_ID = P.PM_ID
+             AND WT.REPORT_DATE = DATE_FORMAT(CURDATE(),'%Y%m%d')
+             AND WT.DEVICE_TYPE = #device_type#
+			<dynamic prepend="">
+				<isNotEmpty prepend="and" property="app_id">
+					P.APP_ID = #app_id#
+				</isNotEmpty>
+				<![CDATA[ 
+				and WT.DISK_USED_PER <> '' 
+				 ]]>
+			</dynamic>
+			ORDER BY USED_PER DESC,DEVICE_NAME DESC
+	</select>
+	
+	<!-- 磁盘性能列表数目 -->
+	<select id="queryPmDiskUsedPerListCount"  resultClass="java.lang.Integer" parameterClass="staDeviceWeek">
+		SELECT COUNT(*)
+		FROM COMP_STA_DEVICE_WEEK_T WT,COMP_RM_PM_T P
+		WHERE WT.DEVICE_ID = P.PM_ID
+		  AND WT.REPORT_DATE = DATE_FORMAT(CURDATE(),'%Y%m%d')
+		  AND WT.DEVICE_TYPE = #device_type#
+		 <dynamic prepend="">
+		     <isNotEmpty prepend="and" property="app_id">
+			     P.APP_ID = #app_id#
+			 </isNotEmpty>
+			 <![CDATA[ 
+				and WT.DISK_USED_PER <> '' 
+				 ]]>
+		 </dynamic>
+	</select>
+	
+	<!-- 磁盘性能图  toP10 -->
+    <select id="getPmDiskUsedPerListTop10" resultClass="staDeviceWeek">
+          SELECT P.PM_NAME DEVICE_NAME,
+                 ROUND(WT.DISK_USED_PER,2) DISK_USED_PER
+           FROM  COMP_STA_DEVICE_WEEK_T WT,COMP_RM_PM_T P
+           WHERE WT.DEVICE_ID = P.PM_ID
+             AND WT.REPORT_DATE = DATE_FORMAT(CURDATE(),'%Y%m%d')
+             AND WT.DEVICE_TYPE = #device_type#
+		<dynamic prepend="">
+			<isNotEmpty prepend="and" property="app_id">
+				P.APP_ID = #app_id#
+			</isNotEmpty>
+			<![CDATA[ 
+				and WT.DISK_USED_PER <> '' 
+				 ]]>
+		</dynamic>
+		ORDER BY DISK_USED_PER DESC,DEVICE_NAME DESC
+		LIMIT 10
+	</select>
+	
+	<select id="queryPmPerList" resultClass="staDeviceWeek" parameterClass="String">
+         SELECT  V.PM_NAME DEVICE_NAME,
+                 ROUND(WT.cpu_processor_utilization,2) cpu_processor_utilization,
+                 ROUND(WT.MEM_USED_PER,2) mem_used_per,
+                 ROUND(WT.DISK_USED_PER,2) disk_used_per
+           FROM  COMP_STA_DEVICE_WEEK_T WT,COMP_RM_PM_T V
+           WHERE WT.DEVICE_ID = V.PM_ID
+             AND WT.REPORT_DATE = DATE_FORMAT(CURDATE(),'%Y%m%d')
+             AND WT.DEVICE_TYPE = '2'
+			<dynamic prepend="">
+				and	V.APP_ID = #app_id#
+				and (   <![CDATA[ WT.CPU_PROCESSOR_UTILIZATION <> '' ]]>
+					 or <![CDATA[ WT.MEM_USED_PER <> '' ]]>
+				 	 or <![CDATA[ WT.DISK_USED_PER <> '' ]]>)
+			</dynamic>
+			ORDER BY WT.CPU_PROCESSOR_UTILIZATION DESC,WT.MEM_USED_PER DESC,WT.DISK_USED_PER DESC,DEVICE_NAME DESC
+	</select>
+	
+	
+	<!-- 业务下的性能统计之小型机-->
+    <!-- Cpu性能 列表 -->
+    <select id="queryMiniPmCpuUsedPerList" resultClass="staDeviceWeek" parameterClass="staDeviceWeek">
+         SELECT  V.MINIPM_NAME DEVICE_NAME,
+                 ROUND(WT.cpu_processor_utilization,2) USED_PER
+           FROM  COMP_STA_DEVICE_WEEK_T WT,COMP_RM_MINIPM_T V
+           WHERE WT.DEVICE_ID = V.MINIPM_ID
+             AND WT.REPORT_DATE = DATE_FORMAT(CURDATE(),'%Y%m%d')
+             AND WT.DEVICE_TYPE = #device_type#
+			<dynamic prepend="">
+				<isNotEmpty prepend="and" property="app_id">
+					V.APP_ID = #app_id#
+				</isNotEmpty>
+				<![CDATA[ 
+				and WT.CPU_PROCESSOR_UTILIZATION <> '' 
+				 ]]>
+			</dynamic>
+			
+			ORDER BY USED_PER DESC,DEVICE_NAME DESC
+	</select>
+	
+	<!-- Cpu性能列表数目 -->
+	<select id="queryMiniPmCpuUsedPerListCount"  resultClass="java.lang.Integer" parameterClass="staDeviceWeek">
+	   SELECT COUNT(*)
+		 FROM COMP_STA_DEVICE_WEEK_T WT,COMP_RM_MINIPM_T V
+		WHERE WT.DEVICE_ID = V.MINIPM_ID
+		  AND WT.REPORT_DATE = DATE_FORMAT(CURDATE(),'%Y%m%d')
+		  AND WT.DEVICE_TYPE = #device_type#
+		 <dynamic prepend="">
+		     <isNotEmpty prepend="and" property="app_id">
+			     V.APP_ID = #app_id#
+			 </isNotEmpty>
+			 <![CDATA[ 
+				and WT.CPU_PROCESSOR_UTILIZATION <> '' 
+				 ]]>
+		 </dynamic>
+	</select>
+	
+	<!-- Cpu性能图 toP10-->
+    <select id="getMiniPmCpuUsedPerListTop10" resultClass="staDeviceWeek">
+         SELECT  V.MINIPM_NAME DEVICE_NAME,
+                 ROUND(WT.cpu_processor_utilization,2) cpu_processor_utilization
+           FROM  COMP_STA_DEVICE_WEEK_T WT,COMP_RM_MINIPM_T V
+           WHERE WT.DEVICE_ID = V.MINIPM_ID
+             AND WT.REPORT_DATE = DATE_FORMAT(CURDATE(),'%Y%m%d')
+             AND WT.DEVICE_TYPE = #device_type#
+			<dynamic prepend="">
+				<isNotEmpty prepend="and" property="app_id">
+					V.APP_ID = #app_id#
+				</isNotEmpty>
+				<![CDATA[ 
+				and WT.CPU_PROCESSOR_UTILIZATION <> '' 
+				 ]]>
+			</dynamic>
+			ORDER BY cpu_processor_utilization DESC,DEVICE_NAME DESC
+			LIMIT 10
+	</select>
+	<!-- 内存性能列表 -->
+    <select id="queryMiniPmMemUsedPerList" resultClass="staDeviceWeek" parameterClass="staDeviceWeek">
+          SELECT V.MINIPM_NAME DEVICE_NAME,
+                 ROUND(WT.MEM_USED_PER,2) USED_PER
+           FROM  COMP_STA_DEVICE_WEEK_T WT,COMP_RM_MINIPM_T V
+           WHERE WT.DEVICE_ID = V.MINIPM_ID
+             AND WT.REPORT_DATE = DATE_FORMAT(CURDATE(),'%Y%m%d')
+             AND WT.DEVICE_TYPE = #device_type#
+			<dynamic prepend="">
+				<isNotEmpty prepend="and" property="app_id">
+					V.APP_ID = #app_id#
+				</isNotEmpty>
+				<![CDATA[ 
+				and WT.MEM_USED_PER <> '' 
+				 ]]>
+			</dynamic>
+			ORDER BY USED_PER DESC,DEVICE_NAME DESC
+	</select> 
+	
+	<!-- 内存性能列表数目 -->
+	<select id="queryMiniPmMemUsedPerListCount"  resultClass="java.lang.Integer" parameterClass="staDeviceWeek">
+		SELECT COUNT(*)
+		FROM COMP_STA_DEVICE_WEEK_T WT,COMP_RM_MINIPM_T V
+		WHERE WT.DEVICE_ID = V.MINIPM_ID
+		  AND WT.REPORT_DATE = DATE_FORMAT(CURDATE(),'%Y%m%d')
+		  AND WT.DEVICE_TYPE = #device_type#
+		 <dynamic prepend="">
+		     <isNotEmpty prepend="and" property="app_id">
+			     V.APP_ID = #app_id#
+			 </isNotEmpty>
+			 <![CDATA[ 
+				and WT.MEM_USED_PER <> '' 
+				 ]]>
+		 </dynamic>
+	</select>
+	
+	<!-- 内存性能图  toP10 -->
+    <select id="getMiniPmMemUsedPerListTop10" resultClass="staDeviceWeek">
+        SELECT V.MINIPM_NAME DEVICE_NAME,
+               ROUND(WT.MEM_USED_PER,2) mem_used_per
+         FROM  COMP_STA_DEVICE_WEEK_T WT,COMP_RM_MINIPM_T V
+         WHERE WT.DEVICE_ID = V.MINIPM_ID
+           AND WT.REPORT_DATE = DATE_FORMAT(CURDATE(),'%Y%m%d')
+           AND WT.DEVICE_TYPE = #device_type#
+		<dynamic prepend="">
+			<isNotEmpty prepend="and" property="app_id">
+				V.APP_ID = #app_id#
+			</isNotEmpty>
+			<![CDATA[ 
+				and WT.MEM_USED_PER <> '' 
+				 ]]>
+		</dynamic>
+		ORDER BY MEM_USED_PER DESC,DEVICE_NAME DESC
+		LIMIT 10
+	</select>
+	<!-- 磁盘性能列表 -->
+    <select id="queryMiniPmDiskUsedPerList" resultClass="staDeviceWeek" parameterClass="staDeviceWeek">
+          SELECT V.MINIPM_NAME DEVICE_NAME,
+                 ROUND(WT.DISK_USED_PER,2) USED_PER
+           FROM  COMP_STA_DEVICE_WEEK_T WT,COMP_RM_MINIPM_T V
+           WHERE WT.DEVICE_ID = V.MINIPM_ID
+             AND WT.REPORT_DATE = DATE_FORMAT(CURDATE(),'%Y%m%d')
+             AND WT.DEVICE_TYPE = #device_type#
+			<dynamic prepend="">
+				<isNotEmpty prepend="and" property="app_id">
+					V.APP_ID = #app_id#
+				</isNotEmpty>
+				<![CDATA[ 
+				and WT.DISK_USED_PER <> '' 
+				 ]]>
+			</dynamic>
+			ORDER BY USED_PER DESC,DEVICE_NAME DESC
+	</select>
+	
+	<!-- 磁盘性能列表数目 -->
+	<select id="queryMiniPmDiskUsedPerListCount"  resultClass="java.lang.Integer" parameterClass="staDeviceWeek">
+		SELECT COUNT(*)
+		FROM COMP_STA_DEVICE_WEEK_T WT,COMP_RM_MINIPM_T V
+		WHERE WT.DEVICE_ID = V.MINIPM_ID
+		  AND WT.REPORT_DATE = DATE_FORMAT(CURDATE(),'%Y%m%d')
+		  AND WT.DEVICE_TYPE = #device_type#
+		 <dynamic prepend="">
+		     <isNotEmpty prepend="and" property="app_id">
+			     V.APP_ID = #app_id#
+			 </isNotEmpty>
+			 <![CDATA[ 
+				and WT.DISK_USED_PER <> '' 
+				 ]]>
+		 </dynamic>
+	</select>
+	
+	<!-- 磁盘性能图  toP10 -->
+    <select id="getMiniPmDiskUsedPerListTop10" resultClass="staDeviceWeek">
+          SELECT V.MINIPM_NAME DEVICE_NAME,
+                 ROUND(WT.DISK_USED_PER,2) DISK_USED_PER
+           FROM  COMP_STA_DEVICE_WEEK_T WT,COMP_RM_MINIPM_T V
+           WHERE WT.DEVICE_ID = V.MINIPM_ID
+             AND WT.REPORT_DATE = DATE_FORMAT(CURDATE(),'%Y%m%d')
+             AND WT.DEVICE_TYPE = #device_type#
+		<dynamic prepend="">
+			<isNotEmpty prepend="and" property="app_id">
+				V.APP_ID = #app_id#
+			</isNotEmpty>
+			<![CDATA[ 
+				and WT.DISK_USED_PER <> '' 
+				 ]]>
+		</dynamic>
+		ORDER BY DISK_USED_PER DESC,DEVICE_NAME DESC
+		LIMIT 10
+	</select>
+	
+	<select id="queryMiniPmPerList" resultClass="staDeviceWeek" parameterClass="String">
+         SELECT  V.MINIPM_NAME DEVICE_NAME,
+                 ROUND(WT.cpu_processor_utilization,2) cpu_processor_utilization,
+                 ROUND(WT.MEM_USED_PER,2) mem_used_per,
+                 ROUND(WT.DISK_USED_PER,2) disk_used_per
+           FROM  COMP_STA_DEVICE_WEEK_T WT,COMP_RM_MINIPM_T V
+           WHERE WT.DEVICE_ID = V.MINIPM_ID
+             AND WT.REPORT_DATE = DATE_FORMAT(CURDATE(),'%Y%m%d')
+             AND WT.DEVICE_TYPE = '0'
+			<dynamic prepend="">
+				and	V.APP_ID = #app_id#
+				and (   <![CDATA[ WT.CPU_PROCESSOR_UTILIZATION <> '' ]]>
+					 or <![CDATA[ WT.MEM_USED_PER <> '' ]]>
+				 	 or <![CDATA[ WT.DISK_USED_PER <> '' ]]>)
+			</dynamic>
+			ORDER BY WT.CPU_PROCESSOR_UTILIZATION DESC,WT.MEM_USED_PER DESC,WT.DISK_USED_PER DESC,DEVICE_NAME DESC
+	</select>
+	
+	
+	<!-- 业务下的性能统计之小型机分区-->
+    <!-- Cpu性能 列表 -->
+    <select id="queryMiniPmParCpuUsedPerList" resultClass="staDeviceWeek" parameterClass="staDeviceWeek">
+         SELECT  V.MINIPMPAR_NAME DEVICE_NAME,
+                 ROUND(WT.cpu_processor_utilization,2) USED_PER
+           FROM  COMP_STA_DEVICE_WEEK_T WT,COMP_RM_MINIPMPAR_T V
+           WHERE WT.DEVICE_ID = V.MINIPMPAR_ID
+             AND WT.REPORT_DATE = DATE_FORMAT(CURDATE(),'%Y%m%d')
+             AND WT.DEVICE_TYPE = #device_type#
+			<dynamic prepend="">
+				<isNotEmpty prepend="and" property="app_id">
+					V.APP_ID = #app_id#
+				</isNotEmpty>
+				<![CDATA[ 
+				and WT.CPU_PROCESSOR_UTILIZATION <> '' 
+				 ]]>
+			</dynamic>
+			
+			ORDER BY USED_PER DESC,DEVICE_NAME DESC
+	</select>
+	
+	<!-- Cpu性能列表数目 -->
+	<select id="queryMiniPmParCpuUsedPerListCount"  resultClass="java.lang.Integer" parameterClass="staDeviceWeek">
+	   SELECT COUNT(*)
+		 FROM COMP_STA_DEVICE_WEEK_T WT,COMP_RM_MINIPMPAR_T V
+		WHERE WT.DEVICE_ID = V.MINIPMPAR_ID
+		  AND WT.REPORT_DATE = DATE_FORMAT(CURDATE(),'%Y%m%d')
+		  AND WT.DEVICE_TYPE = #device_type#
+		 <dynamic prepend="">
+		     <isNotEmpty prepend="and" property="app_id">
+			     V.APP_ID = #app_id#
+			 </isNotEmpty>
+			 <![CDATA[ 
+				and WT.CPU_PROCESSOR_UTILIZATION <> '' 
+				 ]]>
+		 </dynamic>
+	</select>
+	
+	<!-- Cpu性能图 toP10-->
+    <select id="getMiniPmParCpuUsedPerListTop10" resultClass="staDeviceWeek">
+         SELECT  V.MINIPMPAR_NAME DEVICE_NAME,
+                 ROUND(WT.cpu_processor_utilization,2) cpu_processor_utilization
+           FROM  COMP_STA_DEVICE_WEEK_T WT,COMP_RM_MINIPMPAR_T V
+           WHERE WT.DEVICE_ID = V.MINIPMPAR_ID
+             AND WT.REPORT_DATE = DATE_FORMAT(CURDATE(),'%Y%m%d')
+             AND WT.DEVICE_TYPE = #device_type#
+			<dynamic prepend="">
+				<isNotEmpty prepend="and" property="app_id">
+					V.APP_ID = #app_id#
+				</isNotEmpty>
+				<![CDATA[ 
+				and WT.CPU_PROCESSOR_UTILIZATION <> '' 
+				 ]]>
+			</dynamic>
+			ORDER BY cpu_processor_utilization DESC,DEVICE_NAME DESC
+			LIMIT 10
+	</select>
+	<!-- 内存性能列表 -->
+    <select id="queryMiniPmParMemUsedPerList" resultClass="staDeviceWeek" parameterClass="staDeviceWeek">
+          SELECT V.MINIPMPAR_NAME DEVICE_NAME,
+                 ROUND(WT.MEM_USED_PER,2) USED_PER
+           FROM  COMP_STA_DEVICE_WEEK_T WT,COMP_RM_MINIPMPAR_T V
+           WHERE WT.DEVICE_ID = V.MINIPMPAR_ID
+             AND WT.REPORT_DATE = DATE_FORMAT(CURDATE(),'%Y%m%d')
+             AND WT.DEVICE_TYPE = #device_type#
+			<dynamic prepend="">
+				<isNotEmpty prepend="and" property="app_id">
+					V.APP_ID = #app_id#
+				</isNotEmpty>
+				<![CDATA[ 
+				and WT.MEM_USED_PER <> '' 
+				 ]]>
+			</dynamic>
+			ORDER BY USED_PER DESC,DEVICE_NAME DESC
+	</select> 
+	
+	<!-- 内存性能列表数目 -->
+	<select id="queryMiniPmParMemUsedPerListCount"  resultClass="java.lang.Integer" parameterClass="staDeviceWeek">
+		SELECT COUNT(*)
+		FROM COMP_STA_DEVICE_WEEK_T WT,COMP_RM_MINIPMPAR_T V
+		WHERE WT.DEVICE_ID = V.MINIPMPAR_ID
+		  AND WT.REPORT_DATE = DATE_FORMAT(CURDATE(),'%Y%m%d')
+		  AND WT.DEVICE_TYPE = #device_type#
+		 <dynamic prepend="">
+		     <isNotEmpty prepend="and" property="app_id">
+			     V.APP_ID = #app_id#
+			 </isNotEmpty>
+			 <![CDATA[ 
+				and WT.MEM_USED_PER <> '' 
+				 ]]>
+		 </dynamic>
+	</select>
+	
+	<!-- 内存性能图  toP10 -->
+    <select id="getMiniPmParMemUsedPerListTop10" resultClass="staDeviceWeek">
+        SELECT V.MINIPMPAR_NAME DEVICE_NAME,
+               ROUND(WT.MEM_USED_PER,2) mem_used_per
+         FROM  COMP_STA_DEVICE_WEEK_T WT,COMP_RM_MINIPMPAR_T V
+         WHERE WT.DEVICE_ID = V.MINIPMPAR_ID
+           AND WT.REPORT_DATE = DATE_FORMAT(CURDATE(),'%Y%m%d')
+           AND WT.DEVICE_TYPE = #device_type#
+		<dynamic prepend="">
+			<isNotEmpty prepend="and" property="app_id">
+				V.APP_ID = #app_id#
+			</isNotEmpty>
+			<![CDATA[ 
+				and WT.MEM_USED_PER <> '' 
+				 ]]>
+		</dynamic>
+		ORDER BY MEM_USED_PER DESC,DEVICE_NAME DESC
+		LIMIT 10
+	</select>
+	<!-- 磁盘性能列表 -->
+    <select id="queryMiniPmParDiskUsedPerList" resultClass="staDeviceWeek" parameterClass="staDeviceWeek">
+          SELECT V.MINIPMPAR_NAME DEVICE_NAME,
+                 ROUND(WT.DISK_USED_PER,2) USED_PER
+           FROM  COMP_STA_DEVICE_WEEK_T WT,COMP_RM_MINIPMPAR_T V
+           WHERE WT.DEVICE_ID = V.MINIPMPAR_ID
+             AND WT.REPORT_DATE = DATE_FORMAT(CURDATE(),'%Y%m%d')
+             AND WT.DEVICE_TYPE = #device_type#
+			<dynamic prepend="">
+				<isNotEmpty prepend="and" property="app_id">
+					V.APP_ID = #app_id#
+				</isNotEmpty>
+				<![CDATA[ 
+				and WT.DISK_USED_PER <> '' 
+				 ]]>
+			</dynamic>
+			ORDER BY USED_PER DESC,DEVICE_NAME DESC
+	</select>
+	
+	<!-- 磁盘性能列表数目 -->
+	<select id="queryMiniPmParDiskUsedPerListCount"  resultClass="java.lang.Integer" parameterClass="staDeviceWeek">
+		SELECT COUNT(*)
+		FROM COMP_STA_DEVICE_WEEK_T WT,COMP_RM_MINIPMPAR_T V
+		WHERE WT.DEVICE_ID = V.MINIPMPAR_ID
+		  AND WT.REPORT_DATE = DATE_FORMAT(CURDATE(),'%Y%m%d')
+		  AND WT.DEVICE_TYPE = #device_type#
+		 <dynamic prepend="">
+		     <isNotEmpty prepend="and" property="app_id">
+			     V.APP_ID = #app_id#
+			 </isNotEmpty>
+			 <![CDATA[ 
+				and WT.DISK_USED_PER <> '' 
+				 ]]>
+		 </dynamic>
+	</select>
+	
+	<!-- 磁盘性能图  toP10 -->
+    <select id="getMiniPmParDiskUsedPerListTop10" resultClass="staDeviceWeek">
+          SELECT V.MINIPMPAR_NAME DEVICE_NAME,
+                 ROUND(WT.DISK_USED_PER,2) DISK_USED_PER
+           FROM  COMP_STA_DEVICE_WEEK_T WT,COMP_RM_MINIPMPAR_T V
+           WHERE WT.DEVICE_ID = V.MINIPMPAR_ID
+             AND WT.REPORT_DATE = DATE_FORMAT(CURDATE(),'%Y%m%d')
+             AND WT.DEVICE_TYPE = #device_type#
+		<dynamic prepend="">
+			<isNotEmpty prepend="and" property="app_id">
+				V.APP_ID = #app_id#
+			</isNotEmpty>
+			<![CDATA[ 
+				and WT.DISK_USED_PER <> '' 
+				 ]]>
+		</dynamic>
+		ORDER BY DISK_USED_PER DESC,DEVICE_NAME DESC
+		LIMIT 10
+	</select>
+	
+	<select id="queryMiniPmParPerList" resultClass="staDeviceWeek" parameterClass="String">
+         SELECT  V.MINIPMPAR_NAME DEVICE_NAME,
+                 ROUND(WT.cpu_processor_utilization,2) cpu_processor_utilization,
+                 ROUND(WT.MEM_USED_PER,2) mem_used_per,
+                 ROUND(WT.DISK_USED_PER,2) disk_used_per
+           FROM  COMP_STA_DEVICE_WEEK_T WT,COMP_RM_MINIPMPAR_T V
+           WHERE WT.DEVICE_ID = V.MINIPMPAR_ID
+             AND WT.REPORT_DATE = DATE_FORMAT(CURDATE(),'%Y%m%d')
+             AND WT.DEVICE_TYPE = '1'
+			<dynamic prepend="">
+				and	V.APP_ID = #app_id#
+				and (   <![CDATA[ WT.CPU_PROCESSOR_UTILIZATION <> '' ]]>
+					 or <![CDATA[ WT.MEM_USED_PER <> '' ]]>
+				 	 or <![CDATA[ WT.DISK_USED_PER <> '' ]]>)
+			</dynamic>
+			ORDER BY WT.CPU_PROCESSOR_UTILIZATION DESC,WT.MEM_USED_PER DESC,WT.DISK_USED_PER DESC,DEVICE_NAME DESC
+	</select>
+</sqlMap>

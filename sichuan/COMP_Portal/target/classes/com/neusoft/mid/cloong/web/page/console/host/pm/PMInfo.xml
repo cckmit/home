@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="PmInfo">
+	<typeAlias alias="PMItemInfo"
+		type="com.neusoft.mid.cloong.web.page.host.pm.order.info.PMItemInfo" />
+	<typeAlias alias="RespoolInfo"
+		type="com.neusoft.mid.cloong.web.page.host.vm.order.info.RespoolInfo" />
+	<typeAlias alias="RespoolPartInfo"
+		type="com.neusoft.mid.cloong.web.page.host.vm.order.info.RespoolPartInfo" />
+	<typeAlias alias="PMStandardInfo"
+		type="com.neusoft.mid.cloong.web.page.host.pm.order.info.PMStandardInfo" />
+	<typeAlias alias="OrderInfo"
+		type="com.neusoft.mid.cloong.web.page.host.vm.order.info.OrderInfo" />
+	<typeAlias alias="PMCreateFail"
+		type="com.neusoft.mid.cloong.host.pm.core.PMCreateFail" />
+	<typeAlias alias="PMInstanceInfo"
+		type="com.neusoft.mid.cloong.web.page.console.host.pm.info.PMInstanceInfo" />
+	<typeAlias alias="PMNetInfo" 
+		type="com.neusoft.mid.cloong.web.page.console.host.pm.info.NetInfo" />
+
+	<select id="queryPmStandards" parameterClass="RespoolPartInfo"
+		resultClass="PMStandardInfo">
+		SELECT
+			sp.STANDARD_ID standardId,
+			CPU_TYPE cpuType,
+			RAM_SIZE ramSize,
+			DISC_SIZE discSize,
+			pt.PM_TYPE_NAME serverType,
+			DESCRIPTION description,
+			CREATE_TIME createTime,
+			CREATE_USER createUser,
+			UPDATE_TIME updateTime,
+			UPDATE_USER updateUser
+		FROM
+			COMP_STANDARD_PM_T sp
+		LEFT OUTER JOIN comp_pm_type_t pt ON sp.SERVER_TYPE = pt.PM_TYPE_ID
+		LEFT OUTER JOIN COMP_STANDARD_SYN_T ss ON sp.STANDARD_ID = ss.STANDARD_ID AND STANDARD_TYPE = '1' AND ss. STATUS = '2'
+		WHERE RES_POOL_ID = #respoolId#
+		  and RES_POOL_PART_ID = #respoolPartId#
+	</select>
+	
+	<select id="queryPmItems" parameterClass="PMStandardInfo"
+		resultClass="PMItemInfo">
+	   select ITEM_ID itemId,ITEM_NAME itemName,DESCRIPTION DESCRIPTION 
+		 from comp_item_t
+		where ITEM_TYPE = '1' 
+		  and STATUS = '5'
+		  and STANDARD_TYPE = '1'
+		  and STANDARD_ID = #standardId#
+	</select>
+
+	<select id="getPmDetail" parameterClass="java.lang.String"
+		resultClass="PMInstanceInfo">
+		SELECT
+			case1.CASE_ID caseId,
+			case1.PM_ID pmId,
+			case1.PM_NAME pmName,
+			case1.PM_PASSWORD pmPassword,
+			case1.PM_USER pmUser,
+			case1.RES_POOL_ID resPoolId,
+			case1.RES_POOL_NAME resPoolName,
+			case1.RES_POOL_PART_NAME resPoolPartName,
+			case1.RES_POOL_PART_ID resPoolPartId,
+			case1.ORDER_ID orderId,
+			case1.SERVER_TYPE serverType,
+			case1.CPU_TYPE cpuType,
+			case1.RAM_SIZE ramSize,
+			case1.DISC_SIZE discSize,
+			case1.ISO_ID isoId,
+			OS_NAME isoName,
+			case1.DESCRIPTION description,
+			app.APP_ID appId,
+			app.APP_NAME appName,
+			order1.LENGTH_TIME hours,
+			order1.EFFECTIVE_TIME createTime,
+			order1.EXPIRE_TIME expireTime,
+			item.ITEM_NAME itemName,
+			item.ITEM_ID itemId,
+			case1.PARAM_FLAG paramFlag
+		FROM
+			COMP_CASE_PM_T case1
+		LEFT JOIN comp_app_t app ON case1.APP_ID = app.APP_ID
+		LEFT JOIN COMP_ORDER_T order1 ON case1.ORDER_ID = order1.ORDER_ID
+		AND order1. STATUS != '2'
+		LEFT JOIN COMP_ITEM_T item ON case1.ITEM_ID = item.ITEM_ID
+		LEFT JOIN comp_os_t os ON case1.ISO_ID = os.OS_ID
+		WHERE
+			case1.CASE_ID = #caseId#
+	</select>
+	
+	<select id="getPMNet" parameterClass="java.lang.String" resultClass="PMNetInfo">
+		SELECT
+			eth,
+			comp_case_pm_net_t.vlan_id vlanId,
+			VLAN_NAME vlanName,
+			ip,
+			IP_DEFAULT_GATEWAY gateway,
+			comp_case_ipsegment_t.START_IP startIp,
+			comp_case_ipsegment_t.END_IP endIp,
+			comp_case_ipsegment_t.IPSEGMENT_ID ipSegmentId
+		FROM
+			comp_case_pm_net_t
+		LEFT OUTER JOIN comp_vlan_ipsegment_bind_t ON comp_case_pm_net_t.VLAN_ID = comp_vlan_ipsegment_bind_t.VLAN_ID
+		AND comp_vlan_ipsegment_bind_t. STATUS != '1'
+		LEFT OUTER JOIN comp_case_vlan_t ON comp_case_pm_net_t.VLAN_ID = comp_case_vlan_t.VLAN_ID
+		AND comp_case_vlan_t.CANCELED = '0'
+		LEFT OUTER JOIN comp_case_ipsegment_t ON comp_case_ipsegment_t.IPSEGMENT_ID = comp_vlan_ipsegment_bind_t.IPSEGMENT_ID
+		AND comp_case_ipsegment_t.RELEASED = '0'
+		WHERE
+			comp_case_pm_net_t.CASE_ID = #caseId#
+	</select>
+
+	<select id="getPmDetailByCaseId" parameterClass="java.lang.String"
+		resultClass="PMInstanceInfo">
+		SELECT
+		case1.CASE_ID caseId,
+		case1.PM_ID
+		pmId,case1.PM_NAME pmName,case1.ip
+		IP,case1.PM_PASSWORD pmPassword,case1.PM_USER pmUser,case1.STATUS
+		status,case1.RES_POOL_ID
+		resPoolId,case1.RES_POOL_NAME
+		resPoolName,case1.RES_POOL_PART_NAME
+		resPoolPartName,case1.RES_POOL_PART_ID
+		resPoolPartId,case1.ORDER_ID
+		orderId,case1.CPU_TYPE cpuType,case1.RAM_SIZE
+		ramSize,case1.DISC_SIZE
+		discSize,case1.SERVER_TYPE
+		serverType,case1.DESCRIPTION
+		description,order1.LENGTH_TIME hours,
+		order1.EFFECTIVE_TIME
+		createTime,order1.EXPIRE_TIME
+		expireTime,item.ITEM_NAME itemName
+		FROM
+		COMP_CASE_PM_T case1,COMP_ORDER_T
+		order1,COMP_ITEM_T item
+		WHERE
+		case1.CASE_ID=#caseId#
+		and
+		case1.ORDER_ID=order1.ORDER_ID and
+		order1.STATUS!='2' and order1.ITEM_ID
+		= item.ITEM_ID
+	</select>
+
+	<select id="getPmStatus" parameterClass="java.lang.String"
+		resultClass="PMInstanceInfo">
+		SELECT STATUS status, ORDER_ID orderId, CASE_ID caseId, RES_POOL_PART_ID respoolPartId
+		FROM COMP_CASE_PM_T
+		WHERE PM_ID=#pmId#
+	</select>
+	
+	<select id="queryPMLastEth" resultClass="java.lang.String" parameterClass="java.lang.String">
+		SELECT
+			max(eth)
+		FROM
+			COMP_CASE_PM_NET_T
+		WHERE PM_ID = #pmId#
+	</select>
+	
+	<select id="countPMVlanIpsegmentRel" parameterClass="PMNetInfo" resultClass="int">
+		SELECT
+			COUNT(VLAN_ID)
+		FROM
+			comp_vlan_ipsegment_bind_t
+		WHERE
+			VLAN_ID = #vlanId# 
+		AND IPSEGMENT_ID=#ipSegmentId#
+		AND status = '0'
+	</select>
+	
+	<insert id="insertPMVlanIpsegmentRel" parameterClass="PMNetInfo">
+		replace INTO comp_vlan_ipsegment_bind_t (
+			VLAN_ID,
+			IPSEGMENT_ID, 
+		 	Status,
+		 	CREATE_TIME,
+		 	CREATE_USER,
+		 	UPDATE_TIME,
+		 	UPDATE_USER
+		   ) VALUES
+		   (#vlanId#,#ipSegmentId#,'2',#createTime#,#createUser#,#updateTime#,#updateUser#)
+	</insert>
+	
+	<insert id="insertPMModifyNetInfo" parameterClass="PMNetInfo">
+		insert into COMP_CASE_PM_MOD_NET_T (PM_ID, PUR_POSE, ETH, IP, IP_DEFAULT_GATEWAY, VLAN_ID, IP_Subnetmask, TIME_STAMP)
+		values(#pmId#, '2', 'bond1', #ip#, #gateway#, #vlanId#, #subNetMask#, #timeStamp#)
+	</insert>
+	
+	<insert id="insertPMNetInfo" parameterClass="PMNetInfo">
+		insert into COMP_CASE_PM_NET_T (CASE_ID, PM_ID, PUR_POSE, ETH, IP, IP_DEFAULT_GATEWAY, VLAN_ID, IP_Subnetmask)
+		values(#caseId#, #pmId#, '2', 'bond1', #ip#, #gateway#, #vlanId#, #subNetMask#)
+	</insert>
+	
+	<insert id="insertPmNet" parameterClass="PMNetInfo">
+		INSERT INTO comp_case_pm_net_t (
+			CASE_ID,
+			PM_ID, 
+		 	PUR_POSE,
+		  	ETH,
+		   	IP,
+		   	IP_DEFAULT_GATEWAY, 
+		   	VLAN_ID,
+		    IP_Subnetmask
+		   ) VALUES
+		   (#caseId#,#pmId#,#purPose#,'bond1',#ip#,#gateway#,#vlanId#,#subnetmask#)
+	</insert>
+	
+	<update id="updatePmNet"  parameterClass="PMNetInfo" >
+		update
+		comp_case_pm_net_t
+		set
+		PM_ID=#pmId#
+		where
+		CASE_ID=#caseId#
+	</update>
+	
+	<update id="updatePMNetInfo" parameterClass="PMNetInfo">
+		update
+		COMP_CASE_PM_NET_T
+		set
+		ETH=#eth#,
+		IP=#ip#,
+		IP_DEFAULT_GATEWAY=#gateway#,
+		VLAN_ID=#vlanId#,
+		IP_Subnetmask = #subNetMask#
+		where PM_ID=#pmId#
+	</update>
+	
+	<update id="updatePMStatus" parameterClass="PMInstanceInfo">
+		update
+		COMP_CASE_PM_T
+		set
+		STATUS=#status#  ,
+		UPDATE_TIME=#updateTime#,
+		UPDATE_USER=#updateUser# 
+		where
+		PM_ID=#pmId#
+		AND	STATUS!='3'
+	</update>
+	
+	<update id="updatePMDesc" parameterClass="PMInstanceInfo">
+		update
+		COMP_CASE_PM_T
+		set
+		DESCRIPTION=#description# ,
+		UPDATE_TIME=#updateTime#,
+		UPDATE_USER=#updateUser# 
+		where
+		PM_ID=#pmId#
+		AND	STATUS!='3'
+	</update>
+
+	<update id="updatePMSName" parameterClass="PMInstanceInfo">
+		update
+		COMP_CASE_PM_T
+		set
+		PM_NAME=#pmName#,
+		UPDATE_TIME=#updateTime#,
+		UPDATE_USER=#updateUser# 
+		where
+		PM_ID=#pmId#
+		AND	STATUS!='3'
+	</update>
+
+	<select id="getCountPMid" parameterClass="java.lang.String"
+		resultClass="int">
+		SELECT COUNT(*) FROM COMP_CASE_PM_T where PM_ID=#pmId#
+	</select>
+	
+	<insert id="createPMInstanceInfo" parameterClass="PMInstanceInfo">
+		insert into
+		COMP_CASE_PM_T
+		(CASE_ID,PARAM_FLAG,PM_ID,PM_NAME,APP_ID,STATUS,
+		RES_POOL_ID,RES_POOL_PART_ID,
+		ORDER_ID,CPU_TYPE,RAM_SIZE,DISC_SIZE,SERVER_TYPE,ISO_ID,
+		DESCRIPTION, CREATE_TIME, CREATE_USER,UPDATE_TIME,UPDATE_USER,
+		RES_POOL_NAME,RES_POOL_PART_NAME,
+		ITEM_ID,STANDARD_ID,
+		OPERATION_IP,PM_USER,PM_PASSWORD
+		)
+		values
+		(#caseId#,#paramFlag#,#pmId#,#pmName#,#appId#,#status#,#resPoolId#,#resPoolPartId#,#orderId#,
+		#cpuType#,#ramSize#,#discSize#,#serverType#,#isoId#,#description#,#createTime#,
+		#createUser#,#updateTime#,#updateUser#,#resPoolName#,#resPoolPartName#,
+		#itemId#,#standardId#,#operationIP#,#pmUser#,#pmPassword#)
+	</insert>
+
+	<select id="queryPMAllStatus" resultClass="PMInstanceInfo">
+		select PM_ID
+		pmId,STATUS
+		status from COMP_CASE_PM_T where STATUS!='3' and STATUS!='0'
+	</select>
+	
+	<select id="getAllPmNet"   parameterClass="java.lang.String" resultClass="PMNetInfo">
+		SELECT
+			vn.vlan_id vlanId,
+			vn.ip ip,
+			vn.IP_DEFAULT_GATEWAY gateway
+		FROM
+			comp_case_pm_net_t vn
+		LEFT JOIN comp_order_t o ON vn.CASE_ID = o.CASE_ID
+		LEFT JOIN comp_case_pm_t v  ON vn.CASE_ID = v.CASE_ID
+		WHERE
+			o.`STATUS` != '2'
+		AND v.`STATUS` != '3'
+		AND vn.vlan_id = #vlanId#
+	</select>
+	
+	<select id="getAllNetForPmMod"   parameterClass="java.lang.String" resultClass="PMNetInfo">
+		SELECT
+		v.vlan_id vlanId,
+		v.ip ip,
+		v.IP_DEFAULT_GATEWAY gateway
+		FROM
+		comp_case_pm_mod_net_t v LEFT JOIN comp_case_pm_t m ON v.PM_ID=m.PM_ID LEFT JOIN comp_order_t o ON m.CASE_ID=o.CASE_ID
+		WHERE
+		o.`STATUS`!='2'  and  v.vlan_id=#vlanId# AND  v.TIME_STAMP in (
+		SELECT
+			MAX(v.TIME_STAMP)
+		FROM
+			comp_case_pm_mod_net_t v LEFT JOIN comp_case_pm_t m ON v.PM_ID=m.PM_ID LEFT JOIN comp_order_t o ON m.CASE_ID=o.CASE_ID
+		WHERE
+		o.`STATUS`!='2'  and  v.vlan_id=#vlanId#
+		GROUP BY o.CASE_ID
+		)
+	</select>
+
+	<insert id="insertPMFail" parameterClass="PMCreateFail">
+		insert into
+		COMP_PM_CREATE_FAIL_T(
+		FAIL_CAUSE,
+		FAIL_CODE,
+		RES_POOL_ID,
+		RES_POOL_PART_ID,
+		STANDARD_ID,
+		NUM,
+		CREATE_TIME)
+		values
+		(#failCause#,#failCode#,#resPoolId#,#resPoolPartId#,#standardId#,#num#,#createTime#)
+	</insert>
+
+	<insert id="createPMOrder" parameterClass="OrderInfo">
+		insert into
+		COMP_ORDER_T(
+		ORDER_ID,
+		PARENT_ID,
+		STATUS,
+		EFFECTIVE_TIME,
+		LENGTH_TIME,
+		LENGTH_UNIT,
+		CASE_ID,
+		CASE_TYPE,
+		APP_ID,
+		RES_POOL_ID,
+		CREATE_TIME,
+		CREATE_USER,
+		UPDATE_TIME,
+		UPDATE_USER,
+		EXPIRE_TIME
+		)
+		values
+		(#orderId#,#parentId#,#status#,#effectiveTime#,#lengthTime#,#lengthUnit#,#caseId#,#caseType#,#appId#,#resPoolId#,
+		#createTime#,#createUser#,#updateTime#,#updateUser#,#expireTime#)
+	</insert>
+	
+	<insert id="createPMBusinessBind" parameterClass="java.util.HashMap">
+		insert into
+		COMP_BUSINESS_CASE_T
+		(BUSINESS_ID,CASE_ID,CASE_TYPE,CREATE_TIME)
+		values
+		(#businessId#,#caseId#,"1",#createTime#)
+	</insert>
+
+	<update id="updatePMStatusAndOwn" parameterClass="PMInstanceInfo">
+		update 	COMP_CASE_PM_T
+		   set
+				STATUS=#status#  ,
+				UPDATE_TIME=#updateTime#,
+				UPDATE_USER=#updateUser# 
+	     where	PM_ID=#pmId#
+		   AND	STATUS!='3'
+	</update>
+	
+	<!-- 查询是否挂载云硬盘 -->
+	<select id="getCountEbsByPMid" parameterClass="java.lang.String"
+		resultClass="int">
+		SELECT COUNT(CASE_ID) 
+		  FROM COMP_CASE_EBS_T
+		 WHERE HOST_ID=#pmId#
+	</select>
+
+</sqlMap>

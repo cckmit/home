@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
+    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+
+	<!-- 资源视图 -->
+	<bean id="allResourceAction" class="com.neusoft.mid.cloong.web.page.resourceManagement.resView.action.AllResourceAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	
+	<bean id="exportResReportAction" class="com.neusoft.mid.cloong.web.page.resourceManagement.resView.action.ExportResReportAction"
+		  scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+	
+	<bean id="exportAllResAction" class="com.neusoft.mid.cloong.web.page.resourceManagement.resView.action.ExportAllResAction"
+		  scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+	
+	<bean id="exportAppReportAction" class="com.neusoft.mid.cloong.web.page.resourceManagement.appView.performanceStatistics.action.ExportAppReportAction"
+		  scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+	
+	<bean id="exportAllAppReportAction" class="com.neusoft.mid.cloong.web.page.resourceManagement.appView.exceededStatistics.action.ExportAllAppReportAction"
+		  scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+	
+	<bean id="createTreeAction" class="com.neusoft.mid.cloong.web.page.resourceManagement.action.CreateTreeAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	
+	<bean id="pmListAction" class="com.neusoft.mid.cloong.web.page.resourceManagement.pm.action.PmListAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	
+	<bean id="pmInfoDetailAction"
+		class="com.neusoft.mid.cloong.web.page.resourceManagement.pm.action.PmInfoDetailAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+	
+	<bean id="pmGetCabinetListAction"
+		class="com.neusoft.mid.cloong.web.page.resourceManagement.pm.action.PmGetCabinetListAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+	
+	<bean id="vmListAction" class="com.neusoft.mid.cloong.web.page.resourceManagement.vm.action.VmListAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	
+	<bean id="vmInfoDetailAction"
+		class="com.neusoft.mid.cloong.web.page.resourceManagement.vm.action.VmInfoDetailAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+	
+	<bean id="ebsListAction" class="com.neusoft.mid.cloong.web.page.resourceManagement.ebs.action.EbsListAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	
+	<bean id="ebsInfoDetailAction"
+		class="com.neusoft.mid.cloong.web.page.resourceManagement.ebs.action.EbsInfoDetailAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+	
+	<bean id="miniPmListAction" class="com.neusoft.mid.cloong.web.page.resourceManagement.miniPm.action.MiniPmListAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	
+	<bean id="miniPmInfoDetailAction"
+		class="com.neusoft.mid.cloong.web.page.resourceManagement.miniPm.action.MiniPmInfoDetailAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+	
+	<bean id="miniPmParListAction" class="com.neusoft.mid.cloong.web.page.resourceManagement.miniPmPar.action.MiniPmParListAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	
+	<bean id="miniPmParInfoDetailAction"
+		class="com.neusoft.mid.cloong.web.page.resourceManagement.miniPmPar.action.MiniPmParInfoDetailAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+	
+	<bean id="raidListAction" class="com.neusoft.mid.cloong.web.page.resourceManagement.raid.action.RaidListAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	
+	<bean id="raidInfoDetailAction"
+		class="com.neusoft.mid.cloong.web.page.resourceManagement.raid.action.RaidInfoDetailAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+	
+	<bean id="swListAction" class="com.neusoft.mid.cloong.web.page.resourceManagement.sw.action.SwListAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	
+	<bean id="swInfoDetailAction"
+		class="com.neusoft.mid.cloong.web.page.resourceManagement.sw.action.SwInfoDetailAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+	
+		<bean id="swIfListAction" class="com.neusoft.mid.cloong.web.page.resourceManagement.sw.action.SwIfListAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	
+	<bean id="swIfInfoDetailAction"
+		class="com.neusoft.mid.cloong.web.page.resourceManagement.sw.action.SwIfInfoDetailAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+	
+	<bean id="rtListAction" class="com.neusoft.mid.cloong.web.page.resourceManagement.rt.action.RtListAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	
+	<bean id="rtInfoDetailAction"
+		class="com.neusoft.mid.cloong.web.page.resourceManagement.rt.action.RtInfoDetailAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+	
+	<bean id="rtifListAction" class="com.neusoft.mid.cloong.web.page.resourceManagement.rt.action.RtifListAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	
+	<bean id="rtifInfoDetailAction"
+		class="com.neusoft.mid.cloong.web.page.resourceManagement.rt.action.RtifInfoDetailAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+	
+	<bean id="fwListAction" class="com.neusoft.mid.cloong.web.page.resourceManagement.fw.action.FwListAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	
+	<bean id="fwInfoDetailAction"
+		class="com.neusoft.mid.cloong.web.page.resourceManagement.fw.action.FwInfoDetailAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+	
+	<!-- 实时性能 -->
+	<bean id="realTimeReport" 
+	      class="com.neusoft.mid.cloong.web.page.resourceManagement.realTime.action.RealTimeReportAction"
+		  scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+	<bean id="realTimeDiskReport" 
+	      class="com.neusoft.mid.cloong.web.page.resourceManagement.realTime.action.RealTimeDiskReportAction"
+		  scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+	
+	<!-- 业务下性能统计 begin-->
+	<!-- CPU性能  图 -->
+	<bean id="cpuUsedPerReportAction" 
+	class="com.neusoft.mid.cloong.web.page.resourceManagement.appView.performanceStatistics.action.CpuUsedPerReportAction" 
+	scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+	<!-- CPU性能  列表 -->
+	<bean id="cpuUsedPerListAction" 
+	class="com.neusoft.mid.cloong.web.page.resourceManagement.appView.performanceStatistics.action.CpuUsedPerListAction" 
+	scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+	
+	
+	<!-- 内存性能   图-->
+	<bean id="memUsedPerReportAction" 
+	class="com.neusoft.mid.cloong.web.page.resourceManagement.appView.performanceStatistics.action.MemUsedPerReportAction" 
+	scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+	<!-- 内存性能   列表 -->
+	<bean id="memUsedPerListAction" 
+	class="com.neusoft.mid.cloong.web.page.resourceManagement.appView.performanceStatistics.action.MemUsedPerListAction" 
+	scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+	
+	<!-- 磁盘性能   图 -->
+	<bean id="diskUsedPerReportAction" 
+	class="com.neusoft.mid.cloong.web.page.resourceManagement.appView.performanceStatistics.action.DiskUsedPerReportAction" 
+	scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+	<!-- 磁盘性能  列表 -->
+	<bean id="diskUsedPerListAction" 
+	class="com.neusoft.mid.cloong.web.page.resourceManagement.appView.performanceStatistics.action.DiskUsedPerListAction" 
+	scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+	<!-- 业务下性能统计 end-->
+	
+	<!-- 业务维度统计超标设备数 begin -->
+	<!-- CPU超标设备统计 -->
+	<bean id="cpuExceededAction"
+	class="com.neusoft.mid.cloong.web.page.resourceManagement.appView.exceededStatistics.action.CpuExceededAction"
+	scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+	
+	<!-- 内存超标设备统计 -->
+	<bean id="memExceededAction"
+	class="com.neusoft.mid.cloong.web.page.resourceManagement.appView.exceededStatistics.action.MemExceededAction"
+	scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+	
+	<!-- 磁盘超标设备统计 -->
+	<bean id="diskExceededAction"
+	class="com.neusoft.mid.cloong.web.page.resourceManagement.appView.exceededStatistics.action.DiskExceededAction">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+	
+	<!-- 业务维度统计超标设备数 end -->
+	
+	
+	<!-- 跨业务设备数统计 -->
+	<bean id="allDeviceNumAction" 
+	      class="com.neusoft.mid.cloong.web.page.resourceManagement.appView.deviceNum.action.AllDeviceNumAction"
+		  scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+</beans>

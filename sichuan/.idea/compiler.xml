@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="COMP_Portal" />
+        <module name="COMP_ResourcePoolProxy" />
+        <module name="COMP_Common" />
+        <module name="COMP_Management" />
+        <module name="COMP_RPProxy_Interface" />
+        <module name="COMP_Identity" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="COMP_Boss_Agent" target="1.6" />
+      <module name="COMP_Common" target="1.6" />
+      <module name="COMP_Identity" target="1.6" />
+      <module name="COMP_Management" target="1.6" />
+      <module name="COMP_Parent" target="1.6" />
+      <module name="COMP_Portal" target="1.6" />
+      <module name="COMP_ResourcePoolProxy" target="1.6" />
+      <module name="COMP_RPProxy_Interface" target="1.6" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

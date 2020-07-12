@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
+    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+
+	<bean id="businessManagerListAction"
+		class="com.neusoft.mid.cloong.web.page.business.BusinessListAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+
+	<bean id="businessCreateAction"
+		class="com.neusoft.mid.cloong.web.page.business.BusinessCreateAction"
+		scope="prototype">
+		<property name="service">
+			<bean
+				class="com.neusoft.mid.cloong.web.page.business.service.BusinessCreateService">
+				<property name="dao" ref="ibatisDAOProxy" />
+				<property name="seqCen">
+					<bean class="com.neusoft.mid.cloong.common.util.CommonSequenceGenerator">
+						<property name="prefix" value="BUSI-"></property>
+					</bean>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="businessUpdateAction"
+		class="com.neusoft.mid.cloong.web.page.business.BusinessUpdateAction"
+		scope="prototype">
+		<property name="service">
+			<bean
+				class="com.neusoft.mid.cloong.web.page.business.service.BusinessUpdateService">
+				<property name="dao" ref="ibatisDAOProxy" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="hostListAction" class="com.neusoft.mid.cloong.web.page.business.HostListAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+
+	<bean id="businessDelService"
+		class="com.neusoft.mid.cloong.web.page.business.service.BusinessDelService">
+		<property name="dao" ref="ibatisDAOProxy"></property>
+	</bean>
+
+	<bean id="businessDelAction"
+		class="com.neusoft.mid.cloong.web.page.business.BusinessDelAction"
+		scope="prototype">
+		<property name="service" ref="businessDelService"></property>
+	</bean>
+
+	<bean id="businessDetailAction"
+		class="com.neusoft.mid.cloong.web.page.business.BusinessDetailAction"
+		scope="prototype">
+		<property name="service" ref="businessDetailService"></property>
+	</bean>
+
+	<bean id="businessDetailService"
+		class="com.neusoft.mid.cloong.web.page.business.service.BusinessDetailService"
+		scope="prototype">
+		<property name="service" ref="queryResourceListService"></property>
+		<property name="dao" ref="ibatisDAOProxy"></property>
+	</bean>
+	
+	<bean id="businessUnbindAction"
+		class="com.neusoft.mid.cloong.web.page.business.BusinessUnbindAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+	<bean id="businessBindAction"
+		class="com.neusoft.mid.cloong.web.page.business.BusinessBindAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+
+	<!-- 业务树 -->
+	<bean id="createTreeAction" class="com.neusoft.mid.cloong.web.page.console.business.CreateTreeAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	
+	<bean id="showTopoListJsonAction"
+		class="com.neusoft.mid.cloong.web.page.console.topo.TopoListDataAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+	<bean id="showPzhtopoListJsonAction"
+		class="com.neusoft.mid.cloong.web.page.console.topo.PzhtopoListDataAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+		<property name="queryVMState">
+			<ref bean="queryVMState" />
+		</property>
+		
+	</bean>
+	<bean id="showPzhtopoListJson2Action"
+		class="com.neusoft.mid.cloong.web.page.console.topo.PzhtopoListDataAction"
+		scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+	</bean>
+	
+	<!-- 性能树 -->
+	<bean id="createPerformanceTreeAction" class="com.neusoft.mid.cloong.web.page.console.performance.CreatePerformanceTreeAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	
+	<bean id="vmMResourceSearchAction" class="com.neusoft.mid.cloong.web.page.console.performance.VMResourceSearchAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	
+	<bean id="getAlreadyConfTabIndexVMAction" class="com.neusoft.mid.cloong.web.page.console.performance.VMResourceGetTabIndexAction"
+		scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	
+	<bean id="businessPerformanceListAction"
+		class="com.neusoft.mid.cloong.web.page.console.performance.QueryBusinessListAction"
+		scope="prototype">
+		<property name="service" ref="queryBusinessListService"></property>
+	</bean>
+	
+	<bean id="performanceVmview"
+		class="com.neusoft.mid.cloong.web.page.console.performance.PerformanceVmviewAction"
+		scope="prototype">
+	</bean>
+	
+	<bean id="vmPerformanceDetailAction"
+		class="com.neusoft.mid.cloong.web.page.console.performance.VmPerformanceDetailAction" scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	
+	<bean id="VMPropertySearchAction"
+		class="com.neusoft.mid.cloong.web.page.console.performance.VMPropertySearchAction" scope="prototype">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+</beans>

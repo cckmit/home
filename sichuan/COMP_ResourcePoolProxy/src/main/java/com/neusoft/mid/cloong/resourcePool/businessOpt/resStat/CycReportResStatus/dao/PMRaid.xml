@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="PMRaid">
+	<typeAlias alias="RaidPerfPo"
+		type="com.neusoft.mid.cloong.resourcePool.businessOpt.resStat.CycReportResStatus.dao.RAIDPerfPo" />
+
+	<insert id="insertRAIDPerformance" parameterClass="RaidPerfPo">
+		INSERT INTO `comp_sta_raid_rt_t` (
+			`RAID_ID`,
+			`HST_DISK_READ_BYTES`,
+			`HST_DISK_WRITE_BYTES`,
+			`CREATE_TIME`,
+			`RES_POOL_ID`
+		)
+		VALUES
+			(
+				#eqpId#,
+				#hstDiskReadBytes#,
+				#hstDiskWriteBytes#,
+				#collectTime#,
+				#resPoolId#
+			);
+		
+	</insert>
+	
+</sqlMap>

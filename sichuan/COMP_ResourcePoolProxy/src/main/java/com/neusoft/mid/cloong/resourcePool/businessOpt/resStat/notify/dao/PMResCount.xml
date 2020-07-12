@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="PMResCount">
+	<typeAlias alias="PMResCountInfo"
+		type="com.neusoft.mid.cloong.resourcePool.businessOpt.resStat.notify.bean.PMResCountBean" />
+	<select id="getCountPMById" parameterClass="java.util.HashMap"
+		resultClass="java.lang.String">
+		select t.pm_id
+		from comp_pm_res_count_t t
+		where t.pm_id in (
+		<iterate property="SRVConsume" conjunction=",">
+			#SRVConsume[].srvid#
+		</iterate>
+		<![CDATA[
+			)
+			and t.res_pool_id = #poolId#
+			and t.res_pool_part_id = #partId#
+			and ((t.start_time >= #startTime# and t.end_time <= #endTime#)
+			or (t.start_time<= #startTime# and t.end_time >= #endTime#)
+			or (t.start_time > #startTime# and t.start_time < #endTime# and
+			t.end_time > #endTime#)
+			or (t.start_time < #startTime# and t.end_time > #endTime# and t.end_time
+			< #endTime#)
+			)
+		]]>
+	</select>
+
+	<select id="getExistPMId" parameterClass="java.util.HashMap"
+		resultClass="java.lang.String">
+		select pm_id from (
+		<iterate property="SRVConsume" conjunction="UNION">
+			select
+			#SRVConsume[].srvid# pm_id
+			from dual
+		</iterate>
+		) a
+		where (pm_id) not in
+		(SELECT
+		pm_id
+		FROM
+		COMP_CASE_PM_T
+		WHERE
+		res_pool_id = #resPoolId#
+		AND res_pool_part_id = #resPoolPartId#)
+	</select>
+
+	<insert id="insertPMCount" parameterClass="PMResCountInfo">
+		insert into
+		comp_pm_res_count_t
+		(PM_ID,
+		START_TIME,
+		END_TIME,
+		PERIOD_TIME,
+		RUN_TIME,
+		STANDARD_ID,
+		STANDARD_NAME,
+		OWN_USER,
+		RES_POOL_ID,
+		RES_POOL_PART_ID,
+		CREATE_TIME)
+		select
+		#pmId#,
+		#startTime#,
+		#endTime#,
+		#periodTime#,
+		#runTime#,
+		caset.standard_id,
+		standt.standard_name,
+		caset.own_user,
+		caset.res_pool_id,
+		caset.res_pool_part_id,
+		#createTime#
+		from
+		comp_case_pm_t caset
+		left join
+		comp_standard_pm_t standt
+		on
+		caset.standard_id = standt.standard_id
+		where
+		caset.pm_id = #pmId# and caset.res_pool_id
+		= #resPoolId# and
+		caset.res_pool_part_id = #resPoolPartId#
+	</insert>
+</sqlMap>

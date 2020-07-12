@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE validators PUBLIC 
+  		"-//Apache Struts//XWork Validator 1.0.2//EN"
+  		"http://struts.apache.org/dtds/xwork-validator-1.0.2.dtd">
+<validators>
+	<field name="standardName">
+		<field-validator type="stringlength">
+			<param name="maxLength">20</param>
+			<message>规格名称最大长度为20</message>
+		</field-validator>
+	</field>
+	<field name="startTime">
+		<field-validator type="stringlength">
+			<param name="maxLength">14</param>
+			<message>创建起始时间最大长度14</message>
+		</field-validator>
+		<field-validator type="regex">
+			<param name="expression"><![CDATA[^[0-9]{1,14}$]]></param>
+			<message>创建起始日期只能输入数字，请重新输入</message>
+		</field-validator>
+	</field>
+	<field name="endTime">
+		<field-validator type="stringlength">
+			<param name="maxLength">14</param>
+			<message>创建结束时间最大长度14</message>
+		</field-validator>
+		<field-validator type="regex">
+			<param name="expression"><![CDATA[^[0-9]{1,14}$]]></param>
+			<message>创建结束日期只能输入数字，请重新输入</message>
+		</field-validator>
+	</field>
+</validators>

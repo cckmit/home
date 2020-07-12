@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="PMRouter">
+	<typeAlias alias="RouterPerfPo"
+		type="com.neusoft.mid.cloong.resourcePool.businessOpt.resStat.CycReportResStatus.dao.RouterPerfPo" />
+	<typeAlias alias="RouterIFPerfPo"
+		type="com.neusoft.mid.cloong.resourcePool.businessOpt.resStat.CycReportResStatus.dao.RouterIFPerfPo" />
+
+	<insert id="insertRouterPerformance" parameterClass="RouterPerfPo">
+	    INSERT INTO `comp_sta_router_rt_t` (
+			`ROUTER_ID`,
+			`CPU_USED_PER`,
+			`MEM_USED_PER`,
+			`CREATE_TIME`,
+			`RES_POOL_ID`
+		)
+		VALUES
+			(
+				#eqpId#,
+				#cpuUsedPer#,
+				#memUsedPer#,
+				#collectTime#,
+				#resPoolId#
+			);
+		
+	</insert>
+	
+	<insert id="insertRouterIFPerformance" parameterClass="RouterIFPerfPo">
+	    INSERT INTO `comp_sta_router_port_rt_t` (
+			`ROUTER_PORT_ID`,
+			`ROUTER_ID`,
+			`IF_IN_UCAST_PKTS`,
+			`IF_OUT_UCAST_PKTS`,
+			`IF_IN_MULTICAST_PKTS`,
+			`IF_IN_BROADCAST_PKTS`,
+			`IF_OUT_MULTICAST_PKTS`,
+			`IF_OUT_BROADCAST_PKTS`,
+			`IF_IN_DISCARDS`,
+			`IF_OUT_DISCARDS`,
+			`CREATE_TIME`,
+			`RES_POOL_ID`
+		)
+		VALUES
+			(
+				#eqpId#,
+				#parentId#,
+				#ifInUcastPkts#,
+				#ifOutUcastPkts#,
+				#ifInMulticastPkts#,
+				#ifInBroadcastPkts#,
+				#ifOutMulticastPkts#,
+				#ifOutBroadcastPkts#,
+				#ifInDiscards#,
+				#ifOutDiscards#,
+				#collectTime#,
+				#resPoolId#
+			);
+		
+	</insert>
+	
+</sqlMap>

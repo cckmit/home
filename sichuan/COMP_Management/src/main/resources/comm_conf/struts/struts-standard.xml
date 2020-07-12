@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.1//EN"
+    "http://struts.apache.org/dtds/struts-2.1.dtd">
+<struts>
+	<!-- 这只浏览器时候缓存静态内容，默认值为true(生产环境下使用),开发阶段最好关闭 -->
+	<constant name="struts.serve.static.vrowserCache" value="true"></constant>
+	<!-- 当struts的配置文件修改后，系统是否自动重新加载该文件，默认为false(生产环境下使用),开发阶段最好打开 -->
+	<constant name="struts.serve.static.vrowserCache" value="false"></constant>
+	<constant name="struts.ui.theme" value="simple"></constant>
+	<package name="com.neusoft.mid.cloong.standard.vm" namespace="/product"
+		extends="struts-default">
+		<interceptors>
+			<interceptor name="authenticate" class="authenticateInterceptor" />
+			<interceptor name="turnPageInter" class="turnPageInterceptor" />
+			<interceptor-stack name="authStack">
+				<interceptor-ref name="authenticate" />
+				<interceptor-ref name="defaultStack" />
+				<interceptor-ref name="turnPageInter" />
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="authStack" />
+		<global-results>
+			<result name="LOGIN" type="redirectAction">logout</result>
+			<result name="error" type="chain">exceptionIntercepor
+			</result>
+		</global-results>
+		<global-exception-mappings>
+			<exception-mapping exception="java.lang.Exception"
+				result="error" />
+		</global-exception-mappings>
+		<action name="exceptionIntercepor" class="exceptionIntercepor">
+			<result name="success">/WEB-INF/pages/exception/error.jsp
+			</result>
+		</action>
+		<action name="VMStandardListQuery" class="VMStandardListQueryAction">
+			<result name="success">
+				/WEB-INF/pages/product/standard/vm/virtual_list.jsp
+			</result>
+			<result name="input">
+				/WEB-INF/pages/product/standard/vm/virtual_list.jsp
+			</result>
+		</action>
+		<action name="EBSStandardListQuery" class="EBSStandardListQueryAction">
+			<result name="success">
+				/WEB-INF/pages/product/standard/ebs/ebs_list.jsp
+			</result>
+			<result name="input">
+				/WEB-INF/pages/product/standard/ebs/ebs_list.jsp
+			</result>
+		</action>
+		<action name="VMBAKStandardListQuery" class="VMBAKStandardListQueryAction">
+			<result name="success">
+				/WEB-INF/pages/product/standard/vmbak/vmbak_list.jsp
+			</result>
+			<result name="input">
+				/WEB-INF/pages/product/standard/vmbak/vmbak_list.jsp
+			</result>
+		</action>
+	</package>
+	<package name="com.neusoft.mid.cloong.standard.vm.json"
+		namespace="/product" extends="json-default">
+		<interceptors>
+			<interceptor name="authenticate" class="authenticateInterceptor" />
+			<interceptor name="turnPageInter" class="turnPageInterceptor" />
+			<interceptor-stack name="authStack">
+				<interceptor-ref name="authenticate" />
+				<interceptor-ref name="jsonValidationWorkflowStack" />
+				<interceptor-ref name="defaultStack" />
+				<interceptor-ref name="turnPageInter" />
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="authStack" />
+		<global-results>
+			<result name="LOGIN" type="redirectAction">logout</result>
+			<result name="error" type="chain">exceptionIntercepor
+			</result>
+		</global-results>
+		<global-exception-mappings>
+			<exception-mapping exception="java.lang.Exception"
+				result="error" />
+		</global-exception-mappings>
+		<action name="exceptionIntercepor" class="exceptionIntercepor">
+			<result name="success">/WEB-INF/pages/exception/error.jsp
+			</result>
+		</action>
+		<action name="VMStandardListQueryJson" class="VMStandardListQueryActionJson">
+			<result type="json" name="success"></result>
+			<result type="json" name="error"></result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<action name="VMStandardDetail" class="VMStandardDetailAction">
+			<result type="json" name="success"></result>
+			<result type="json" name="error"></result>
+		</action>
+		<action name="VMStandardCreate" class="VMStandardCreateAction">
+			<result type="json" name="success"></result>
+			<result type="json" name="error"></result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<action name="VMStandardModify" class="VMStandardModifyAction">
+			<result type="json" name="success"></result>
+			<result type="json" name="error"></result>
+			<result type="json" name="deleted"></result>
+			<result type="json" name="inuse"></result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<action name="VMStandardDelete" class="VMStandardDeleteAction">
+			<result type="json" name="success"></result>
+			<result type="json" name="error"></result>
+			<result type="json" name="deleted"></result>
+			<result type="json" name="inuse"></result>
+		</action>
+		<!-- 查询虚拟机规格同步资源池 -->
+		<action name="vmStandardResList" class="vmStandardResListAction">
+			<result type="json" name="success"></result>
+			<result type="json" name="error"></result>
+			<result type="json" name="failure"></result>
+		</action>
+		<!-- 查询虚拟硬盘规格同步资源池 -->
+		<action name="ebsStandardResList" class="ebsStandardResListAction">
+			<result type="json" name="success"></result>
+			<result type="json" name="error"></result>
+			<result type="json" name="failure"></result>
+		</action>
+		<!-- 虚拟机规格同步资源池 -->
+		<action name="vmSynchroResPool" class="vmSynchroResPoolAction">
+			<result type="json" name="success"></result>
+			<result type="json" name="error"></result>
+			<result type="json" name="failure"></result>
+		</action>
+		<!-- 虚拟机模板同步资源池 -->
+		<action name="vmSynchroResTemplatePool" class="vmSynchroResPoolTemplateAction">
+			<result type="json" name="success"></result>
+			<result type="json" name="error"></result>
+			<result type="json" name="failure"></result>
+		</action>
+		<!-- 虚拟硬盘规格同步资源池 -->
+		<action name="ebsSynchroResPool" class="ebsSynchroResPoolAction">
+			<result type="json" name="success"></result>
+			<result type="json" name="error"></result>
+			<result type="json" name="failure"></result>
+		</action>
+		<action name="EBSStandardListQueryJson" class="EBSStandardListQueryActionJson">
+			<result type="json" name="success"></result>
+			<result type="json" name="error"></result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<action name="EBSStandardDetail" class="EBSStandardDetailAction">
+			<result type="json" name="success"></result>
+			<result type="json" name="error"></result>
+		</action>
+		<action name="EBSStandardCreate" class="EBSStandardCreateAction">
+			<result type="json" name="success"></result>
+			<result type="json" name="error"></result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<action name="EBSStandardModify" class="EBSStandardModifyAction">
+			<result type="json" name="success"></result>
+			<result type="json" name="error"></result>
+			<result type="json" name="deleted"></result>
+			<result type="json" name="inuse"></result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<action name="EBSStandardDelete" class="EBSStandardDeleteAction">
+			<result type="json" name="success"></result>
+			<result type="json" name="error"></result>
+			<result type="json" name="deleted"></result>
+			<result type="json" name="inuse"></result>
+		</action>
+		<action name="VMBAKStandardCreate" class="VMBAKStandardCreateAction">
+			<result type="json" name="success"></result>
+			<result type="json" name="error"></result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<action name="VMBAKStandardDetail" class="VMBAKStandardDetailAction">
+			<result type="json" name="success"></result>
+			<result type="json" name="error"></result>
+		</action>
+		<action name="VMBAKStandardListQueryJson" class="VMBAKStandardListQueryActionJson">
+			<result type="json" name="success"></result>
+			<result type="json" name="error"></result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<action name="VMBAKStandardDelete" class="VMBAKStandardDeleteAction">
+			<result type="json" name="success"></result>
+			<result type="json" name="error"></result>
+			<result type="json" name="deleted"></result>
+			<result type="json" name="inuse"></result>
+		</action>
+		<action name="VMBAKSynchroResPool" class="VMBAKSynchroResPoolAction">
+			<result type="json" name="success"></result>
+			<result type="json" name="error"></result>
+			<result type="json" name="failure"></result>
+		</action>
+		<action name="VMBAKStandardModify" class="VMBAKStandardModifyAction">
+			<result type="json" name="success"></result>
+			<result type="json" name="error"></result>
+			<result type="json" name="failure"></result>
+		</action>
+		<!-- 查询虚拟机备份规格同步资源池 -->
+		<action name="VMBAKStandardResList" class="VMBAKStandardResListAction">
+			<result type="json" name="success"></result>
+			<result type="json" name="error"></result>
+			<result type="json" name="failure"></result>
+		</action>
+	</package>
+</struts>

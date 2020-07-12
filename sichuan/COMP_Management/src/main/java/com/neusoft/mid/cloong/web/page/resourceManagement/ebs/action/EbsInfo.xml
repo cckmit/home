@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="EbsInfo">
+	<typeAlias alias="ebsInfo" type="com.neusoft.mid.cloong.web.page.resourceManagement.info.EbsInfo" />
+	<!-- 查询块存储信息列表   -->
+	<select id="queryEbsInfos" parameterClass="ebsInfo" resultClass="ebsInfo">
+		SELECT  E.EBS_ID ebsId,
+				E.EBS_NAME ebsName,
+				E.DISK_SIZE diskSize,
+				E.CUR_STATUS curStatus,
+				A.APP_NAME appName,
+				R.RES_POOL_NAME resPoolName,
+				IFNULL(CASE_VM.VM_NAME,V.VM_NAME) vmName,
+				DATE_FORMAT(
+					E.UPDATE_TIME,
+					'%Y-%m-%d %H:%i:%s'
+				) updateTime
+		 FROM COMP_RM_EBS_T E
+			  LEFT JOIN COMP_RES_POOL_T R on E.RES_POOL_ID = R.RES_POOL_ID
+			  LEFT JOIN COMP_APP_T A on E.APP_ID = A.APP_ID
+			  LEFT JOIN COMP_RM_VM_T V on E.PARENT_ID = V.VM_ID
+			  LEFT JOIN COMP_CASE_VM_T CASE_VM ON CASE_VM.VM_ID = E.PARENT_ID
+	     WHERE 1=1
+		<dynamic prepend="">
+			<isNotEmpty prepend="and" property="ebsId">
+				upper(EBS_ID) like
+				upper(CONCAT('%',trim(#ebsId#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="ebsName">
+				upper(EBS_NAME) like
+				upper(CONCAT('%',trim(#ebsName#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="appId">
+				upper(E.APP_ID) like
+				upper(CONCAT('%',trim(#appId#),'%'))
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<!-- 查询块存储信息列表数目 -->
+	<select id="countQueryEbs" parameterClass="ebsInfo" resultClass="java.lang.Integer">
+		SELECT  count(*)
+		FROM COMP_RM_EBS_T E
+			  LEFT JOIN COMP_RES_POOL_T R on E.RES_POOL_ID = R.RES_POOL_ID
+			  LEFT JOIN COMP_APP_T A on E.APP_ID = A.APP_ID
+			  LEFT JOIN COMP_RM_VM_T V on E.PARENT_ID = V.VM_ID
+	     WHERE 1=1
+		<dynamic prepend="">
+			<isNotEmpty prepend="and" property="ebsId">
+				upper(EBS_ID) like
+				upper(CONCAT('%',trim(#ebsId#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="ebsName">
+				upper(EBS_NAME) like
+				upper(CONCAT('%',trim(#ebsName#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="appId">
+				upper(E.APP_ID) like
+				upper(CONCAT('%',trim(#appId#),'%'))
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<!-- 查询块存储信息详情-->
+	<select id="queryEbsInfo" parameterClass="ebsInfo" resultClass="ebsInfo">
+		SELECT  E.EBS_ID ebsId,
+				E.EBS_NAME ebsName,
+				E.DISK_SIZE diskSize,
+				E.CUR_STATUS curStatus,
+				A.APP_NAME appName,
+				R.RES_POOL_NAME resPoolName,
+				IFNULL(CASE_VM.VM_NAME,V.VM_NAME) vmName,
+				DATE_FORMAT(
+					E.UPDATE_TIME,
+					'%Y-%m-%d %H:%i:%s'
+				) updateTime
+		 FROM COMP_RM_EBS_T E
+			  LEFT JOIN COMP_RES_POOL_T R on E.RES_POOL_ID = R.RES_POOL_ID
+			  LEFT JOIN COMP_APP_T A on E.APP_ID = A.APP_ID
+			  LEFT JOIN COMP_RM_VM_T V on E.PARENT_ID = V.VM_ID
+			  LEFT JOIN COMP_CASE_VM_T CASE_VM ON CASE_VM.VM_ID = E.PARENT_ID
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="" property="ebsId">
+				E.EBS_ID = #ebsId#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+</sqlMap>

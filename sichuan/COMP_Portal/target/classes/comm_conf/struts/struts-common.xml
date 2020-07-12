@@ -1,0 +1,1815 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<!-- 这只浏览器时候缓存静态内容，默认值为true(生产环境下使用),开发阶段最好关闭 -->
+	<constant name="struts.serve.static.vrowserCache" value="false"></constant>
+	<!-- 当struts的配置文件修改后，系统是否自动重新加载该文件，默认为false(生产环境下使用),开发阶段最好打开 -->
+	<constant name="struts.ui.theme" value="simple"></constant>
+
+	<package name="com.neusoft.mid.cloong.web.login" extends="struts-default,json-default">
+		<global-results>
+			<result name="error" type="chain">exceptionIntercepor</result>
+		</global-results>
+		<global-exception-mappings>
+			<exception-mapping exception="java.lang.Exception"
+				result="error" />
+		</global-exception-mappings>
+		<action name="login" class="loginAction">
+			<result name="SUCCESS" type="redirectAction">
+				<param name="actionName">console/resourcesOverviewAction</param>
+			</result>
+			<result name="INVALID">/login.jsp</result>
+			<result name="FAILURE">/login.jsp</result>
+		</action>
+		<action name="dymanicCodeLogin" class="dymanicCodeLoginAction">
+			<result name="SUCCESS" type="redirectAction">
+				<param name="actionName">console/resourcesOverviewAction</param>
+			</result>
+			<result name="INVALID">/login.jsp</result>
+			<result name="FAILURE">/login.jsp</result>
+		</action>
+		<action name="logout" class="logoutAction">
+			<result name="SUCCESS" type="redirect">/login.jsp</result>
+		</action>
+		<!-- <action name="register" class="registerAction"> <result name="success" 
+			type="redirect">/registerSuccess_byQuestion.jsp </result> <result name="error" 
+			type="redirect">/register_byQuestion.jsp</result> </action> -->
+		<action name="forgetPassword" class="forgetPasswordAction">
+			<result name="SHORTMESSAGE">/inputShortMessage.jsp</result>
+			<result name="EMAIL">/inputEmailMessage.jsp</result>
+			<result name="error">/forgetPassword.jsp</result>
+		</action>
+		<action name="shortMessageConfirm" class="shortMessageConfirmAction">
+			<result name="success">/resetPassword.jsp</result>
+			<result name="REPEATSHORTMESSAGE">/forgetPassword.jsp</result>
+			<result name="error">/inputShortMessage.jsp</result>
+		</action>
+		<action name="emailConfirm" class="emailConfirmAction">
+			<result name="success">/resetPassword.jsp</result>
+			<result name="error">/badEmailurl.jsp</result>
+		</action>
+		<action name="resetPassword" class="resetPasswordAction">
+			<result name="success">/resetPasswordBack.jsp</result>
+			<result name="error">/resetPasswordBack.jsp</result>
+		</action>
+		<action name="register" class="registerAction">
+			<result name="success" type="json" />
+			<result name="error" type="json" />
+			<result name="statusinvalid" >/WEB-INF/pages/exception/500.jsp</result>
+		</action>
+		<action name="hostMore" class="hostMoreAction">
+			<result name="success">/host_more.jsp</result>
+			<result name="error">/host_more.jsp</result>
+		</action>
+	</package>
+
+	<!-- 资源视图开始 -->
+	<package name="com.neusoft.mid.cloong.vm" namespace="/console"
+		extends="struts-default,json-default">
+		<interceptors>
+			<interceptor name="authenticate" class="authenticateInterceptor" />
+			<interceptor name="turnPageInter" class="turnPageInterceptor" />
+			<interceptor-stack name="authStack">
+				<interceptor-ref name="authenticate" />
+				<interceptor-ref name="defaultStack" />
+				<interceptor-ref name="turnPageInter" />
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="authStack" />
+		<global-results>
+			<result name="LOGIN" type="redirectAction">logout</result>
+			<result name="error" type="chain">exceptionIntercepor</result>
+		</global-results>
+		<global-exception-mappings>
+			<exception-mapping exception="java.lang.Exception"
+				result="error" />
+		</global-exception-mappings>
+		<action name="exceptionIntercepor" class="exceptionIntercepor">
+			<result name="success">/WEB-INF/pages/exception/error.jsp
+			</result>
+		</action>
+		<action name="vmDetailAction" class="vmDetailAction">
+			<result name="success">/WEB-INF/pages/console/host/vm_detail.jsp
+			</result>
+			<result name="failure" type="redirectAction">
+				<param name="actionName">vmQueryListAction</param>
+				<param name="errMsg">${errMeg}</param>
+			</result>
+		</action>
+
+		<!-- 虚拟机性能页面 -->
+		<action name="hostRealTimePerformance" class="hostRealTimePerformance">
+			<result name="success">/WEB-INF/pages/console/host/realTime_performance.jsp
+			</result>
+		</action>
+
+		<!-- 虚拟机批量审批结果 -->
+		<action name="vmBatchQueryListAction" class="vmBatchQueryListAction"
+			method="vmBatchQueryList">
+			<result name="success">/WEB-INF/pages/console/host/vm_batch_list.jsp
+			</result>
+			<result name="failure">/WEB-INF/pages/console/host/vm_batch_list.jsp
+			</result>
+		</action>
+
+		<!-- 虚拟机性能定时查询,为Ajax返回json格式 -->
+		<action name="hostRealTimePerformanceJson" class="hostRealTimePerformance">
+			<result name="success" type="json">
+				<param name="excludeProperties">ibatisDAO,container</param>
+				<param name="ignoreHierarchy">false</param>
+				<param name="enumAsBean">true</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">realTime</param>
+				<param name="root">realTimeList</param>
+			</result>
+		</action>
+
+		<!-- 查询虚拟机列表 -->
+		<action name="vmQueryListAction" class="vmQueryListAction">
+			<result name="success">/WEB-INF/pages/console/host/vm_list.jsp
+			</result>
+			<result name="error">/WEB-INF/pages/console/host/vm_list.jsp
+			</result>
+			<result name="failure">/WEB-INF/pages/console/host/vm_list.jsp
+			</result>
+		</action>
+
+		<action name="vmApplyAction" class="vmApplyAction">
+			<result name="success">/WEB-INF/pages/console/host/vm_apply_commend.jsp
+			</result>
+			<result name="failure">/WEB-INF/pages/console/host/vm_apply_commend.jsp
+			</result>
+		</action>
+
+		<!-- 云主机预订购 -->
+		<action name="vmPreApplyAction" class="vmPreApplyAction">
+			<result name="success">/WEB-INF/pages/console/host/vm_pre_apply_commend.jsp
+			</result>
+			<result name="failure">/WEB-INF/pages/console/host/vm_pre_apply_commend.jsp
+			</result>
+		</action>
+
+		<!-- 虚拟机预订购 -->
+		<action name="vmPreApplyInfoAction" class="vmPreApplyInfoAction">
+			<result name="success" type="redirectAction">
+				<param name="actionName">vmPreApplyQueryListAction</param>
+				<param name="msg">${msg}</param>
+			</result>
+			<result name="failure" type="redirectAction">
+				<param name="actionName">vmPreApplyQueryListAction</param>
+				<param name="msg">${msg}</param>
+				<param name="errMsg">${errMsg}</param>
+			</result>
+			<result name="input">/WEB-INF/pages/console/host/vm_pre_apply_commend.jsp
+			</result>
+		</action>
+
+		<!-- 查询预订购虚拟机列表 -->
+		<action name="vmPreApplyQueryListAction" class="vmPreApplyQueryListAction">
+			<result name="success">/WEB-INF/pages/console/host/vm_pre_list.jsp
+			</result>
+			<result name="error">/WEB-INF/pages/console/host/vm_pre_list.jsp
+			</result>
+			<result name="failure">/WEB-INF/pages/console/host/vm_pre_list.jsp
+			</result>
+		</action>
+
+		<!-- 云主机预订购详情 -->
+		<action name="vmPreApplyDetailAction" class="vmPreApplyDetailAction">
+			<result name="success">/WEB-INF/pages/console/host/vm_pre_apply_detail.jsp
+			</result>
+			<result name="failure" type="redirectAction">
+				<param name="actionName">vmPreApplyQueryListAction</param>
+				<param name="errMsg">${errMeg}</param>
+			</result>
+		</action>
+		
+		<!-- boss订购单列表 -->
+		<action name="bossOrderList" class="bossOrderListAction">
+			<result name="success">/WEB-INF/pages/console/bossOrder/bossOrder_list.jsp
+			</result>
+			<result name="error">/WEB-INF/pages/console/bossOrder/bossOrder_list.jsp
+			</result>
+			<result name="failure">/WEB-INF/pages/console/bossOrder/bossOrder_list.jsp
+			</result>
+		</action>
+		
+		<!-- boss订购详情 -->
+		<action name="bossOrderDetailAction" class="bossOrderDetailAction">
+			<result name="success">/WEB-INF/pages/console/bossOrder/bossOrder_detail.jsp
+			</result>
+			<result name="failure" type="redirectAction">
+				<param name="actionName">bossOrderList</param>
+				<param name="errMsg">${errMeg}</param>
+			</result>
+		</action>
+		
+		<!-- boss更新状态为已订购 -->
+		<action name="bossOrderStatusUpdateAction" class="bossOrderStatusUpdateAction">
+			<interceptor-ref name="jsonValidationWorkflowStack"></interceptor-ref>
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+
+		<!-- 预订购更新状态为已订购 -->
+		<action name="vmPreApplyStatusUpdateAction" class="vmPreApplyStatusUpdateAction">
+			<interceptor-ref name="jsonValidationWorkflowStack"></interceptor-ref>
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+
+
+		<action name="vmApplyInfoAction" class="vmApplyInfoAction">
+			<result name="success" type="redirectAction">
+				<param name="actionName">vmQueryListAction</param>
+				<param name="msg">${msg}</param>
+			</result>
+			<result name="failure" type="redirectAction">
+				<param name="actionName">vmQueryListAction</param>
+				<param name="msg">${msg}</param>
+				<param name="errMsg">${errMsg}</param>
+			</result>
+			<result name="input">/WEB-INF/pages/console/host/vm_apply_commend.jsp
+			</result>
+		</action>
+
+		<!-- 虚拟机详情页展示备份列表 -->
+		<action name="vmBakQueryJsonAction" class="vmBakQueryJsonAction">
+			<result name="success" type="json" />
+			<result name="error" type="json" />
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+
+		<!-- 物理机页面 -->
+		<action name="pmQueryListAction" class="pmQueryListAction">
+			<result name="success">/WEB-INF/pages/console/host/pm_list.jsp
+			</result>
+			<result name="error">/WEB-INF/pages/console/host/pm_list.jsp
+			</result>
+			<result name="failure">/WEB-INF/pages/console/host/pm_list.jsp
+			</result>
+		</action>
+
+		<action name="pmApplyAction" class="pmApplyAction">
+			<result name="success">/WEB-INF/pages/console/host/pm_apply_commend.jsp
+			</result>
+			<result name="failure">/WEB-INF/pages/console/host/pm_apply_commend.jsp
+			</result>
+		</action>
+
+		<action name="pmApplyInfoAction" class="pmApplyInfoAction">
+			<result name="success" type="redirectAction">
+				<param name="actionName">pmQueryListAction</param>
+				<param name="msg">${msg}</param>
+			</result>
+			<result name="failure" type="redirectAction">
+				<param name="actionName">pmQueryListAction</param>
+				<param name="msg">${msg}</param>
+				<param name="errMsg">${errMsg}</param>
+			</result>
+			<result name="input">/WEB-INF/pages/console/host/pm_apply_commend.jsp
+			</result>
+		</action>
+
+		<action name="pmDetailAction" class="pmDetailAction">
+			<result name="success">/WEB-INF/pages/console/host/pm_detail.jsp
+			</result>
+			<result name="failure" type="chain">
+				<param name="actionName">pmQueryListAction</param>
+				<param name="errMsg">${errMeg}</param>
+			</result>
+		</action>
+
+		<!-- 虚拟机备份-开始 -->
+		<!-- 虚拟机备份任务列表 -->
+		<action name="vmBakQueryListAction" class="vmBakQueryListAction">
+			<result name="success">/WEB-INF/pages/console/vmbak/vmbak_list.jsp
+			</result>
+			<result name="error">/WEB-INF/pages/console/vmbak/vmbak_list.jsp
+			</result>
+			<result name="failure">/WEB-INF/pages/console/vmbak/vmbak_list.jsp
+			</result>
+		</action>
+
+		<!-- 跳转到创建虚拟机备份任务页面 -->
+		<action name="vmBakApplyAction" class="vmBakApplyAction">
+			<result name="success">/WEB-INF/pages/console/vmbak/vmbak_apply.jsp
+			</result>
+			<result name="failure" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">errorMsg,resultFlag</param>
+			</result>
+		</action>
+
+		<action name="vmBakApplyActionByAjax" class="vmBakApplyAction">
+			<result name="success" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">resultFlag</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">errorMsg,resultFlag</param>
+			</result>
+		</action>
+
+		<!-- 创建虚拟机备份任务 -->
+		<action name="vmBakApplyInfoAction" class="vmBakApplyInfoAction">
+			<result name="success" type="redirectAction">
+				<param name="actionName">vmBakQueryListAction</param>
+				<param name="msg">${msg}</param>
+			</result>
+			<result name="failure" type="redirectAction">
+				<param name="actionName">vmBakQueryListAction</param>
+				<param name="msg">${msg}</param>
+				<param name="errMsg">${errMsg}</param>
+			</result>
+			<result name="input">/WEB-INF/pages/console/vmbak/vmbak_add.jsp
+			</result>
+		</action>
+
+		<!-- 虚拟机备份任务详情 -->
+		<action name="vmBakDetailAction" class="vmBakDetailAction">
+			<result name="success">/WEB-INF/pages/console/vmbak/vmbak_detail.jsp
+			</result>
+			<result name="failure">/WEB-INF/pages/console/vmbak/vmbak_detail.jsp
+			</result>
+		</action>
+		<!-- 虚拟机备份-结束 -->
+
+
+		<action name="ebsApplyAction" class="ebsApplyAction">
+			<result name="success">/WEB-INF/pages/console/disk/ebs_apply.jsp
+			</result>
+			<result name="failure">/WEB-INF/pages/console/disk/ebs_apply.jsp
+			</result>
+		</action>
+
+		<!-- 云硬盘 自定义配置 -->
+		<action name="ebsCustomApplyAction" class="ebsApplyAction">
+			<result name="success">/WEB-INF/pages/console/disk/ebs_apply_custom.jsp
+			</result>
+			<result name="failure">/WEB-INF/pages/console/disk/ebs_apply_custom.jsp
+			</result>
+		</action>
+
+		<action name="ebsApplyInfoAction" class="ebsApplyInfoAction">
+			<result name="success" type="redirectAction">
+				<param name="actionName">ebsQueryListAction</param>
+				<param name="msg">${msg}</param>
+			</result>
+			<result name="failure" type="redirectAction">
+				<param name="actionName">ebsQueryListAction</param>
+				<param name="msg">${msg}</param>
+				<param name="errMsg">${errMsg}</param>
+			</result>
+			<result name="input">/WEB-INF/pages/console/disk/ebs_apply.jsp
+			</result>
+		</action>
+
+		<!-- 云硬盘自定义提交 -->
+		<action name="ebsApplyInfoCustomAction" class="ebsApplyInfoCustomAction">
+			<result name="success" type="redirectAction">
+				<param name="actionName">ebsQueryListAction</param>
+				<param name="msg">${msg}</param>
+			</result>
+			<result name="failure" type="redirectAction">
+				<param name="actionName">ebsQueryListAction</param>
+				<param name="msg">${msg}</param>
+				<param name="errMsg">${errMsg}</param>
+			</result>
+			<result name="input">/WEB-INF/pages/console/disk/ebs_apply_custom.jsp
+			</result>
+		</action>
+
+
+		
+
+
+		<!-- 资源视图概况 -->
+		<action name="resourcesOverviewAction" class="EmptyAction">
+			<result name="SUCCESS">/WEB-INF/pages/console/resources/business_overview.jsp
+			</result>
+		</action>
+
+	</package>
+
+
+	<!-- 业务视图开始 -->
+	<package name="com.neusoft.mid.cloong.console.business"
+		namespace="/business_console" extends="struts-default,json-default">
+		<interceptors>
+			<interceptor name="authenticate" class="authenticateInterceptor" />
+			<interceptor name="businessMenu" class="businessMenuInterceptor" />
+			<interceptor name="turnPageInter" class="turnPageInterceptor" />
+			<interceptor-stack name="authStack">
+				<interceptor-ref name="authenticate" />
+				<interceptor-ref name="businessMenu" />
+				<interceptor-ref name="defaultStack" />
+				<interceptor-ref name="turnPageInter" />
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="authStack" />
+		<global-results>
+			<result name="LOGIN" type="redirectAction">logout</result>
+			<result name="error" type="chain">exceptionIntercepor</result>
+		</global-results>
+		<global-exception-mappings>
+			<exception-mapping exception="java.lang.Exception"
+				result="error" />
+		</global-exception-mappings>
+		<!-- 查询业务视图树 -->
+		<action name="creatTreeActionJson" class="createTreeAction">
+			<result type="json" name="success"></result>
+			<result type="json" name="error"></result>
+			<result type="json" name="failure"></result>
+		</action>
+		<!-- 业务视图物理机页面 -->
+		<action name="pmQueryListAction" class="pmQueryListAction">
+			<result name="success">/WEB-INF/pages/console/business/host/pm_list.jsp
+			</result>
+			<result name="error">/WEB-INF/pages/console/business/host/pm_list.jsp
+			</result>
+			<result name="failure">/WEB-INF/pages/console/business/host/pm_list.jsp
+			</result>
+		</action>
+
+		<action name="businessOverview" class="businessListAction">
+			<result name="success">/WEB-INF/pages/console/business/business_overview.jsp
+			</result>
+		</action>
+		<action name="ebsQueryListAction" class="queryEBSListAction">
+			<result name="success">/WEB-INF/pages/console/business/disk/ebs_list.jsp
+			</result>
+			<result name="error">/WEB-INF/pages/console/business/disk/ebs_list.jsp
+			</result>
+			<result name="failure">/WEB-INF/pages/console/business/disk/ebs_list.jsp
+			</result>
+		</action>
+		<action name="ebsQueryListByMountStatusAction" class="queryEBSListAction">
+			<result name="success" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">pageBar,diskInfos.*</param>
+			</result>
+			<result name="error" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<action name="ebsApplyAction" class="resourceApplyBusinessConsoleAction">
+			<result name="success">/WEB-INF/pages/console/business/disk/ebs_apply.jsp
+			</result>
+			<result name="failure">/WEB-INF/pages/console/business/disk/ebs_apply.jsp
+			</result>
+		</action>
+
+		<!-- 业务磁盘 自定义配置 -->
+		<action name="ebsCustomApplyAction" class="resourceApplyBusinessConsoleAction">
+			<result name="success">/WEB-INF/pages/console/business/disk/ebs_apply_custom.jsp
+			</result>
+			<result name="failure">/WEB-INF/pages/console/business/disk/ebs_apply_custom.jsp
+			</result>
+		</action>
+		<action name="diskDetail" class="diskDetailBusinessConsoleAction">
+			<result name="success">
+				/WEB-INF/pages/console/business/disk/ebs_detail_mount.jsp
+			</result>
+			<result name="failure" type="redirectAction">
+				<param name="actionName">ebsQueryListAction</param>
+			</result>
+		</action>
+		<!-- 业务视图查询主机 -->
+		<action name="hostList" class="vmQueryListAction">
+			<result name="success">/WEB-INF/pages/console/business/host/host_list.jsp
+			</result>
+			<result name="error">/WEB-INF/pages/console/business/host/host_list.jsp
+			</result>
+			<result name="failure">/WEB-INF/pages/console/business/host/host_list.jsp
+			</result>
+		</action>
+		<action name="vmDetail" class="vmDetailBusinessConsoleAction">
+			<result name="success">/WEB-INF/pages/console/business/host/vm_detail.jsp
+			</result>
+			<result name="failure" type="redirectAction">
+				<param name="actionName">hostList</param>
+				<param name="errMsg">${errMeg}</param>
+			</result>
+		</action>
+		<!-- 虚拟机详情页展示备份列表 -->
+		<action name="vmBakQueryJsonAction" class="vmBakQueryJsonAction">
+			<result name="success" type="json" />
+			<result name="error" type="json" />
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<action name="pmDetail" class="pmDetailBusinessConsoleAction">
+			<result name="success">/WEB-INF/pages/console/business/host/pm_detail.jsp
+			</result>
+			<result name="failure" type="redirectAction">
+				<param name="actionName">pmQueryListAction</param>
+				<param name="errMsg">${errMeg}</param>
+			</result>
+		</action>
+		<action name="vmApply" class="resourceApplyBusinessConsoleAction">
+			<result name="success">/WEB-INF/pages/console/business/host/vm_apply_commend.jsp
+			</result>
+		</action>
+		<action name="lbApply" class="resourceApplyBusinessConsoleAction">
+			<result name="success">/WEB-INF/pages/console/business/loadbalance/LB_apply_commend.jsp
+			</result>
+		</action>
+		<action name="pmApply" class="resourceApplyBusinessConsoleAction">
+			<result name="success">/WEB-INF/pages/console/business/host/pm_apply_commend.jsp
+			</result>
+		</action>
+		<action name="vmApplyInfoAction" class="vmApplyInfoBusinessConsoleAction">
+			<result name="success" type="redirectAction">
+				<param name="actionName">hostList</param>
+				<param name="queryBusinessId">${appId}</param>
+				<param name="type">${type}</param>
+				<param name="msg">${msg}</param>
+				<param name="nodeType">${nodeType}</param>
+				<param name="nodeId">${nodeId}</param>
+				<param name="treeNodeName">${treeNodeName}</param>
+				<param name="pnodeId">${pnodeId}</param>
+				<param name="pnodeName">${pnodeName}</param>
+				<param name="appId">${appId}</param>
+				<param name="curFun">${curFun}</param>
+			</result>
+			<result name="failure" type="redirectAction">
+				<param name="actionName">hostList</param>
+				<param name="queryBusinessId">${appId}</param>
+				<param name="type">${type}</param>
+				<param name="msg">${msg}</param>
+				<param name="errMsg">${errMsg}</param>
+				<param name="nodeType">${nodeType}</param>
+				<param name="nodeId">${nodeId}</param>
+				<param name="treeNodeName">${treeNodeName}</param>
+				<param name="pnodeId">${pnodeId}</param>
+				<param name="pnodeName">${pnodeName}</param>
+				<param name="appId">${appId}</param>
+				<param name="curFun">${curFun}</param>
+			</result>
+			<result name="input">/WEB-INF/pages/console/business/host/vm_apply_commend.jsp
+			</result>
+		</action>
+		<action name="pmApplyInfoAction" class="pmApplyInfoActionBusinessConsoleAction">
+			<result name="success" type="chain">
+				<param name="actionName">hostList</param>
+				<param name="queryBusinessId">${queryBusinessId}</param>
+				<param name="type">${type}</param>
+				<param name="msg">${msg}</param>
+			</result>
+			<result name="failure" type="chain">
+				<param name="actionName">hostList</param>
+				<param name="queryBusinessId">${queryBusinessId}</param>
+				<param name="type">${type}</param>
+				<param name="errMsg">${errMsg}</param>
+			</result>
+			<result name="input">/WEB-INF/pages/console/business/host/pm_apply_commend.jsp
+			</result>
+		</action>
+		<action name="diskNameUpdateAction" class="DiskNameUpdateAction">
+			<result name="success" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">msg,result</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">msg</param>
+			</result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<action name="ebsApplyInfoAction" class="ebsApplyInfoAction">
+			<result name="success" type="redirectAction">
+				<param name="actionName">ebsQueryListAction</param>
+				<param name="queryBusinessId">${appId}</param>
+				<param name="msg">${msg}</param>
+				<param name="nodeType">${nodeType}</param>
+				<param name="nodeId">${nodeId}</param>
+				<param name="treeNodeName">${treeNodeName}</param>
+				<param name="pnodeId">${pnodeId}</param>
+				<param name="pnodeName">${pnodeName}</param>
+				<param name="appId">${appId}</param>
+				<param name="curFun">${curFun}</param>
+			</result>
+			<result name="failure" type="redirectAction">
+				<param name="actionName">ebsQueryListAction</param>
+				<param name="queryBusinessId">${appId}</param>
+				<param name="msg">${msg}</param>
+				<param name="errMsg">${errMsg}</param>
+				<param name="nodeType">${nodeType}</param>
+				<param name="nodeId">${nodeId}</param>
+				<param name="treeNodeName">${treeNodeName}</param>
+				<param name="pnodeId">${pnodeId}</param>
+				<param name="pnodeName">${pnodeName}</param>
+				<param name="appId">${appId}</param>
+				<param name="curFun">${curFun}</param>
+			</result>
+			<result name="input" type="redirectAction">
+				<param name="actionName">ebsCustomApplyAction</param>
+				<param name="queryBusinessId">${appId}</param>
+				<param name="msg">${msg}</param>
+				<param name="errMsg">${errMsg}</param>
+				<param name="nodeType">${nodeType}</param>
+				<param name="nodeId">${nodeId}</param>
+				<param name="treeNodeName">${treeNodeName}</param>
+				<param name="pnodeId">${pnodeId}</param>
+				<param name="pnodeName">${pnodeName}</param>
+				<param name="appId">${appId}</param>
+				<param name="curFun">${curFun}</param>
+			</result>
+		</action>
+		<action name="LBdetailbusinessAction" class="loadBalanceAction"
+			method="LBdetailinfo">
+			<result name="success">/WEB-INF/pages/console/business/loadbalance/LB_detail.jsp
+			</result>
+			<result name="failure">/WEB-INF/pages/console/business/loadbalance/LB_list.jsp
+			</result>
+		</action>
+
+		<action name="ebsApplyInfoCustomAction" class="ebsApplyInfoCustomAction">
+			<result name="success" type="redirectAction">
+				<param name="actionName">ebsQueryListAction</param>
+				<param name="queryBusinessId">${appId}</param>
+				<param name="msg">${msg}</param>
+				<param name="nodeType">${nodeType}</param>
+				<param name="nodeId">${nodeId}</param>
+				<param name="treeNodeName">${treeNodeName}</param>
+				<param name="pnodeId">${pnodeId}</param>
+				<param name="pnodeName">${pnodeName}</param>
+				<param name="appId">${appId}</param>
+				<param name="curFun">${curFun}</param>
+			</result>
+			<result name="failure" type="redirectAction">
+				<param name="actionName">ebsQueryListAction</param>
+				<param name="queryBusinessId">${appId}</param>
+				<param name="msg">${msg}</param>
+				<param name="errMsg">${errMsg}</param>
+				<param name="nodeType">${nodeType}</param>
+				<param name="nodeId">${nodeId}</param>
+				<param name="treeNodeName">${treeNodeName}</param>
+				<param name="pnodeId">${pnodeId}</param>
+				<param name="pnodeName">${pnodeName}</param>
+				<param name="appId">${appId}</param>
+				<param name="curFun">${curFun}</param>
+			</result>
+			<result name="input">/WEB-INF/pages/console/business/disk/ebs_apply_custom.jsp
+			</result>
+		</action>
+
+		<!-- 虚拟机性能统计 -->
+		<action name="vmPerformanceList" class="vmPerformanceList">
+			<result name="success">/WEB-INF/pages/console/business/vmPerformance/vm_performance.jsp
+			</result>
+			<result name="error">/WEB-INF/pages/console/business/vmPerformance/vm_performance.jsp
+			</result>
+		</action>
+		
+		<!-- 虚拟机性能统计-设备列表 -->
+		<action name="vmDeviceList" class="vmPerformanceList" method="device">
+			<interceptor-ref name="jsonValidationWorkflowStack"></interceptor-ref>
+             <result name="success" type="json"></result>
+             <result name="error" type="json"></result>
+		</action>
+		
+		<!-- 虚拟机性能统计-查询 -->
+		<action name="vmPerformanceSearchList" class="vmPerformanceQueryList">
+             <result name="success" type="json"></result>
+             <result name="error" type="json"></result>
+		</action>
+		
+		<!-- 虚拟机性能统计-导出 -->
+		<action name="vmPerformanceReport" class="vmPerformanceReport">
+			<result name="error">/WEB-INF/pages/console/business/vmPerformance/vm_performance.jsp
+			</result>
+		</action>
+		
+		<!-- vlan业务视图 -->
+		<action name="vlanQueryListAction" class="queryVlanListAction">
+			<result name="success">/WEB-INF/pages/console/business/vlan/vlan_list.jsp
+			</result>
+			<result name="error">/WEB-INF/pages/console/business/vlan/vlan_list.jsp
+			</result>
+			<result name="failure">/WEB-INF/pages/console/business/vlan/vlan_list.jsp
+			</result>
+		</action>
+				
+		<!-- vlan3期 业务视图 -->
+		<action name="vlanQueryListAction3Phase" class="queryVlanListAction3Phase">
+			<result name="success">/WEB-INF/pages/console/business/vlan3Phase/vlan_list.jsp
+			</result>
+			<result name="error">/WEB-INF/pages/console/business/vlan3Phase/vlan_list.jsp
+			</result>
+			<result name="failure">/WEB-INF/pages/console/business/vlan3Phase/vlan_list.jsp
+			</result>
+		</action>
+
+		<!-- 进入vlan创建页面 -->
+		<action name="createVlanAction" class="vlanApplyAction">
+			<result name="success">
+				/WEB-INF/pages/console/business/vlan/vlan_apply.jsp
+			</result>
+		</action>
+		
+		<!-- 进入vlan创建页面 34期  -->
+		<action name="createVlanAction3Phase" class="vlanApply3PhaseAction">
+			<result name="success">
+				/WEB-INF/pages/console/business/vlan3Phase/vlan_apply.jsp
+			</result>
+		</action>
+
+		<!-- 申请vlan -->
+		<action name="vlanApplyInfoAction" class="vlanApplyInfoAction">
+			<result name="success" type="redirectAction">
+				<param name="actionName">vlanQueryListAction</param>
+				<param name="queryBusinessId">${appId}</param>
+				<param name="businessName">${pnodeName}</param>
+				<param name="msg">${msg}</param>
+				<param name="nodeType">${nodeType}</param>
+				<param name="nodeId">${nodeId}</param>
+				<param name="treeNodeName">${treeNodeName}</param>
+				<param name="pnodeId">${pnodeId}</param>
+				<param name="pnodeName">${pnodeName}</param>
+				<param name="appId">${appId}</param>
+				<param name="curFun">${curFun}</param>
+			</result>
+			<result name="failure" type="redirectAction">
+				<param name="actionName">vlanQueryListAction</param>
+				<param name="queryBusinessId">${appId}</param>
+				<param name="businessName">${pnodeName}</param>
+				<param name="msg">${msg}</param>
+				<param name="errMsg">${errMsg}</param>
+				<param name="nodeType">${nodeType}</param>
+				<param name="nodeId">${nodeId}</param>
+				<param name="treeNodeName">${treeNodeName}</param>
+				<param name="pnodeId">${pnodeId}</param>
+				<param name="pnodeName">${pnodeName}</param>
+				<param name="appId">${appId}</param>
+				<param name="curFun">${curFun}</param>
+			</result>
+			<result name="input">
+				/WEB-INF/pages/console/business/vlan/vlan_apply.jsp
+			</result>
+		</action>
+		
+		<!-- 申请vlan 34期  -->
+		<action name="vlanApplyInfoAction3Phase" class="vlanApplyInfo3PhaseAction">
+			<result name="success" type="redirectAction">
+				<param name="actionName">vlanQueryListAction3Phase</param>
+				<param name="queryBusinessId">${appId}</param>
+				<param name="businessName">${pnodeName}</param>
+				<param name="msg">${msg}</param>
+				<param name="nodeType">${nodeType}</param>
+				<param name="nodeId">${nodeId}</param>
+				<param name="treeNodeName">${treeNodeName}</param>
+				<param name="pnodeId">${pnodeId}</param>
+				<param name="pnodeName">${pnodeName}</param>
+				<param name="appId">${appId}</param>
+				<param name="curFun">${curFun}</param>
+			</result>
+			<result name="failure" type="redirectAction">
+				<param name="actionName">vlanQueryListAction3Phase</param>
+				<param name="queryBusinessId">${appId}</param>
+				<param name="businessName">${pnodeName}</param>
+				<param name="msg">${msg}</param>
+				<param name="errMsg">${errMsg}</param>
+				<param name="nodeType">${nodeType}</param>
+				<param name="nodeId">${nodeId}</param>
+				<param name="treeNodeName">${treeNodeName}</param>
+				<param name="pnodeId">${pnodeId}</param>
+				<param name="pnodeName">${pnodeName}</param>
+				<param name="appId">${appId}</param>
+				<param name="curFun">${curFun}</param>
+			</result>
+			<result name="input">
+				/WEB-INF/pages/console/business/vlan3Phase/vlan_apply.jsp
+			</result>
+		</action>
+
+		<!-- 释放Vlan -->
+		<action name="vlanCancelAction" class="vlanCancelAction">
+			<result name="success" type="redirectAction">
+				<param name="actionName">vlanQueryListAction</param>
+				<param name="queryBusinessId">${appId}</param>
+				<param name="businessName">${pnodeName}</param>
+				<param name="msg">${msg}</param>
+				<param name="nodeType">${nodeType}</param>
+				<param name="nodeId">${nodeId}</param>
+				<param name="treeNodeName">${treeNodeName}</param>
+				<param name="pnodeId">${pnodeId}</param>
+				<param name="pnodeName">${pnodeName}</param>
+				<param name="appId">${appId}</param>
+				<param name="curFun">${curFun}</param>
+			</result>
+			<result name="failure" type="redirectAction">
+				<param name="actionName">vlanQueryListAction</param>
+				<param name="queryBusinessId">${appId}</param>
+				<param name="businessName">${pnodeName}</param>
+				<param name="msg">${msg}</param>
+				<param name="errMsg">${errMsg}</param>
+				<param name="nodeType">${nodeType}</param>
+				<param name="nodeId">${nodeId}</param>
+				<param name="treeNodeName">${treeNodeName}</param>
+				<param name="pnodeId">${pnodeId}</param>
+				<param name="pnodeName">${pnodeName}</param>
+				<param name="appId">${appId}</param>
+				<param name="curFun">${curFun}</param>
+			</result>
+			<result name="statusinvalid" type="redirectAction">
+				<param name="actionName">vlanQueryListAction</param>
+				<param name="queryBusinessId">${appId}</param>
+				<param name="businessName">${pnodeName}</param>
+				<param name="msg">${msg}</param>
+				<param name="errMsg">${errMsg}</param>
+				<param name="nodeType">${nodeType}</param>
+				<param name="nodeId">${nodeId}</param>
+				<param name="treeNodeName">${treeNodeName}</param>
+				<param name="pnodeId">${pnodeId}</param>
+				<param name="pnodeName">${pnodeName}</param>
+				<param name="appId">${appId}</param>
+				<param name="curFun">${curFun}</param>
+			</result>
+		</action>
+		
+		<!-- 释放Vlan 34期  -->
+		<action name="vlanCancelAction3Phase" class="VLANCancel3PhaseAction">
+			<result name="success" type="redirectAction">
+				<param name="actionName">vlanQueryListAction3Phase</param>
+				<param name="queryBusinessId">${appId}</param>
+				<param name="businessName">${pnodeName}</param>
+				<param name="msg">${msg}</param>
+				<param name="nodeType">${nodeType}</param>
+				<param name="nodeId">${nodeId}</param>
+				<param name="treeNodeName">${treeNodeName}</param>
+				<param name="pnodeId">${pnodeId}</param>
+				<param name="pnodeName">${pnodeName}</param>
+				<param name="appId">${appId}</param>
+				<param name="curFun">${curFun}</param>
+			</result>
+			<result name="failure" type="redirectAction">
+				<param name="actionName">vlanQueryListAction3Phase</param>
+				<param name="queryBusinessId">${appId}</param>
+				<param name="businessName">${pnodeName}</param>
+				<param name="msg">${msg}</param>
+				<param name="errMsg">${errMsg}</param>
+				<param name="nodeType">${nodeType}</param>
+				<param name="nodeId">${nodeId}</param>
+				<param name="treeNodeName">${treeNodeName}</param>
+				<param name="pnodeId">${pnodeId}</param>
+				<param name="pnodeName">${pnodeName}</param>
+				<param name="appId">${appId}</param>
+				<param name="curFun">${curFun}</param>
+			</result>
+			<result name="statusinvalid" type="redirectAction">
+				<param name="actionName">vlanQueryListAction3Phase</param>
+				<param name="queryBusinessId">${appId}</param>
+				<param name="businessName">${pnodeName}</param>
+				<param name="msg">${msg}</param>
+				<param name="errMsg">${errMsg}</param>
+				<param name="nodeType">${nodeType}</param>
+				<param name="nodeId">${nodeId}</param>
+				<param name="treeNodeName">${treeNodeName}</param>
+				<param name="pnodeId">${pnodeId}</param>
+				<param name="pnodeName">${pnodeName}</param>
+				<param name="appId">${appId}</param>
+				<param name="curFun">${curFun}</param>
+			</result>
+		</action>
+		
+		<!-- 修改vlan -->
+		<action name="vlanNameEdit" class="vlanNameEditAction">
+			<result name="success" type="json">
+			</result>
+			<result name="error" type="json">
+			</result>
+		</action>
+		
+		<!-- 修改vlan 34期  -->		
+		<action name="vlanNameEdit3Phase" class="vlanNameEdit3PhaseAction">
+			<result name="success" type="json">
+			</result>
+			<result name="error" type="json">
+			</result>
+		</action>
+		
+		<!-- 业务 vlan详情 34期  -->	
+		<action name="vlanDetail" class="vlanDetail3PhaseAction">
+			<result name="success">
+				/WEB-INF/pages/console/business/vlan3Phase/vlan_detail.jsp
+			</result>
+			<result name="error">
+				WEB-INF/pages/console/business/vlan3Phase/vlan_list.jsp
+			</result>	
+		</action>
+
+		<!-- IP段开始 -->
+		<action name="ipSegmentQueryListAction" class="queryIpSegmentListAction">
+			<result name="success">/WEB-INF/pages/console/business/ipSegment/ipSegment_list.jsp
+			</result>
+			<result name="error">/WEB-INF/pages/console/business/ipSegment/ipSegment_list.jsp
+			</result>
+			<result name="failure">/WEB-INF/pages/console/business/ipSegment/ipSegment_list.jsp
+			</result>
+		</action>
+
+		<!-- 负载均衡开始 -->
+		<action name="lbQueryListAction" class="querylbListAction">
+			<result name="success">/WEB-INF/pages/console/business/loadbalance/LB_list.jsp
+			</result>
+			<result name="error">/WEB-INF/pages/console/business/loadbalance/LB_list.jsp
+			</result>
+			<result name="failure">/WEB-INF/pages/console/business/loadbalance/LB_list.jsp
+			</result>
+		</action>
+
+		<action name="createIpSegmentAction" class="createIpSegmentAction">
+			<result name="success">
+				/WEB-INF/pages/console/business/ipSegment/ipSegment_apply.jsp
+			</result>
+		</action>
+
+		<action name="IpSegmentCreateInfoAction" class="IpSegmentCreateInfoAction">
+			<result name="success" type="redirectAction">
+				<param name="actionName">ipSegmentQueryListAction</param>
+				<param name="msg">${msg}</param>
+				<param name="queryBusinessId">${appId}</param>
+				<param name="nodeType">${nodeType}</param>
+				<param name="nodeId">${nodeId}</param>
+				<param name="treeNodeName">${treeNodeName}</param>
+				<param name="pnodeId">${pnodeId}</param>
+				<param name="pnodeName">${pnodeName}</param>
+				<param name="appId">${appId}</param>
+				<param name="curFun">${curFun}</param>
+			</result>
+			<result name="failure" type="redirectAction">
+				<param name="actionName">ipSegmentQueryListAction</param>
+				<param name="msg">${msg}</param>
+				<param name="errMsg">${errMsg}</param>
+				<param name="queryBusinessId">${appId}</param>
+				<param name="nodeType">${nodeType}</param>
+				<param name="nodeId">${nodeId}</param>
+				<param name="treeNodeName">${treeNodeName}</param>
+				<param name="pnodeId">${pnodeId}</param>
+				<param name="pnodeName">${pnodeName}</param>
+				<param name="appId">${appId}</param>
+				<param name="curFun">${curFun}</param>
+
+			</result>
+			<result name="input">/WEB-INF/pages/console/business/ipSegment/ipSegment_apply.jsp
+			</result>
+		</action>
+
+		<!-- 页面Ajax查询可用IP段 -->
+		<action name="queryIpSegmentAction" class="queryIpSegmentAction">
+			<result name="success" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">ipSegmentList.*,pageBar</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">faultString</param>
+			</result>
+		</action>
+
+		<action name="ipSegmentDetailAction" class="ipSegmentDetailAction">
+			<result name="success">
+				/WEB-INF/pages/console/business/ipSegment/ipSegment_detail.jsp
+			</result>
+			<result name="failure">
+				/WEB-INF/pages/console/business/ipSegment/ipSegment_list.jsp
+			</result>
+		</action>
+
+		<action name="ipSegmentReleaseAction" class="ipSegmentReleaseAction">
+			<result name="success" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">msg</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">msg</param>
+			</result>
+		</action>
+
+		<action name="ipSegmentUpdateNameAction" class="ipSegmentUpdateNameAction">
+			<result name="success" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">msg,ipSegmentDesc</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">msg</param>
+			</result>
+			<result name="error" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">msg</param>
+			</result>
+		</action>
+
+		<!-- IP段结束 -->
+
+		<!-- 虚拟机备份-开始 -->
+		<!-- 虚拟机备份任务列表 -->
+		<action name="vmBakQueryListAction" class="vmBakQueryListAction">
+			<result name="success">/WEB-INF/pages/console/vmbak/vmbak_list.jsp
+			</result>
+			<result name="error">/WEB-INF/pages/console/vmbak/vmbak_list.jsp
+			</result>
+			<result name="failure">/WEB-INF/pages/console/vmbak/vmbak_list.jsp
+			</result>
+		</action>
+
+		<!-- 跳转到创建虚拟机备份任务页面 -->
+		<action name="vmBakApplyAction" class="vmBakApplyAction">
+			<result name="success">/WEB-INF/pages/console/vmbak/vmbak_apply.jsp
+			</result>
+			<result name="failure" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">errorMsg,resultFlag</param>
+			</result>
+		</action>
+
+		<action name="vmBakApplyActionByAjax" class="vmBakApplyAction">
+			<result name="success" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">resultFlag</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">errorMsg,resultFlag</param>
+			</result>
+		</action>
+
+		<!-- 创建虚拟机备份任务 -->
+		<action name="vmBakApplyInfoAction" class="vmBakApplyInfoAction">
+			<result name="success" type="redirectAction">
+				<param name="actionName">vmBakQueryListAction</param>
+				<param name="msg">${msg}</param>
+				<param name="nodeType">${nodeType}</param>
+				<param name="nodeId">${nodeId}</param>
+				<param name="treeNodeName">${treeNodeName}</param>
+				<param name="pnodeId">${pnodeId}</param>
+				<param name="pnodeName">${pnodeName}</param>
+				<param name="appId">${appId}</param>
+				<param name="curFun">${curFun}</param>
+			</result>
+			<result name="failure" type="redirectAction">
+				<param name="actionName">vmBakQueryListAction</param>
+				<param name="msg">${msg}</param>
+				<param name="errMsg">${errMsg}</param>
+				<param name="nodeType">${nodeType}</param>
+				<param name="nodeId">${nodeId}</param>
+				<param name="treeNodeName">${treeNodeName}</param>
+				<param name="pnodeId">${pnodeId}</param>
+				<param name="pnodeName">${pnodeName}</param>
+				<param name="appId">${appId}</param>
+				<param name="curFun">${curFun}</param>
+			</result>
+			<result name="input">/WEB-INF/pages/console/vmbak/vmbak_add.jsp
+			</result>
+		</action>
+
+		<!-- 虚拟机备份任务详情 -->
+		<action name="vmBakDetailAction" class="vmBakDetailAction">
+			<result name="success">/WEB-INF/pages/console/vmbak/vmbak_detail.jsp
+			</result>
+			<result name="failure">/WEB-INF/pages/console/vmbak/vmbak_detail.jsp
+			</result>
+		</action>
+		<!-- 虚拟机备份-结束 -->
+	</package>
+
+
+	<package name="com.neusoft.mid.cloong.cosole.business.json"
+		extends="json-default">
+		<interceptors>
+			<interceptor name="authenticate" class="authenticateInterceptor" />
+			<interceptor name="turnPageInter" class="turnPageInterceptor" />
+			<interceptor-stack name="authStack">
+				<interceptor-ref name="authenticate" />
+				<interceptor-ref name="defaultStack" />
+				<interceptor-ref name="turnPageInter" />
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="authStack" />
+		<global-results>
+			<result name="LOGIN" type="redirectAction">logout</result>
+			<result name="error" type="chain">exceptionIntercepor</result>
+		</global-results>
+		<global-exception-mappings>
+			<exception-mapping exception="java.lang.Exception"
+				result="error" />
+		</global-exception-mappings>
+		<!-- 业务视图查询概况 -->
+		<action name="resourceListForBusinessOverview" class="queryResourcesListAction">
+			<result name="success" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">resourceList\..+$</param>
+			</result>
+		</action>
+		<action name="businessListJson" class="businessManagerListAction">
+			<result name="success" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">businessInfoList.*,pageBar</param>
+			</result>
+		</action>
+		
+		<action name="vmListJson" class="vmListJsonAction" method="queryVmListJson">
+			<result name="success" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">vmList.*,pageBar</param>
+			</result>
+		</action>
+
+		<!-- 资费列表 -->
+		<action name="queryChargesList" class="chargesListAction">
+			<result name="success" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">businessInfoList.*,pageBar</param>
+			</result>
+		</action>
+
+	</package>
+
+	<package name="com.neusoft.mid.cloong.vm.json" extends="json-default">
+		<interceptors>
+			<interceptor name="authenticate" class="authenticateInterceptor" />
+			<interceptor name="turnPageInter" class="turnPageInterceptor" />
+			<interceptor-stack name="authStack">
+				<interceptor-ref name="authenticate" />
+				<interceptor-ref name="defaultStack" />
+				<interceptor-ref name="turnPageInter" />
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="authStack" />
+		<global-results>
+			<result name="LOGIN" type="redirectAction">logout</result>
+			<result name="error" type="chain">exceptionIntercepor</result>
+		</global-results>
+		<global-exception-mappings>
+			<exception-mapping exception="java.lang.Exception"
+				result="error" />
+		</global-exception-mappings>
+		<action name="vmStateQueryAction" class="vmStateQueryAction">
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+		</action>
+		<action name="vmDescUpdateAction" class="vmDescUpdateAction">
+			<interceptor-ref name="jsonValidationWorkflowStack"></interceptor-ref>
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<action name="vmNameUpdateAction" class="vmNameUpdateAction">
+			<interceptor-ref name="jsonValidationWorkflowStack"></interceptor-ref>
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<action name="vmStopAction" method="stopVm" class="vmOperatorAction">
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+		</action>
+		<action name="vmStartAction" method="startVm" class="vmOperatorAction">
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+		</action>
+		<action name="vmRebootAction" method="rebootVm" class="vmOperatorAction">
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+		</action>
+		<action name="vmResumeAction" method="resumeVm" class="vmOperatorAction">
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+		</action>
+		<action name="vmPauseAction" method="pauseVm" class="vmOperatorAction">
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+		</action>
+		<!-- 查询一组虚拟机状态 -->
+		<action name="vmQueryListStateAction" class="vmQueryListStateAction">
+			<result name="success" type="json"></result>
+		</action>
+		<action name="vmSearchStateAction" class="vmSearchStateAction">
+			<result name="success" type="json"></result>
+		</action>
+
+		<action name="vmQueryJson" class="VmQueryJsonAction">
+			<result name="success" type="json">
+				<param name="enumAsBean">true</param>
+			</result>
+			<result name="error" type="json" />
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+
+		<!-- 预订购列表查询 -->
+		<action name="vmPreApplyQueryJson" class="VmPreApplyQueryJsonAction">
+			<result name="success" type="json">
+				<param name="enumAsBean">true</param>
+			</result>
+			<result name="error" type="json" />
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		
+		<action name="bossOrderQueryJson" class="bossOrderQueryJsonAction">
+			<result name="success" type="json">
+				<param name="enumAsBean">true</param>
+			</result>
+			<result name="error" type="json" />
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+
+		<action name="vmDialogQueryJson" class="VmQueryJsonAction"
+			method="vmDialogQueryJson">
+			<result name="success" type="json">
+				<param name="enumAsBean">true</param>
+			</result>
+			<result name="error" type="json" />
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+
+		<action name="pmQueryJson" class="PmQueryJsonAction">
+			<result name="success" type="json">
+				<param name="enumAsBean">true</param>
+			</result>
+			<result name="error" type="json" />
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+
+		<action name="vlanQueryJson" class="VlanQueryJsonAction">
+			<result name="success" type="json" />
+			<result name="error" type="json" />
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+
+
+		<!-- 查询一组云硬盘状态 -->
+		<action name="ebsQueryListStateAction" class="ebsQueryListStateAction">
+			<result name="success" type="json"></result>
+		</action>
+		<action name="vmDelAction" class="vmDelAction">
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+		</action>
+
+		<action name="vmOnloadResPoolAction" class="vmOnloadResPoolAction">
+			<interceptor-ref name="jsonValidationWorkflowStack"></interceptor-ref>
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+			<result name="error" type="json"></result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+
+		<action name="vmOnloadResAppAction" class="vmOnloadResAppAction">
+			<interceptor-ref name="jsonValidationWorkflowStack"></interceptor-ref>
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+			<result name="error" type="json"></result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+
+		<action name="vmOnloadIpsegmentAction" class="vmOnloadIpsegmentAction">
+			<interceptor-ref name="jsonValidationWorkflowStack"></interceptor-ref>
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+			<result name="error" type="json"></result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+
+		<action name="vmOnloadPrivateIpAction" class="vmOnloadPrivateIpAction">
+			<interceptor-ref name="jsonValidationWorkflowStack"></interceptor-ref>
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+			<result name="error" type="json"></result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+
+		<action name="vmOnloadOsAction" class="vmOnloadOsAction">
+			<interceptor-ref name="jsonValidationWorkflowStack"></interceptor-ref>
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+			<result name="error" type="json"></result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+
+		<action name="vmCheckGatewayAction" class="vmCheckGatewayAction">
+			<interceptor-ref name="jsonValidationWorkflowStack"></interceptor-ref>
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+			<result name="error" type="json"></result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+
+		<action name="vmOnloadItemAction" class="vmOnloadItemAction">
+			<interceptor-ref name="jsonValidationWorkflowStack"></interceptor-ref>
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+			<result name="error" type="json"></result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+
+		<action name="vmRecommendStandards" class="vmOnloadItemAction"
+			method="queryRecommendStandards">
+			<interceptor-ref name="jsonValidationWorkflowStack"></interceptor-ref>
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+			<result name="error" type="json"></result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+
+		<!-- 物理机操作 -->
+		<action name="pmOnloadResPoolAction" class="vmOnloadResPoolAction">
+			<interceptor-ref name="jsonValidationWorkflowStack"></interceptor-ref>
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+			<result name="error" type="json"></result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<action name="pmOnloadItemAction" class="pmOnloadItemAction">
+			<interceptor-ref name="jsonValidationWorkflowStack"></interceptor-ref>
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+			<result name="error" type="json"></result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<action name="pmStateQueryAction" class="pmStateQueryAction">
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+		</action>
+
+		<action name="pmSearchStateAction" class="pmSearchStateAction">
+			<result name="success" type="json"></result>
+		</action>
+
+		<action name="pmDescUpdateAction" class="pmDescUpdateAction">
+			<interceptor-ref name="jsonValidationWorkflowStack"></interceptor-ref>
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<action name="pmNameUpdateAction" class="pmNameUpdateAction">
+			<interceptor-ref name="jsonValidationWorkflowStack"></interceptor-ref>
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<action name="pmStopAction" method="stopPm" class="pmOperatorAction">
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+		</action>
+		<action name="pmStartAction" method="startPm" class="pmOperatorAction">
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+		</action>
+		<action name="pmRebootAction" method="rebootPm" class="pmOperatorAction">
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+		</action>
+		<action name="pmResumeAction" method="resumePm" class="pmOperatorAction">
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+		</action>
+		<action name="pmPauseAction" method="pausePm" class="pmOperatorAction">
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+		</action>
+		<!-- 查询一组虚拟机状态 -->
+		<action name="pmQueryListStateAction" class="pmQueryListStateAction">
+			<result name="success" type="json"></result>
+		</action>
+		<action name="pmDelAction" class="pmDelAction">
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+		</action>
+
+		<action name="pmOnloadResAppAction" class="pmOnloadResAppAction">
+			<interceptor-ref name="jsonValidationWorkflowStack"></interceptor-ref>
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+			<result name="error" type="json"></result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+
+		<action name="pmOnloadIpsegmentAction" class="pmOnloadIpsegmentAction">
+			<interceptor-ref name="jsonValidationWorkflowStack"></interceptor-ref>
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+			<result name="error" type="json"></result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+
+		<action name="pmOnloadPrivateIpAction" class="pmOnloadPrivateIpAction">
+			<interceptor-ref name="jsonValidationWorkflowStack"></interceptor-ref>
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+			<result name="error" type="json"></result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+
+		<action name="pmOnloadOsAction" class="pmOnloadOsAction">
+			<interceptor-ref name="jsonValidationWorkflowStack"></interceptor-ref>
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+			<result name="error" type="json"></result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+
+		<!-- 修改虚拟机配置信息 -->
+		<action name="pmUpdateAction" class="pmUpdateAction">
+			<interceptor-ref name="jsonValidationWorkflowStack"></interceptor-ref>
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+
+		<!-- 克隆虚拟机 -->
+		<action name="vmGhostInfoAction" class="vmGhostInfoAction">
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+		</action>
+
+		<!-- 概况获取虚拟机 -->
+		<action name="vmListForOverviewAction" class="vmListForOverviewAction">
+			<result type="json">
+				<param name="vmResultInfos">vmImages</param>
+			</result>
+		</action>
+		<!-- 概况获取虚拟机批量修改 -->
+		<action name="vmBatchListForOverviewAction" class="vmBatchQueryListAction"
+			method="vmBatchListForOverview">
+			<result type="json" />
+		</action>
+		<!-- 概况获取物理机 -->
+		<action name="pmListForOverviewAction" class="pmListForOverviewAction">
+			<result name="success" type="json">
+				<param name="pmResultInfos"></param>
+			</result>
+			<result name="failure" type="json"></result>
+		</action>
+
+		<!-- 修改虚拟机配置信息 -->
+		<action name="vmUpdateAction" class="vmUpdateAction">
+			<interceptor-ref name="jsonValidationWorkflowStack"></interceptor-ref>
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<!-- 批量修改虚拟机配置信息 -->
+		<action name="vmBatchUpdateAction" class="vmUpdateAction"
+			method="vmBatchUpdate">
+			<interceptor-ref name="jsonValidationWorkflowStack"></interceptor-ref>
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+
+
+
+	</package>
+
+	<!-- 虚拟机备份json-开始 -->
+	<package name="com.neusoft.mid.cloong.vmbak.json" extends="json-default">
+		<interceptors>
+			<interceptor name="authenticate" class="authenticateInterceptor" />
+			<interceptor name="turnPageInter" class="turnPageInterceptor" />
+			<interceptor-stack name="authStack">
+				<interceptor-ref name="authenticate" />
+				<interceptor-ref name="defaultStack" />
+				<interceptor-ref name="turnPageInter" />
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="authStack" />
+		<global-results>
+			<result name="LOGIN" type="redirectAction">logout</result>
+			<result name="error" type="chain">exceptionIntercepor</result>
+		</global-results>
+		<global-exception-mappings>
+			<exception-mapping exception="java.lang.Exception"
+				result="error" />
+		</global-exception-mappings>
+
+		<!-- 创建虚拟机备份任务，绑定虚拟机 -->
+		<action name="vmBakSearchVMListJsonAction" class="vmBakApplyInfoAction"
+			method="queryVmList">
+			<result name="success" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">vmResultInfos.*,pageBar</param>
+			</result>
+			<result name="failure" type="json"></result>
+		</action>
+
+		<!-- 删除虚拟机备份任务 -->
+		<action name="vmBakDelJsonAction" class="vmBakDelAction">
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+		</action>
+
+		<!-- 虚拟机备份详情页面，查询备份状态和恢复状态 -->
+		<action name="vmBakQueryDetailStateByAjax" class="vmBakDetailAction"
+			method="vmBakQueryDetailStateByAjax">
+			<result name="success" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">vmBakInfo.*</param>
+			</result>
+			<result name="failure" type="json"></result>
+		</action>
+
+		<!-- 虚拟机备份详情页面，查询虚拟机备份 -->
+		<action name="queryVmBakListByAjax" class="vmBakDetailAction"
+			method="queryVmBakListByAjax">
+			<result name="success" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">backupList.*,pageBar</param>
+			</result>
+			<result name="failure" type="json"></result>
+		</action>
+
+		<!-- 恢复虚拟机备份 -->
+		<action name="vmBakRestoreJsonAction" class="vmBakRestoreAction">
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+		</action>
+
+		<!-- 查询虚拟机备份任务列表中任务的状态 -->
+		<action name="vmBakQueryListStateAction" class="vmBakQueryListStateAction">
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+		</action>
+
+		<!-- 概况获取虚拟机备份 -->
+		<action name="vmBakListForOverviewAction" class="vmBakQueryListAction"
+			method="queryVmListForOverview">
+			<result name="success" type="json">
+				<param name="vmBakResultInfos"></param>
+			</result>
+			<result name="failure" type="json"></result>
+		</action>
+	</package>
+	<!-- 虚拟机备份json-结束 -->
+
+
+	<package name="com.neusoft.mid.cloong.ebs.json" extends="json-default">
+		<interceptors>
+			<interceptor name="authenticate" class="authenticateInterceptor" />
+			<interceptor name="turnPageInter" class="turnPageInterceptor" />
+			<interceptor-stack name="authStack">
+				<interceptor-ref name="authenticate" />
+				<interceptor-ref name="defaultStack" />
+				<interceptor-ref name="turnPageInter" />
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="authStack" />
+		<global-results>
+			<result name="LOGIN" type="redirectAction">logout</result>
+			<result name="error" type="chain">exceptionIntercepor</result>
+		</global-results>
+		<global-exception-mappings>
+			<exception-mapping exception="java.lang.Exception"
+				result="error" />
+		</global-exception-mappings>
+
+		<action name="ebsOnloadResPoolAction" class="ebsOnloadResPoolAction">
+			<interceptor-ref name="jsonValidationWorkflowStack"></interceptor-ref>
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+			<result name="error" type="json"></result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<action name="ebsOnloadItemAction" class="ebsOnloadItemAction">
+			<interceptor-ref name="jsonValidationWorkflowStack"></interceptor-ref>
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+			<result name="error" type="json"></result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<action name="ebsRecommendStandards" class="ebsOnloadItemAction"
+			method="queryRecommendStandards">
+			<interceptor-ref name="jsonValidationWorkflowStack"></interceptor-ref>
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+			<result name="error" type="json"></result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<!-- 注册（密保方式）验证用户账号唯一 -->
+		<action name="registerValidateUserIdAction" class="registerValidateUserIdAction">
+			<interceptor-ref name="jsonValidationWorkflowStack"></interceptor-ref>
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+			<result name="error" type="json"></result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+
+		<!-- 获取业务列表 <action name="queryAppListAction" class="queryAppListAction"> 
+			<interceptor-ref name="jsonValidationWorkflowStack"></interceptor-ref> <result 
+			name="success" type="json"> <param name="excludeProperties">ibatisDAO,authId,container</param> 
+			<param name="ignoreHierarchy">false</param> <param name="enumAsBean">true</param> 
+			</result> <result name="failure" type="json"> <param name="root">appList</param> 
+			</result> </action> -->
+
+		<!-- 找回密码时验证用户名是否存在 @author zhangyunfeng 2015-02-28 -->
+		<action name="findPWValidateUserIdaction" class="findPasswordValidateUserIdAction">
+			<interceptor-ref name="jsonValidationWorkflowStack"></interceptor-ref>
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+			<result name="error" type="json"></result>
+			<result name="statusinvalid" >/WEB-INF/pages/exception/500.jsp</result>
+		</action>
+		<!-- 找回密码 验证码是否正确 @author zhangyunfeng 2015-02-28 -->
+		<action name="findPWValidateVerifyaction" class="findPasswordValidateVerifyAction">
+			<interceptor-ref name="jsonValidationWorkflowStack"></interceptor-ref>
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+			<result name="error" type="json"></result>
+			<result name="statusinvalid" >/WEB-INF/pages/exception/500.jsp</result>
+		</action>
+
+		<!-- 找回密码 查询用户密保问题 @author zhangyunfeng 2015-03-02 -->
+		<action name="findPWQueryUserQuestionAction" class="findPasswordQueryUserQuestionAction">
+			<interceptor-ref name="jsonValidationWorkflowStack"></interceptor-ref>
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+			<result name="error" type="json"></result>
+			<result name="statusinvalid" >/WEB-INF/pages/exception/500.jsp</result>
+		</action>
+
+		<!-- 找回密码 修改密码 @author zhangyunfeng 2015-03-02 -->
+		<action name="resetUserPasswordAction" class="ResetUserPasswordAction">
+			<interceptor-ref name="jsonValidationWorkflowStack"></interceptor-ref>
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+			<result name="error" type="json"></result>
+		</action>
+
+	</package>
+	<!-- 获取业务列表 -->
+	<package name="com.neusoft.mid.cloong.user.json" extends="json-default">
+		<interceptors>
+			<interceptor name="authenticate" class="authenticateInterceptor" />
+			<interceptor name="turnPageInter" class="turnPageInterceptor" />
+			<interceptor-stack name="authStack">
+				<interceptor-ref name="authenticate" />
+				<interceptor-ref name="defaultStack" />
+				<interceptor-ref name="turnPageInter" />
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="authStack" />
+		<global-results>
+			<result name="LOGIN" type="redirectAction">logout</result>
+			<result name="error" type="chain">exceptionIntercepor</result>
+		</global-results>
+		<global-exception-mappings>
+			<exception-mapping exception="java.lang.Exception"
+				result="error" />
+		</global-exception-mappings>
+
+		<action name="queryAppListAction" class="queryAppListAction">
+			<interceptor-ref name="jsonValidationWorkflowStack" />
+			<interceptor-ref name="turnPageInter" />
+			<result name="success" type="json">
+				<param name="excludeProperties">ibatisDAO,authId,container</param>
+				<param name="ignoreHierarchy">false</param>
+				<param name="enumAsBean">true</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+	</package>
+
+
+	<!-- 通用返回JSON -->
+	<package name="common.json" extends="json-default">
+		<global-results>
+			<result name="error" type="chain">exceptionIntercepor</result>
+		</global-results>
+		<global-exception-mappings>
+			<exception-mapping exception="java.lang.Exception"
+				result="error" />
+		</global-exception-mappings>
+		<action name="imageAction" class="ImageAction">
+			<result type="json">
+				<param name="root">vmImages</param>
+			</result>
+		</action>
+		<action name="dymanicCode" class="dymanicCodeAction">
+			<result name="success" type="json" />
+			<result name="error" type="json" />
+		</action>
+	</package>
+</struts>

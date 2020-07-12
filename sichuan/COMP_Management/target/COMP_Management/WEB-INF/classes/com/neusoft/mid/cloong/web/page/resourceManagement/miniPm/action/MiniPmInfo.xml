@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="MiniPmInfo">
+	<typeAlias alias="miniPmInfo" type="com.neusoft.mid.cloong.web.page.resourceManagement.info.MiniPmInfo" />
+	<typeAlias alias="machinerRoomInfo" type="com.neusoft.mid.cloong.web.page.resourceManagement.info.MachinerRoomInfo" />
+	<typeAlias alias="cabinetInfo" type="com.neusoft.mid.cloong.web.page.resourceManagement.info.CabinetInfo" />
+	<!-- 查询小型机列表 -->
+	<select id="queryMiniPmInfos" parameterClass="miniPmInfo" resultClass="miniPmInfo">
+		SELECT  P.MINIPM_ID miniPmId,
+				P.MINIPM_NAME miniPmName,
+				RM.MACHINEROOM_NAME machinerRoomName,
+				RC.CABINET_NAME cabinetName,
+				P.IP ip,
+				P.CPU_NUM cpuNum,
+				CASE P.MEMORY_SIZE WHEN '' THEN '' ELSE FORMAT(P.MEMORY_SIZE / 1024, 2) END AS memorySize,
+				P.DISK_SIZE diskSize,
+				P.CUR_STATUS curStatus,
+				DATE_FORMAT(
+					P.UPDATE_TIME,
+					'%Y-%m-%d %H:%i:%s'
+				) updateTime
+		  FROM  COMP_RM_MINIPM_T P
+				LEFT JOIN COMP_RM_MACHINEROOM_T RM ON P.MACHINEROOM_ID = RM.MACHINEROOM_ID
+				LEFT JOIN COMP_RM_CABINET_T RC ON P.CABINET_ID = RC.CABINET_ID
+		  WHERE 1=1
+		<dynamic prepend="">
+			<isNotEmpty prepend="and" property="miniPmId">
+				upper(MINIPM_ID) like
+				upper(CONCAT('%',trim(#miniPmId#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="miniPmName">
+				upper(MINIPM_NAME) like
+				upper(CONCAT('%',trim(#miniPmName#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="appId">
+				upper(P.APP_ID) like
+				upper(CONCAT('%',trim(#appId#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="cabinetId">
+				P.CABINET_ID = #cabinetId#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="machinerRoomId">
+				P.MACHINEROOM_ID = #machinerRoomId#
+			</isNotEmpty>
+		</dynamic>
+		ORDER BY updateTime DESC
+	</select>
+	<!-- 查询小型机列表 数目-->
+	<select id="countQueryMiniPm" parameterClass="miniPmInfo" resultClass="java.lang.Integer">
+		SELECT  count(*)
+		  FROM  COMP_RM_MINIPM_T P
+				LEFT JOIN COMP_RM_MACHINEROOM_T RM ON P.MACHINEROOM_ID = RM.MACHINEROOM_ID
+				LEFT JOIN COMP_RM_CABINET_T RC ON P.CABINET_ID = RC.CABINET_ID
+		  WHERE 1=1
+		<dynamic prepend="">
+			<isNotEmpty prepend="and" property="miniPmId">
+				upper(MINIPM_ID) like
+				upper(CONCAT('%',trim(#miniPmId#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="miniPmName">
+				upper(MINIPM_NAME) like
+				upper(CONCAT('%',trim(#miniPmName#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="appId">
+				upper(P.APP_ID) like
+				upper(CONCAT('%',trim(#appId#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="cabinetId">
+				P.CABINET_ID = #cabinetId#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="machinerRoomId">
+				P.MACHINEROOM_ID = #machinerRoomId#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<!-- 查询机房下拉框列表 -->
+	<select id="getMachinerRoomInfos" parameterClass="machinerRoomInfo" resultClass="machinerRoomInfo">
+		SELECT RM.MACHINEROOM_ID machinerRoomId, RM.MACHINEROOM_NAME machinerRoomName
+		FROM COMP_RM_MACHINEROOM_T RM
+	</select>
+	<!-- 查询机柜下拉框列表 -->
+	<select id="getCabinetInfos" parameterClass="cabinetInfo" resultClass="cabinetInfo">
+		SELECT RM.CABINET_ID cabinetId, RM.CABINET_NAME cabinetName
+		FROM COMP_RM_CABINET_T RM
+		WHERE RM.MACHINEROOM_ID = #machinerRoomId#
+	</select>
+	
+	<!-- 查看小型机详情 -->
+	<select id="queryMiniPmInfo" parameterClass="miniPmInfo" resultClass="miniPmInfo">
+		SELECT  P.MINIPM_ID miniPmId,
+				P.MINIPM_NAME miniPmName,
+				P.IP ip,
+				P.SERVER_TYPE serverType,
+				P.CPU_NUM cpuNum,
+				P.CPU_TYPE cpuType,
+				P.CPU_FREQUENCY cpuFrequency,
+				CASE P.MEMORY_SIZE WHEN '' THEN '' ELSE FORMAT(P.MEMORY_SIZE / 1024, 2) END AS memorySize,
+				P.DISK_SIZE diskSize,
+				P.VENDOR_NAME vendorName,
+				DATE_FORMAT(
+					P.RUN_TIME,
+					'%Y-%m-%d %H:%i:%s'
+				) runTime,
+				P.CUR_STATUS curStatus,
+				A.APP_NAME appName,
+				R.RES_POOL_NAME resPoolName,
+				RP.RES_POOL_PART_NAME resPoolPartName,
+				P.OS_TYPE osType,
+				DATE_FORMAT(
+					P.UPDATE_TIME,
+					'%Y-%m-%d %H:%i:%s'
+				) updateTime,
+				RM.MACHINEROOM_NAME machinerRoomName,
+				RC.CABINET_NAME cabinetName
+		 FROM  COMP_RM_MINIPM_T P
+				LEFT JOIN COMP_RES_POOL_T R ON P.RES_POOL_ID = R.RES_POOL_ID
+				LEFT JOIN COMP_RES_POOL_PART_T RP ON P.RES_POOL_PART_ID = RP.RES_POOL_PART_ID
+				LEFT JOIN COMP_APP_T A ON P.APP_ID = A.APP_ID
+				LEFT JOIN COMP_RM_MACHINEROOM_T RM ON P.MACHINEROOM_ID = RM.MACHINEROOM_ID
+				LEFT JOIN COMP_RM_CABINET_T RC ON P.CABINET_ID = RC.CABINET_ID
+		  <dynamic prepend="WHERE">
+			<isNotEmpty prepend="" property="miniPmId">
+				P.MINIPM_ID = #miniPmId#
+			</isNotEmpty>
+			<isEmpty prepend="" property="miniPmId">
+				1=1
+				ORDER BY updateTime DESC
+			</isEmpty>
+		  </dynamic>
+	</select>
+	
+</sqlMap>

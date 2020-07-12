@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="VmInfo">
+	<typeAlias alias="vmInfo" type="com.neusoft.mid.cloong.web.page.resourceManagement.info.VmInfo" />
+	<typeAlias alias="ebsInfo" type="com.neusoft.mid.cloong.web.page.resourceManagement.info.EbsInfo" />
+	
+	<select id="queryVmInfos" parameterClass="vmInfo" resultClass="vmInfo">
+		SELECT  V.VM_ID vmId,
+				IFNULL(CASE_VM.VM_NAME,V.VM_NAME) AS vmName,
+				V.PRIVATE_IP privateIp,
+				V.CPU_NUM cpuNum,
+				V.CPU_FREQUENCY cpuFrequency,
+				V.MEMORY_SIZE memorySize,
+			/* 	CASE V.MEMORY_SIZE WHEN '' THEN '' ELSE FORMAT(V.MEMORY_SIZE / 1024, 2) END AS memorySize, */
+				V.DISK_SIZE diskSize,
+				DATE_FORMAT(
+					V.RUN_TIME,
+					'%Y-%m-%d %H:%i:%s'
+				) runTime,
+				V.CUR_STATUS curStatus,
+				V.APP_ID appId,
+				A.APP_NAME appName,
+				V.RES_POOL_ID resPoolId,
+				R.RES_POOL_NAME resPoolName,
+				V.RES_POOL_PART_ID resPoolPartId,
+				RP.RES_POOL_PART_NAME resPoolPartName,
+				V.OS_TYPE osType,
+				V.VM_OS vmOs,
+				P.PM_NAME pmName,
+				DATE_FORMAT(
+					V.UPDATE_TIME,
+					'%Y-%m-%d %H:%i:%s'
+				) updateTime
+		  FROM COMP_RM_VM_T V
+			  LEFT JOIN COMP_RM_PM_T P ON V.PM_ID = P.PM_ID
+			  LEFT JOIN COMP_RES_POOL_T R ON V.RES_POOL_ID = R.RES_POOL_ID
+			  LEFT JOIN COMP_RES_POOL_PART_T RP ON V.RES_POOL_ID = RP.RES_POOL_ID
+			  LEFT JOIN COMP_APP_T A ON V.APP_ID = A.APP_ID
+			  LEFT JOIN comp_case_vm_t CASE_VM ON CASE_VM.VM_ID = V.VM_ID
+		   WHERE 1= 1
+		<dynamic prepend="">
+			<isNotEmpty prepend="and" property="vmId">
+				upper(V.VM_ID) like
+				upper(CONCAT('%',trim(#vmId#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="vmName">
+				upper(IFNULL(CASE_VM.VM_NAME,V.VM_NAME)) like
+				upper(CONCAT('%',trim(#vmName#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="appId">
+				upper(V.APP_ID) = #appId#
+			</isNotEmpty>
+			
+			<isNotEmpty prepend="and" property="querycurStatus">
+				V.CUR_STATUS =
+				#querycurStatus#
+			</isNotEmpty>
+			
+		</dynamic>
+		ORDER BY updateTime DESC
+	</select>
+	
+	<select id="countQueryVm" parameterClass="vmInfo" resultClass="java.lang.Integer">
+		SELECT  count(*)
+		 FROM COMP_RM_VM_T V
+			  LEFT JOIN COMP_RM_PM_T P ON V.PM_ID = P.PM_ID
+			  LEFT JOIN COMP_RES_POOL_T R ON V.RES_POOL_ID = R.RES_POOL_ID
+			  LEFT JOIN COMP_RES_POOL_PART_T RP ON V.RES_POOL_ID = RP.RES_POOL_ID
+			  LEFT JOIN COMP_APP_T A ON V.APP_ID = A.APP_ID
+			  LEFT JOIN comp_case_vm_t CASE_VM ON CASE_VM.VM_ID = V.VM_ID
+	    WHERE 1= 1
+		<dynamic prepend="">
+			<isNotEmpty prepend="and" property="vmId">
+				upper(V.VM_ID) like
+				upper(CONCAT('%',trim(#vmId#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="vmName">
+				upper(IFNULL(CASE_VM.VM_NAME,V.VM_NAME)) like
+				upper(CONCAT('%',trim(#vmName#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="appId">
+				upper(V.APP_ID) = #appId#
+			</isNotEmpty>
+			
+			<isNotEmpty prepend="and" property="querycurStatus">
+				V.CUR_STATUS  =
+				#querycurStatus#
+			</isNotEmpty>
+			
+		<!-- 	<isNotEmpty prepend="and" property="curStatus">
+				upper(V.CUR_STATUS) like
+				upper(CONCAT('%',trim(#curStatus#),'%'))
+			</isNotEmpty> -->
+		</dynamic>
+	</select>
+	
+	
+	<!-- 查看物理机详情 -->
+	<select id="queryPmInfoFromVm" parameterClass="pmInfo" resultClass="pmInfo">
+		SELECT P.PM_ID pmId,
+		P.PM_NAME pmName,
+		P.IP ip,
+		P.NETMASK netMask,
+		P.SERVER_TYPE serverType,
+		P.CPU_NUM cpuNum,
+		P.CPU_TYPE cpuType,
+		P.CPU_FREQUENCY cpuFrequency,
+		P.NUC_NUM_PER_CPU nucNumPerCpu,
+		P.MEMORY_SIZE memorySize,
+		/*CASE P.MEMORY_SIZE WHEN '' THEN '' ELSE FORMAT(P.MEMORY_SIZE / 1024, 2)
+		END AS memorySize,*/
+		P.DISK_SIZE diskSize,
+		P.VENDOR_NAME vendorName,
+		p.ETHADA_TYPE ethadaType,
+		DATE_FORMAT(
+		P.RUN_TIME,
+		'%Y-%m-%d %H:%i:%s'
+		) runTime,
+		P.CUR_STATUS curStatus,
+		P.SERIALNUM serialNum,
+		A.APP_NAME appName,
+		R.RES_POOL_NAME resPoolName,
+		RP.RES_POOL_PART_NAME resPoolPartName,
+		P.OS_TYPE osType,
+		P.SWITCH_IF_RELATIONS switchIfRelations,
+		DATE_FORMAT(
+		P.UPDATE_TIME,
+		'%Y-%m-%d %H:%i:%s'
+		) updateTime,
+		RM.MACHINEROOM_NAME machinerRoomName,
+		RC.CABINET_NAME cabinetName,
+		P.CPU_MODEL cpuModel,
+		P.NTP_IP ntpIp,
+		P.MAINTENANCE_FACTORY maintenanceFactory,
+		P.GATEWAY gateway,
+		P.HB_DESCRIPTION hbDescription,
+		P.BK_PM bkPm,
+		P.BUSINESS_CONTACT businessContact,
+		P.SYS_EXCHANGE_AREA_SIZE sysExchangeAreaSize,
+		DATE_FORMAT(
+		P.ONLINE_TIME,
+		'%Y-%m-%d %H:%i:%s'
+		) onlineTime,
+		P.TCPP_VALUE tcppValue,
+		P.APPLICATION_DESCRIBE applicationDescribe,
+		P.PORT_LABEL portLabel,
+		P.CPUEQP_SERIALNUM cpueqpSerialnum,
+		P.PM_STATE pmState
+		FROM COMP_RM_PM_T P
+		LEFT JOIN COMP_RES_POOL_T R ON P.RES_POOL_ID = R.RES_POOL_ID
+		LEFT JOIN COMP_RES_POOL_PART_T RP ON P.RES_POOL_ID =
+		RP.RES_POOL_ID
+		LEFT JOIN COMP_APP_T A ON P.APP_ID = A.APP_ID
+		LEFT JOIN COMP_RM_MACHINEROOM_T RM ON P.MACHINEROOM_ID = RM.MACHINEROOM_ID
+		LEFT JOIN COMP_RM_CABINET_T RC ON P.CABINET_ID = RC.CABINET_ID
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="" property="pmId">
+				P.PM_ID = #pmId#
+			</isNotEmpty>
+			<isEmpty prepend="" property="pmId">
+				1=1
+				ORDER BY updateTime DESC
+			</isEmpty>
+		</dynamic>
+	</select>
+	
+	
+	<!-- 查看虚拟机详情 -->
+    <select id="queryVmInfo" parameterClass="vmInfo" resultClass="vmInfo">
+		SELECT  V.VM_ID vmId,
+				IFNULL(CASE_VM.VM_NAME,V.VM_NAME) AS vmName,
+				V.PRIVATE_IP privateIp,
+				V.CPU_NUM cpuNum,
+				V.CPU_FREQUENCY cpuFrequency,
+				V.MEMORY_SIZE  memorySize,
+				/*CASE V.MEMORY_SIZE WHEN '' THEN '' ELSE FORMAT(V.MEMORY_SIZE / 1024, 2) END AS memorySize,*/
+				V.DISK_SIZE diskSize,
+				DATE_FORMAT(
+					V.RUN_TIME,
+					'%Y-%m-%d %H:%i:%s'
+				) runTime,
+				V.CUR_STATUS curStatus,
+				V.APP_ID appId,
+				A.APP_NAME appName,
+				V.RES_POOL_ID resPoolId,
+				R.RES_POOL_NAME resPoolName,
+				V.RES_POOL_PART_ID resPoolPartId,
+				RP.RES_POOL_PART_NAME resPoolPartName,
+				V.OS_TYPE osType,
+				os.OS_NAME vmOs,
+				P.PM_NAME pmName,
+				P.PM_ID pmId,
+				DATE_FORMAT(
+					V.UPDATE_TIME,
+					'%Y-%m-%d %H:%i:%s'
+				) updateTime
+		 FROM COMP_RM_VM_T V
+			  LEFT JOIN COMP_RM_PM_T P ON V.PM_ID = P.PM_ID
+			  LEFT JOIN COMP_RES_POOL_T R ON V.RES_POOL_ID = R.RES_POOL_ID
+			  LEFT JOIN COMP_RES_POOL_PART_T RP ON V.RES_POOL_ID = RP.RES_POOL_ID
+			  LEFT JOIN COMP_APP_T A ON V.APP_ID = A.APP_ID
+			  LEFT JOIN	comp_os_t os ON V.VM_OS = os.OS_ID
+			  LEFT JOIN comp_case_vm_t CASE_VM ON CASE_VM.VM_ID = V.VM_ID
+		  <dynamic prepend="WHERE">
+			<isNotEmpty prepend="" property="vmId">
+				V.VM_ID = #vmId#
+			</isNotEmpty>
+			<isEmpty prepend="" property="vmId">
+				1=1
+				ORDER BY updateTime DESC
+			</isEmpty>
+		  </dynamic>
+	</select>
+	
+	<!-- 查看虚拟机的块存储信息列表   -->
+	<select id="queryEbsInfosByParentId" parameterClass="ebsInfo" resultClass="ebsInfo">
+		SELECT E.EBS_NAME ebsName, 
+		       E.DISK_SIZE diskSize, 
+		       E.CUR_STATUS curStatus
+		 FROM COMP_RM_EBS_T E,
+			  COMP_RM_VM_T V
+	    WHERE E.PARENT_ID = V.VM_ID
+	      AND E.APP_ID = V.APP_ID
+	      AND E.PARENT_ID = #parentId#
+        ORDER BY DISKSIZE+0 DESC
+	</select>
+	
+	<!-- 查看虚拟机的块存储信息列表数目 -->
+	<select id="countQueryEbsInfosByParentId" parameterClass="ebsInfo" resultClass="java.lang.Integer">
+		SELECT  count(*)
+		FROM COMP_RM_EBS_T E,
+			  COMP_RM_VM_T V
+	    WHERE E.PARENT_ID = V.VM_ID
+	      AND E.APP_ID = V.APP_ID
+		  AND E.PARENT_ID = #parentId#
+	</select>
+	
+	
+	
+	
+	
+</sqlMap>

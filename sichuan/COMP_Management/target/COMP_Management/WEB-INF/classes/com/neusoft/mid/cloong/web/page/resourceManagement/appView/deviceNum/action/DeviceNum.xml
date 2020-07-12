@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="DeviceNum">
+<typeAlias alias="deviceNum" type="com.neusoft.mid.cloong.web.page.resourceManagement.info.DeviceNum" />
+
+	    <!-- 设备数列表 -->
+	    <select id="queryAllDeviceNumList" resultClass="deviceNum" parameterClass="deviceNum">
+			SELECT W.APP_ID, A.APP_NAME,
+				   SUM( CASE W.DEVICE_TYPE WHEN 0 THEN W.DEVICE_NUM ELSE 0 END ) MINIPM_NUM,
+				   SUM( CASE W.DEVICE_TYPE WHEN 1 THEN W.DEVICE_NUM ELSE 0 END ) MINIPMPAR_NUM,
+				   SUM( CASE W.DEVICE_TYPE WHEN 2 THEN W.DEVICE_NUM ELSE 0 END ) PM_NUM,
+				   SUM( CASE W.DEVICE_TYPE WHEN 3 THEN W.DEVICE_NUM ELSE 0 END ) VM_NUM,
+				   SUM( CASE W.DEVICE_TYPE WHEN 4 THEN W.DEVICE_NUM ELSE 0 END ) EBS_NUM
+			  FROM COMP_STA_DEVICE_APP_WEEK_T W, COMP_APP_T A
+			 WHERE W.APP_ID = A.APP_ID
+			   AND W.REPORT_DATE = DATE_FORMAT(SYSDATE(), '%Y%m%d')
+			GROUP BY W.APP_ID, A.APP_NAME
+			ORDER BY W.APP_ID
+		</select>
+		
+		<!-- 设备数列表数目 -->
+		<select id="queryAllDeviceNumCount"  resultClass="java.lang.Integer" parameterClass="deviceNum">
+			SELECT COUNT(DISTINCT W.APP_ID)
+			  FROM COMP_STA_DEVICE_APP_WEEK_T W, COMP_APP_T A
+			 WHERE W.APP_ID = A.APP_ID
+			   AND W.REPORT_DATE = DATE_FORMAT(SYSDATE(), '%Y%m%d')
+		</select>
+</sqlMap>

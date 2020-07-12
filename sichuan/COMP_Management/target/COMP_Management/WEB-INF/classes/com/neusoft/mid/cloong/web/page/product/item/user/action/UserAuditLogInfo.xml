@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="UserAuditLogInfo">
+	<typeAlias alias="userAuditLogInfo"
+		type="com.neusoft.mid.cloong.web.page.product.item.user.info.UserAuditLogInfo" />
+		<!-- 
+	<select id="queryUserReleaseLog" resultClass="userAuditLogInfo">
+		SELECT
+		*
+		FROM (
+			SELECT
+			USER_ID	userId,
+			STATUS status,
+			RELEASE_TIME auditTime,
+			RELEASE_USER auditUser,
+			RELEASE_INFO auditInfo
+			FROM
+			COMP_ITEM_RELEASE_LOG_T
+			WHERE
+			USER_ID = #userId#
+			ORDER BY RELEASE_TIME DESC
+		)
+		WHERE ROWNUM=1
+	</select> -->
+	<select id="queryUserAuditLog" resultClass="userAuditLogInfo">
+			SELECT
+			USER_ID	userId,
+			STATUS status,
+			AUDIT_TIME auditTime,
+			AUDIT_USER auditUser,
+			AUDIT_INFO auditInfo
+			FROM
+			COMP_USER_AUDIT_LOG_T
+			WHERE
+			USER_ID = #userId#
+			AND AUDIT_TIME = (SELECT MAX(AUDIT_TIME) FROM COMP_USER_AUDIT_LOG_T WHERE USER_ID = #userId#)
+	</select>
+	<insert id="inserUserAuditLog" parameterClass="userAuditLogInfo">
+		INSERT INTO
+		COMP_USER_AUDIT_LOG_T
+		( USER_ID,
+		STATUS,
+		AUDIT_TIME,
+		AUDIT_USER,
+		AUDIT_INFO )
+		values
+		( #userId#,
+		#status#,
+		#auditTime#,
+		#auditUser#,
+		#auditInfo# )
+	</insert>
+	<insert id="inserUserReleaseLog" parameterClass="userAuditLogInfo">
+		INSERT INTO
+		COMP_USER_AUDIT_LOG_T
+		( USER_ID,
+		STATUS,
+		RELEASE_TIME,
+		RELEASE_USER,
+		RELEASE_INFO )
+		values
+		( #userId#,
+		#status#,
+		#auditTime#,
+		#auditUser#,
+		#auditInfo# )
+	</insert>
+</sqlMap>

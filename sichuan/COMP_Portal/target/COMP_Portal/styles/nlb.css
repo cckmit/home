@@ -1,0 +1,145 @@
+@charset "utf-8";
+/* CSS Document */
+
+/* 列表显示IP图标 */
+.ico-nlb{
+	background:url(../images/ico_nlb.png) no-repeat center center;
+}
+/* 详细页 列表 表格样式 */
+.apply-info div.nlb-tab-list{
+	float:left;
+	width:60%;
+	height:auto;
+	margin:0 0 20px;
+	text-align:left;
+	
+}
+.nlb-tab-list table{
+	width:100%;
+	height:100%;
+	text-align:center;
+	font-size:14px;
+	margin-top:-10px;
+	border-collapse:none;
+}
+.nlb-tab-list th{
+	font-weight:200;
+	color:#222;
+	width:25%;
+}
+.nlb-tab-list tr{
+	line-height:40px;
+}
+/* 申请 列表 表格样式 */
+.apply-info div.nlb-apply-tab-list{
+	float:left;
+	width:70%;
+	height:auto;
+	margin:0 0 20px;
+	text-align:left;
+}
+.nlb-apply-tab-list table{
+	width:100%;
+	height:100%;
+	text-align:left;
+	font-size:12px;
+	margin-top:-10px;
+	border-collapse:none;
+}
+.nlb-apply-tab-list th{
+	font-weight:200;
+	color:#222;
+	width:25%;
+}
+.nlb-apply-tab-list tr{
+	/*line-height:40px;*/
+	height:40px;
+}
+/* 详细页 短显示列表 样式 */
+.list-left td{
+	text-align:left;
+}
+.list-left table{
+	width:100%;
+	text-align:left;
+	margin-left:20px;
+}
+.apply-info div.nlb-aout-h{
+	clear:both;
+	*height:auto;
+}
+
+/*列表中的操作按钮*/
+.nlb-ls-opt{
+	color:#fff;
+	background:#3cb4f0;
+	border: 1px solid #35a0d4;
+	line-height:20px;
+	/*圆角*/
+	-moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius:3px;
+}
+.nlb-ls-opt a{
+	color:#ffffff;
+	padding: 0 20px;
+	font-size:12px;
+    text-decoration: none;
+}
+
+/* 文本框样式*/
+.nlb-input-max{
+	border: 1px solid #d2d3d4;
+	width:205px;
+	background-color:#FFFFFF;
+	font-size:14px;
+}
+/* 表格信息 文本框样式 */
+.nlb-tab-input-min{
+	border: 1px solid #d2d3d4;
+	width:80px;
+	background-color:#FFFFFF;
+	font-size:12px;
+	text-align:left;
+	line-height:20px;
+}
+/* 表格信息 只读文本框样式 */
+.nlb-tab-label-min{
+	border: 1px solid #d2d3d4;
+	width:80px;
+	background-color:#FFFFFF;
+	font-size:12px;
+	text-align:center;
+	line-height:20px;
+}
+
+/*申请页服务器选择样式*/
+.nlb-server table{
+	width:60%;
+}
+/*左侧服务器字体大小颜色*/
+.nlb-server label span{
+	font-size:14px;
+	color:#222;
+}
+/* 右侧 第一部分内容样式 */
+.nlb-detail-r{
+	background:none;
+	border:none;
+	margin-top:10px;
+	color:#222222;
+	line-height:30px;
+}
+/* 申请 右侧详细中的span样式 */
+.nlb-detail-r span{
+	margin-left:10px;
+	font-size:14px;
+}
+/* 右侧 配置详细中  规则 悬浮样式*/
+.nlb-rule-div{
+	float:left;
+	width:65%;
+}
+.nlb-align-c{
+	text-align:center;
+}

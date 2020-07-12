@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="PmInfo">
+	<typeAlias alias="PmInfo" type="com.neusoft.mid.cloong.host.pm.PMInfo" />
+	
+	<typeAlias alias="PMCreateFail" type="com.neusoft.mid.cloong.host.pm.PMCreateFail" />
+	
+	
+	<typeAlias alias="PMStateQueueItemInfo" type="com.neusoft.mid.cloong.host.pm.PMStateQueueItemInfo" />
+	
+	<typeAlias alias="PMStateQueryReq" type="com.neusoft.mid.cloong.host.pm.PMStateQueryReq" />
+	
+	<typeAlias alias="OrderInfo" type="com.neusoft.mid.cloong.order.info.OrderInfo" />
+	
+	<!-- 更新物理机的状态信息 -->
+	<update id="updatePMStatus" parameterClass="PmInfo">
+		update
+		COMP_CASE_PM_T
+		set
+		STATUS=#pmState#
+		<isNotEmpty prepend="," property="operationIP">
+			operationIP = #operationIP#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="userName">
+			PM_USER = #userName#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="password">
+			PM_PASSWORD = #password#
+		</isNotEmpty>
+		where PM_ID=#pmId#
+		AND STATUS != '3'
+	</update>
+	<!-- 插入物理机创建失败信息 -->
+	<insert id="insertPMFail" parameterClass="PMCreateFail">
+		insert into
+		COMP_PM_CREATE_FAIL_T(
+		FAIL_CAUSE,
+		FAIL_CODE,
+		RES_POOL_ID,
+		RES_POOL_PART_ID,
+		STANDARD_ID,
+		SUBNETWORK,
+		NUM,
+		CREATE_TIME)
+		values
+		(#failCause#,#failCode#,#resPoolId#,#resPoolPartId#,#standardId#,#subNetwork#,#num#,#createTime#)
+	</insert>
+	
+	<!-- 查询指定状态的物理机 -->
+	<select id="queryPMByStatus" resultClass="PMStateQueueItemInfo" parameterClass="java.util.List">
+		SELECT
+		pm_id pmId,
+		pm_id serialNum,
+		res.res_pool_id resourcePoolId,
+		res.res_pool_url resourceUrl,
+		res.user_pwd password,
+		pm.res_pool_part_id resourcePoolPartId
+		FROM comp_case_pm_t pm left join
+		comp_res_pool_t res on
+		pm.res_pool_id = res.res_pool_id
+		WHERE
+		<iterate conjunction="or" close=")" open="(">
+			pm.status = #list[]#
+		</iterate>
+	</select>
+	
+	<!-- 查询创建中物理机实例 -->
+	<select id="createPMStateQuery" resultClass="PMStateQueueItemInfo">
+		SELECT
+		pm_id pmId,
+		pm_id serialNum,
+		res.res_pool_id resourcePoolId,
+		res.res_pool_url resourceUrl,
+		res.user_pwd password,
+		pm.res_pool_part_id resourcePoolPartId
+		FROM comp_case_pm_t pm left join comp_res_pool_t res on
+		pm.res_pool_id = res.res_pool_id
+		WHERE
+		pm.status = '1'
+	</select>
+	
+	<!-- 查询物理机订单信息 -->
+	<select id="queryPMOrderInfo" parameterClass="PMStateQueryReq" resultClass="OrderInfo">
+	select 
+		ORDER_ID orderId,
+		STATUS status,
+		LENGTH_TIME lengthTime,
+		LENGTH_UNIT lengthUnit,
+		CREATE_TIME createTime,
+		CREATE_USER createUser,
+		EFFECTIVE_TIME effectiveTime,
+		EXPIRE_TIME expireTime 
+	from COMP_ORDER_T
+	where ORDER_ID=(select order_id 
+	                  from COMP_CASE_PM_T
+		             where PM_ID =#pmId#)
+	</select>
+</sqlMap>

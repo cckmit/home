@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+	http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<import resource="classpath:META-INF/cxf/cxf.xml" />
+	<import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" />
+	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
+	
+	<bean id="OrderResourceImpl" class="com.neusoft.mid.comp.boss.server.ws.impl.OrderResourceImpl" />
+
+	<!-- address的地址是hi接口类名+WS -->
+	<jaxws:endpoint id="OrderResourceWS"
+		implementor="#OrderResourceImpl"
+		address="/OrderResourceWS">
+		<jaxws:inInterceptors>
+			<bean
+				class="com.neusoft.mid.comp.boss.ws.logging.interceptor.MyLoggingInInterceptor" />
+		</jaxws:inInterceptors>
+		<jaxws:outInterceptors>
+			<bean
+				class="com.neusoft.mid.comp.boss.ws.logging.interceptor.MyLoggingOutInterceptor" />
+		</jaxws:outInterceptors>
+	</jaxws:endpoint>
+
+</beans>

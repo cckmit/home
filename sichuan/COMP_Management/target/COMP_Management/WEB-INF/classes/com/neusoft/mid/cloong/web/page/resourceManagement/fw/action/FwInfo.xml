@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="FwInfo">
+	<typeAlias alias="fwInfo" type="com.neusoft.mid.cloong.web.page.resourceManagement.info.FwInfo" />
+	
+	<select id="queryFwInfos" parameterClass="fwInfo" resultClass="fwInfo">
+		SELECT  V.firewall_id firewallId,
+				V.firewall_name firewallName,
+				V.fw_type fwType,
+				V.sw_version swVersion,
+				V.vendor_name vendorName,
+				V.fw_ip fwIp,
+				V.cur_status curStatus,
+				V.fw_serialnum fwSerialnum,
+				V.throughput,
+				V.app_ids appIds,
+				V.connect_num connectNum,
+				V.new_connect_num newConnectNum,
+				V.asset_origin_type assetOriginType,
+				V.asset_state assetState,
+				V.asset_sla_type assetSlaType,
+				V.port_num portNum,
+				V.firewall_policy firewallPolicy,
+				V.RES_POOL_ID resPoolId,
+				R.RES_POOL_NAME resPoolName,
+				DATE_FORMAT(
+					V.UPDATE_TIME,
+					'%Y-%m-%d %H:%i:%s'
+				) updateTime
+		  FROM COMP_RM_FIREWALL_T V
+		  LEFT JOIN COMP_RES_POOL_T R ON V.RES_POOL_ID = R.RES_POOL_ID
+		 WHERE 1= 1
+		<dynamic prepend="">
+			<isNotEmpty prepend="and" property="firewallId">
+				upper(V.firewall_id) like
+				upper(CONCAT('%',trim(#firewallId#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="firewallName">
+				upper(V.firewall_name) like
+				upper(CONCAT('%',trim(#firewallName#),'%'))
+			</isNotEmpty>
+		</dynamic>
+		ORDER BY updateTime DESC
+	</select>
+	
+	<select id="countQueryFw" parameterClass="fwInfo" resultClass="java.lang.Integer">
+		SELECT  count(*)
+		 FROM COMP_RM_FIREWALL_T V
+		 LEFT JOIN COMP_RES_POOL_T R ON V.RES_POOL_ID = R.RES_POOL_ID
+		WHERE 1= 1
+		<dynamic prepend="">
+			<isNotEmpty prepend="and" property="firewallId">
+				upper(V.firewall_id) like
+				upper(CONCAT('%',trim(#firewallId#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="firewallName">
+				upper(V.firewall_name) like
+				upper(CONCAT('%',trim(#firewallName#),'%'))
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<!-- 查看虚拟机详情 -->
+    <select id="queryFwInfo" parameterClass="fwInfo" resultClass="fwInfo">
+		SELECT  V.firewall_id firewallId,
+				V.firewall_name firewallName,
+				V.fw_type fwType,
+				V.sw_version swVersion,
+				V.vendor_name vendorName,
+				V.fw_ip fwIp,
+				V.cur_status curStatus,
+				V.fw_serialnum fwSerialnum,
+				V.throughput,
+				V.app_ids appIds,
+				V.connect_num connectNum,
+				V.new_connect_num newConnectNum,
+				V.asset_origin_type assetOriginType,
+				V.asset_state assetState,
+				V.asset_sla_type assetSlaType,
+				V.port_num portNum,
+				V.firewall_policy firewallPolicy,
+				V.RES_POOL_ID resPoolId,
+				R.RES_POOL_NAME resPoolName,
+				DATE_FORMAT(
+					V.UPDATE_TIME,
+					'%Y-%m-%d %H:%i:%s'
+				) updateTime
+		  FROM COMP_RM_FIREWALL_T V
+		  LEFT JOIN COMP_RES_POOL_T R ON V.RES_POOL_ID = R.RES_POOL_ID
+		  <dynamic prepend="WHERE">
+			<isNotEmpty prepend="" property="firewallId">
+				V.firewall_id = #firewallId#
+			</isNotEmpty>
+			<isEmpty prepend="" property="firewallId">
+				1=1
+				ORDER BY updateTime DESC
+			</isEmpty>
+		  </dynamic>
+	</select>
+	
+	<!-- 查看虚拟机详情 -->
+    <select id="queryAppNames" parameterClass="fwInfo" resultClass="java.lang.String">
+    	select  group_concat(APP_NAME) appName
+    	from COMP_APP_T 
+    	where 1=1
+    	<iterate prepend="AND" property="appIdList"
+			open="(" close=")" conjunction="OR">
+			APP_ID=#appIdList[]#
+		</iterate>
+    </select>
+</sqlMap>

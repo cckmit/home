@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE validators PUBLIC 
+  		"-//Apache Struts//XWork Validator 1.0.2//EN"
+  		"http://struts.apache.org/dtds/xwork-validator-1.0.2.dtd">
+<validators>
+	<field name="resPoolId">
+		<field-validator type="requiredstring">
+			<param name="trim">true</param>
+			<message>资源池编码不能为空，请重新输入</message>
+		</field-validator>
+		<field-validator type="stringlength">
+			<param name="maxLength">20</param>
+			<message>资源池编码最大长度为20</message>
+		</field-validator>
+	</field>
+	<field name="resPoolPartId">
+		<field-validator type="requiredstring">
+			<param name="trim">true</param>
+			<message>资源池分区编码不能为空，请重新输入</message>
+		</field-validator>
+		<field-validator type="stringlength">
+			<param name="maxLength">20</param>
+			<message>资源池分区编码最大长度为20</message>
+		</field-validator>
+		<field-validator type="regex">
+			<param name="regexExpression"><![CDATA[^[a-zA-Z0-9-_]+$]]></param>
+			<message>资源池分区编码只由数字及英文中划线组成，请重新输入</message>
+		</field-validator>
+	</field>
+	<field name="resPoolPartName">
+		<field-validator type="requiredstring">
+			<param name="trim">true</param>
+			<message>资源池分区名称不能为空，请重新输入</message>
+		</field-validator>
+		<field-validator type="stringlength">
+			<param name="maxLength">20</param>
+			<message>资源池分区名称最大长度为20</message>
+		</field-validator>
+	</field>
+	<field name="description">
+		<field-validator type="stringlength">
+			<param name="maxLength">100</param>
+			<message>描述最大长度为100</message>
+		</field-validator>
+	</field>
+	<field name="cpuNumTotal">
+		<field-validator type="requiredstring">
+			<param name="trim">true</param>
+			<message>每虚机VCPU个数不能为空，请重新输入</message>
+		</field-validator>
+		<field-validator type="regex">
+			<param name="regexExpression"><![CDATA[^\d+$]]></param>
+			<message>每虚机VCPU个数需要是大于0的整数</message>
+		</field-validator>
+	</field>
+	<field name="ramSizeTotal">
+		<field-validator type="requiredstring">
+			<param name="trim">true</param>
+			<message>每虚机内存数不能为空，请重新输入</message>
+		</field-validator>
+		<field-validator type="regex">
+			<param name="regexExpression"><![CDATA[^\d+$]]></param>
+			<message>每虚机内存数需要是大于0的整数</message>
+		</field-validator>
+	</field>
+	<field name="discSizeTotal">
+		<field-validator type="requiredstring">
+			<param name="trim">true</param>
+			<message>每虚机硬盘容量不能为空，请重新输入</message>
+		</field-validator>
+		<field-validator type="regex">
+			<param name="regexExpression"><![CDATA[^\d+$]]></param>
+			<message>每虚机硬盘容量需要是大于0的整数</message>
+		</field-validator>
+	</field>
+</validators>

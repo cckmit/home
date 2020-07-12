@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
+    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+
+	<!-- 物理机操作后状态查询队列 -->
+	<bean id="pmProcessingStateQueue" class="com.neusoft.mid.cloong.host.pm.impl.PMStateQueue"></bean>
+
+	<!-- 系统启动后，轮询所有数据库中状态为处理中的物理机,获取其当前的真正状态 -->
+	<bean id="pmProcessingStateQueryService" class="com.neusoft.mid.cloong.host.pm.impl.PMStateQueryService">
+		<property name="transactonGen" ref="transactonGen" />
+		<property name="sequenceGenerator" ref="sequenceGenerator" />
+		<property name="timeStampgen" ref="timeStampgen" />
+		<property name="pmStateQuery" ref="pmStateQuery" />
+		<property name="ibatisDao" ref="ibatisDAOProxy" />
+		<property name="pmStateQueue" ref="pmProcessingStateQueue" />
+		<property name="futureStatusSet">
+			<set>
+				<value>2</value>
+				<value>3</value>
+				<value>4</value>
+				<value>6</value>
+			</set>
+		</property>
+		<property name="currentStatus">
+			<set>
+				<value>15</value>
+				<value>16</value>
+			</set>
+		</property>
+		<property name="processOnBoot" value="true"></property>
+		<property name="pmRetransInterval">
+			<value>${pmRetransInterval}</value>
+		</property>
+		<property name="pmMaxTransTime">
+			<value>${pmMaxTransTime}</value>
+		</property>
+	</bean>
+	
+
+	<bean id="pmStateQuery" class="com.neusoft.mid.cloong.host.pm.impl.PMStateQueryImpl">
+		<property name="common" ref="privateWebServiceClientFactory" />
+		<property name="timeout">
+			<value>${requestTimeout}</value>
+		</property>
+	</bean>
+	
+	
+
+<!-- 物理机创建 -->
+	<!-- 创建PM发送到资源池后查询资源状态及IP、带宽线程池 -->
+	<bean id="pmCreateProcessor" class="com.neusoft.mid.cloong.host.pm.impl.PMCreateProcessor">
+		<property name="senderCreatePMTask">
+			<ref bean="senderCreatePMTaskExecutor" />
+		</property>
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="pmCreator" ref="pmCreator" />
+		<property name="resourcePoolCacheService" ref="resourcePoolCacheService" />
+		<property name="transactonGen" ref="transactonGen" />
+		<property name="timeStampgen" ref="timeStampgen" />
+		<property name="pmStateQuery" ref="pmStateQuery" />
+		<property name="interval">
+			<value>${nextQueryPMStatusInterval}
+			</value>
+		</property>
+		<property name="acquireStandardResPoolId">
+			<ref bean="acquireStandardResPoolId" />
+		</property>
+	</bean>
+	
+	
+	<bean id="pmCreator" class="com.neusoft.mid.cloong.host.pm.impl.PMCreateImpl">
+		<property name="common" ref="privateWebServiceClientFactory" />
+		<property name="timeout">
+			<value>${requestTimeout}</value>
+		</property>
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+	<bean id="senderCreatePMTaskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<property name="corePoolSize" value="0" />
+		<property name="keepAliveSeconds" value="2000" />
+		<property name="maxPoolSize" value="10" />
+		<property name="queueCapacity" value="500" />
+	</bean>
+	
+
+	<!-- 物理机操作-->
+	<bean id="pmOperatorProcessor" class="com.neusoft.mid.cloong.host.pm.impl.PMOperatorProcessor">
+		<property name="pmOperator" ref="pmOperator" />
+		<property name="transactonGen" ref="transactonGen" />
+		<property name="timeStampgen" ref="timeStampgen" />
+		<property name="resourcePoolCacheService" ref="resourcePoolCacheService" />
+		<property name="pmStateQueue" ref="pmProcessingStateQueue" />
+	</bean>
+	<bean id="pmOperator" class="com.neusoft.mid.cloong.host.pm.impl.PMOperatorImpl">
+		<property name="common" ref="privateWebServiceClientFactory" />
+		<property name="timeout">
+			<value>${requestTimeout}</value>
+		</property>
+	</bean> 
+
+	<!-- 物理机配置修改 -->
+	<bean id="pmModifyProcessor" class="com.neusoft.mid.cloong.host.pm.impl.PMModifyProcessor">
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="pmModify" ref="pmModify" />
+		<property name="resourcePoolCacheService" ref="resourcePoolCacheService" />
+		<property name="transactonGen" ref="transactonGen" />
+		<property name="timeStampgen" ref="timeStampgen" />
+	</bean>
+	<bean id="pmModify" class="com.neusoft.mid.cloong.host.pm.impl.PMModifyImpl">
+		<property name="common" ref="privateWebServiceClientFactory" />
+		<property name="timeout">
+			<value>${requestTimeout}</value>
+		</property>
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+	</bean>
+
+	<!-- 物理机删除操作 -->
+	<bean id="pmDeleteProcessor" class="com.neusoft.mid.cloong.host.pm.impl.PMDeleteProcessor">
+		<property name="pmDelete" ref="pmDelete" />
+		<property name="transactonGen" ref="transactonGen" />
+		<property name="timeStampgen" ref="timeStampgen" />
+		<property name="resourcePoolCacheService" ref="resourcePoolCacheService" />
+	</bean>
+	<bean id="pmDelete" class="com.neusoft.mid.cloong.host.pm.impl.PMDeleteImpl">
+		<property name="common" ref="privateWebServiceClientFactory" />
+		<property name="timeout">
+			<value>${requestTimeout}</value>
+		</property>
+	</bean>
+
+	<!-- 物理机状态查询 -->
+	<bean id="queryPMStateProcessor" class="com.neusoft.mid.cloong.host.pm.impl.QueryPMStateProcessor">
+		<property name="resourcePoolCacheService" ref="resourcePoolCacheService" />
+		<property name="transactonGen" ref="transactonGen" />
+		<property name="timeStampgen" ref="timeStampgen" />
+		<property name="pmStateQuery" ref="pmStateQuery" />
+	</bean>
+
+
+	<!-- 创建中定时查询 -->
+	<bean id="createPMStateQueryService" class="com.neusoft.mid.cloong.host.pm.impl.CreatePMStateQueryService">
+		<property name="senderCreatePMTask">
+			<ref bean="senderCreatePMTaskExecutor" />
+		</property>
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="transactonGen" ref="transactonGen" />
+		<property name="timeStampgen" ref="timeStampgen" />
+		<property name="pmStateQuery" ref="pmStateQuery" />
+		<property name="interval" value="${nextQueryPMStatusInterval}" />
+	</bean>
+
+
+</beans>

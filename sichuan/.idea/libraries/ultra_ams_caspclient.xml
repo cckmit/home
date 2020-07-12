@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="ultra_ams_caspclient">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/COMP_Management/src/main/webapp/WEB-INF/lib/ultra_ams_caspclient.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

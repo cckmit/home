@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<!-- 这只浏览器时候缓存静态内容，默认值为true(生产环境下使用),开发阶段最好关闭 -->
+	<constant name="struts.serve.static.vrowserCache" value="false"></constant>
+	<!-- 当struts的配置文件修改后，系统是否自动重新加载该文件，默认为false(生产环境下使用),开发阶段最好打开 -->
+	<constant name="struts.serve.static.vrowserCache" value="true"></constant>
+	<constant name="struts.ui.theme" value="simple"></constant>
+
+	<package name="com.neusoft.mid.cloong.web.page.userCenter"
+		namespace="/userCenter" extends="struts-default">
+		<interceptors>
+			<interceptor name="authenticate" class="authenticateInterceptor" />
+			<interceptor name="turnPageInter" class="turnPageInterceptor" />
+			<interceptor-stack name="authStack">
+				<interceptor-ref name="authenticate" />
+				<interceptor-ref name="defaultStack" />
+				<interceptor-ref name="turnPageInter" />
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="authStack" />
+		<global-results>
+			<result name="error" type="chain">exceptionIntercepor
+			</result>
+			<result name="LOGIN" type="redirectAction">logout</result>
+		</global-results>
+		<global-exception-mappings>
+			<exception-mapping exception="java.lang.Exception"
+				result="error" />
+		</global-exception-mappings>
+		
+		<action name="exceptionIntercepor" class="exceptionIntercepor">
+			<result name="success">/WEB-INF/pages/exception/error.jsp
+			</result>
+		</action>
+
+		<action name="orderQuery" class="OrderQueryAction">
+			<result name="success">
+				/WEB-INF/pages/userCenter/orders/user_orders_list.jsp
+			</result>
+			<result name="error">
+				/WEB-INF/pages/userCenter/orders/user_orders_list.jsp
+			</result>
+		</action>
+	</package>
+	<package name="com.neusoft.mid.cloong.web.page.userCenter.json"
+		extends="json-default">
+		<interceptors>
+			<interceptor name="authenticate" class="authenticateInterceptor" />
+			<interceptor name="turnPageInter" class="turnPageInterceptor" />
+			<interceptor-stack name="authStack">
+				<interceptor-ref name="authenticate" />
+				<interceptor-ref name="jsonValidationWorkflowStack" />
+				<interceptor-ref name="defaultStack" />
+				<interceptor-ref name="turnPageInter" />
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="authStack" />
+		<global-results>
+			<result name="error" type="chain">exceptionIntercepor
+			</result>
+			<result name="LOGIN" type="redirectAction">logout</result>
+		</global-results>
+		<global-exception-mappings>
+			<exception-mapping exception="java.lang.Exception"
+				result="error" />
+		</global-exception-mappings>
+		
+		<action name="exceptionIntercepor" class="exceptionIntercepor">
+			<result name="success">/WEB-INF/pages/exception/error.jsp
+			</result>
+		</action>
+		<action name="orderQueryJson" class="OrderQueryJsonAction">
+			<result name="success" type="json" />
+			<result name="error" type="json" />
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		
+		<!-- 查询vlan列表 -->
+		<action name="vlanQueryJson" class="VlanQueryJsonAction">
+			<result name="success" type="json" />
+			<result name="error" type="json" />
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		
+		<action name="vmOnloadIpsegmentAction" class="vmOnloadIpsegmentAction">
+			<interceptor-ref name="jsonValidationWorkflowStack"></interceptor-ref>
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+			<result name="error" type="json"></result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		
+		<action name="vmOnloadPrivateIpAction" class="vmOnloadPrivateIpAction">
+			<interceptor-ref name="jsonValidationWorkflowStack"></interceptor-ref>
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+			<result name="error" type="json"></result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		
+		<!-- 订单详情 -->
+		<action name="orderDetail" class="OrderDetailAction">
+			<result name="success" type="json" />
+			<result name="error" type="json" />
+		</action>
+		<!-- 订单审批 -->
+		<action name="orderAuditAll" class="OrderAuditAllAction">
+			<result name="success" type="json" />
+			<result name="error" type="json" />
+		</action>
+		<action name="orderBatchAidut" class="OrderBatchAidutAction">
+			<result name="success" type="json" />
+			<result name="error" type="json" />
+		</action>
+		<!-- 订单回收 -->
+		<!-- 虚拟机 -->
+		<action name="vmDelAction" class="vmDelAction">
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+		</action>
+		<!-- 虚拟硬盘 -->
+		<action name="ebsDelAction" class="ebsDeleteAction">
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+		</action>
+		
+		
+		<action name="vmOrderInto" class="VMOrderDetailQueryAction">
+			<result name="success" type="json" />
+			<result name="error" type="json" />
+		</action>
+		<action name="vmModifyOrderInto" class="VMModifyOrderDetailQueryAction">
+			<result name="success" type="json" />
+			<result name="error" type="json" />
+		</action>
+		
+		<action name="ebsOrderInto" class="EBSOrderDetailQueryAction">
+			<result name="success" type="json" />
+			<result name="error" type="json" />
+		</action>
+		
+		<action name="bkOrderInto" class="BKOrderDetailQueryAction">
+			<result name="success" type="json" />
+			<result name="error" type="json" />
+		</action>
+		
+		<action name="pmOrderInto" class="PMOrderDetailQueryAction">
+			<result name="success" type="json" />
+			<result name="error" type="json" />
+		</action>
+		
+		<action name="orderAidut" class="OrderAidutAction">
+			<result name="success" type="json" />
+			<result name="error" type="json" />
+		</action>
+		
+		<action name="eBSOrderAidutAction" class="EBSOrderAidutAction">
+			<result name="success" type="json" />
+			<result name="error" type="json" />
+		</action>
+		<action name="vmOrderAidutAction" class="VMOrderAidutAction">
+			<result name="success" type="json" />
+			<result name="error" type="json" />
+		</action>
+		<action name="vmModifyOrderAidutAction" class="vmModifyOrderAidutAction">
+			<result name="success" type="json" />
+			<result name="error" type="json" />
+		</action>
+		<!-- 克隆审批 -->
+		<action name="vmGhostOrderAidutAction" class="vmGhostOrderAidutAction">
+			<result name="success" type="json" />
+			<result name="error" type="json" />
+		</action>
+		<action name="pmOrderAidutAction" class="PMOrderAidutAction">
+			<result name="success" type="json" />
+			<result name="error" type="json" />
+		</action>
+		<action name="vmBakOrderAidutAction" class="VMBAKOrderAidutAction">
+			<result name="success" type="json" />
+			<result name="error" type="json" />
+		</action>
+		<!-- 物理机订单删除 -->
+		<action name="pmDelAction" class="pmDelAction">
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+		</action>
+		<!-- 虚拟机备份订单删除 -->
+		<action name="vmBakDelJsonAction" class="vmBakDelAction">
+			<result name="success" type="json"></result>
+			<result name="failure" type="json"></result>
+		</action>
+	</package>
+</struts>

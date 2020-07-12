@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	   xmlns:util="http://www.springframework.org/schema/util" xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:tx="http://www.springframework.org/schema/tx"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
+    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+
+	<bean id="vaultService" class="com.neusoft.mid.cloong.vault.service.VaultService"></bean>
+	<bean id="wsdlClientConfig" class="com.neusoft.mid.cloong.vault.config.WsdlClientConfig"></bean>
+	<bean id="roleSearchService" class="com.neusoft.mid.cloong.identity.service.RoleSearchService"></bean>
+	<!--<bean id="bussinessSupportService" class="com.neusoft.mid.cloong.vault.wsdl.services.BussinessSupportService"></bean>-->
+
+	<bean id="queryAppOperJKStatus"
+		  class="com.neusoft.mid.cloong.vault.controller.VaultAction"
+		  scope="prototype">
+		<property name="ibatisDAO" ref="ibatisDAOProxy"></property>
+		<property name="vaultService" ref="vaultService"></property>
+		<property name="roleSearchService" ref="roleSearchService"></property>
+		<property name="wsdlClientConfig" ref="wsdlClientConfig"></property>
+		<!--<property name="bussinessSupportService" ref="bussinessSupportService"></property>-->
+	</bean>
+
+
+
+	<!--	<bean id="businessUpdateAction"-->
+<!--		  class="com.neusoft.mid.cloong.web.page.business.BusinessUpdateAction"-->
+<!--		  scope="prototype">-->
+<!--		<property name="service">-->
+<!--			<bean class="com.neusoft.mid.cloong.web.page.business.service.BusinessUpdateService">-->
+<!--				<property name="dao" ref="ibatisDAOProxy" />-->
+<!--			</bean>-->
+<!--		</property>-->
+<!--	</bean>-->
+
+
+
+
+</beans>

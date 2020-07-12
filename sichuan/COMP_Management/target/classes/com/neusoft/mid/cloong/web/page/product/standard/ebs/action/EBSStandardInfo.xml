@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="EBSStandardInfo">
+	<typeAlias alias="StandardResListInfo"
+		type="com.neusoft.mid.cloong.web.page.product.standard.vm.info.StandardResListInfo" />
+	<typeAlias alias="EBSStandardInfo"
+		type="com.neusoft.mid.cloong.web.page.product.standard.ebs.info.EBSStandardInfo" />
+	<select id="queryEBSStandardInfo" resultClass="EBSStandardInfo"
+		parameterClass="EBSStandardInfo">
+		SELECT
+		standard_Id standardId,
+		standard_name standardName,
+		disc_size discSize,
+		resourceType,
+		description description,
+		create_time createTime,
+		create_user createUser,
+		update_time updateTime,
+		update_user updateUser,
+		(select
+		count(*) from comp_item_t b where b.standard_Id =
+		a.standard_Id) as
+		useStatus
+		FROM
+		COMP_STANDARD_EBS_T a
+		WHERE
+		(SELECT
+		COUNT(*) FROM
+		COMP_STANDARD_SYN_T c WHERE c.standard_Id=a.standard_Id
+		AND
+		STATUS='2')>0
+		AND status = '0'
+		<isNotEmpty prepend="AND" property="discSize">
+			<isNotEqual compareValue="0" property="discSize">
+				disc_size=#discSize#
+			</isNotEqual>
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="useStatus">
+			<isEqual compareValue="1" property="useStatus">
+				(select count(*) from
+				comp_item_t b where b.standard_Id = a.standard_Id) > 0 
+			</isEqual>
+			<isEqual compareValue="0" property="useStatus">
+				(select count(*) from
+				comp_item_t b where b.standard_Id = a.standard_Id) = 0 
+			</isEqual>
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="standardId">
+			a.standard_Id = #standardId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="standardName">
+			a.standard_Name like CONCAT('%',#standardName#,'%')
+		</isNotEmpty>
+	</select>
+	<select id="queryEBSStandardInfoDetail" resultClass="EBSStandardInfo"
+		parameterClass="EBSStandardInfo">
+		SELECT
+		standard_Id standardId,
+		standard_name standardName,
+		disc_size discSize,
+		resourceType,
+		description description,
+		create_time createTime,
+		create_user createUser,
+		update_time updateTime,
+		update_user updateUser,
+		(select
+		count(*) from comp_item_t b where b.standard_Id =
+		a.standard_Id) as
+		useStatus
+		FROM
+		COMP_STANDARD_EBS_T a
+		WHERE
+		status = '0'
+		<isNotEmpty prepend="AND" property="standardId">
+			a.standard_Id = #standardId#
+		</isNotEmpty>
+	</select>
+	<select id="queryEBSStandardList" resultClass="EBSStandardInfo"
+		parameterClass="StandardQueryPara">
+		SELECT
+		standard_name standardName,
+		standard_Id standardId,
+		create_time createTime,
+		create_user createUser
+		FROM
+		COMP_STANDARD_EBS_T where status
+		='0'
+		<isNotEmpty property="standardName" prepend="and">
+			standard_name like CONCAT('%',#standardName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="startTime">
+			create_time >=#startTime# 
+			</isNotEmpty>
+		<isNotEmpty prepend="and" property="endTime">
+			create_time &lt;=#endTime# 
+			</isNotEmpty>
+			order by update_time desc
+		</select>
+		<select id="queryEBSStandardCount" resultClass="java.lang.Integer"
+		parameterClass="StandardQueryPara">
+		SELECT COUNT(*)
+		FROM
+		COMP_STANDARD_EBS_T where status
+		='0'
+		<isNotEmpty property="standardName" prepend="and">
+			standard_name like CONCAT('%',#standardName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="startTime">
+			create_time >=#startTime# 
+			</isNotEmpty>
+		<isNotEmpty prepend="and" property="endTime">
+			create_time &lt;=#endTime# 
+			</isNotEmpty>
+			order by update_time desc
+		</select>
+		<select id="queryEBSStandardDetail" parameterClass="java.lang.String" resultClass="EBSStandardInfo">
+			select STANDARD_ID standardId,STANDARD_NAME standardName,DISC_SIZE discSize,resourceType,DESCRIPTION description from COMP_STANDARD_EBS_T where STANDARD_ID=#standardId# and status
+		='0'
+		</select>
+		<insert id="createEBSStandard" parameterClass="EBSStandardInfo">
+			insert into COMP_STANDARD_EBS_T 
+		(STANDARD_ID ,
+		STANDARD_NAME,
+		DISC_SIZE ,
+		resourceType,
+		DESCRIPTION ,
+		STATUS ,
+		CREATE_TIME ,
+		CREATE_USER ,
+		UPDATE_TIME ,
+		UPDATE_USER )
+		 values 
+		(#standardId#,
+		#standardName#,
+		#discSize#,
+		#resourceType#,
+		#description#,
+		'0',
+		#createTime#,
+		#createUser#,
+		#updateTime#,
+		#updateUser#
+		)
+		</insert>
+		<update id="updateEBSStandard" parameterClass="EBSStandardInfo">
+			update COMP_STANDARD_EBS_T set STANDARD_NAME=#standardName#,DISC_SIZE=#discSize#,resourceType=#resourceType#,DESCRIPTION=#description#,UPDATE_TIME=#updateTime#,UPDATE_USER=#updateUser# where STANDARD_ID=#standardId# and STATUS='0'
+		</update>
+		<!-- 删除虚拟硬盘规格 -->
+		<update id="deleteEbsStandard" parameterClass="java.lang.String">
+			update COMP_STANDARD_EBS_T set STATUS='1' where STANDARD_ID=#standardId# and STATUS='0'
+		</update>
+		<select id="queryInsertEbsSynData" resultClass="StandardResListInfo">
+			SELECT
+			standard_id standardId,
+			res_pool_id resPoolId,
+			res_pool_part_id resPoolPartId
+			FROM 
+			comp_ebs_standard_res_v 
+			WHERE 
+			standard_Id=#standardId# 
+			AND(
+			<iterate property="resourcePoolInfos" conjunction="OR">
+				(res_pool_id
+				=#resourcePoolInfos[].resourcePoolId# and res_pool_part_id=
+				#resourcePoolInfos[].resourcePoolPart#)
+			</iterate>
+			)
+			AND flage='0'
+		</select>
+		<select id="queryEBSStandInfo" resultClass="EBSStandardInfo">
+			SELECT 
+			standard_name standardName,
+			standard_id standardId,
+			disc_size discSize,
+			resourceType,
+			description description,
+			create_user createUser,
+			create_time createTime
+			FROM
+			comp_standard_EBS_t
+			WHERE
+			standard_id=#standardId#
+		</select>
+		<!-- 查询虚拟硬盘同步资源视图 -->
+		<select id="queryEbsStandResList" resultClass="StandardResListInfo">
+			SELECT 
+			standard_id standardId,
+			standard_name standardName,
+			res_pool_id resPoolId,
+			res_pool_name resPoolName,
+			res_pool_part_id resPoolPartId,
+			res_pool_part_name resPoolPartName,
+			status status,
+			resStatus resStatus
+			FROM comp_ebs_standard_res_v 
+			WHERE standard_id=#standardId# 
+			AND resStatus!='0'
+			ORDER BY res_pool_id,res_pool_part_id
+		</select>
+</sqlMap>

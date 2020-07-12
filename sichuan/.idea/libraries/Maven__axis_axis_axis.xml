@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: axis:axis:axis">
+    <CLASSES>
+      <root url="jar://D:/repository/axis/axis/axis/axis-axis.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://D:/repository/axis/axis/axis/axis-axis-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://D:/repository/axis/axis/axis/axis-axis-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

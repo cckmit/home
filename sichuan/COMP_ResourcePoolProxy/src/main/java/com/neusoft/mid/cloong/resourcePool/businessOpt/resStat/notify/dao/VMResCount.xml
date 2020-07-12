@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="VMResCount">
+	<typeAlias alias="VMResCountInfo"
+		type="com.neusoft.mid.cloong.resourcePool.businessOpt.resStat.notify.bean.VMResCountBean" />
+	<select id="getCountVMById" parameterClass="java.util.HashMap"
+		resultClass="java.lang.String">
+		select t.vm_id
+		from comp_vm_res_count_t t
+		where t.vm_id in (
+		<iterate property="consume" conjunction=",">
+			#consume[].vmid#
+		</iterate>
+		<![CDATA[
+			)
+			and t.res_pool_id = #poolId#
+			and t.res_pool_part_id = #partId#
+			and ((t.start_time >= #startTime# and t.end_time <= #endTime#)
+			or (t.start_time<= #startTime# and t.end_time >= #endTime#)
+			or (t.start_time > #startTime# and t.start_time < #endTime# and
+			t.end_time > #endTime#)
+			or (t.start_time < #startTime# and t.end_time > #endTime# and t.end_time
+			< #endTime#)
+			)
+		]]>
+	</select>
+
+	<select id="getExistVMId" parameterClass="java.util.HashMap"
+		resultClass="java.lang.String">
+		select vm_id from (
+		<iterate property="consume" conjunction="UNION">
+			select
+			#consume[].vmid# vm_id
+			from dual
+		</iterate>
+		) a
+		where (vm_id) NOT IN
+		(SELECT
+		vm_id
+		FROM
+		COMP_CASE_VM_T
+		WHERE
+		res_pool_id = #resPoolId#
+		AND res_pool_part_id = #resPoolPartId#)
+	</select>
+
+	<insert id="insertVMCount" parameterClass="VMResCountInfo">
+		insert into
+		comp_Vm_res_count_t
+		(VM_ID,
+		START_TIME,
+		END_TIME,
+		PERIOD_TIME,
+		RUN_TIME,
+		STANDARD_ID,
+		STANDARD_NAME,
+		OWN_USER,
+		RES_POOL_ID,
+		RES_POOL_PART_ID,
+		CREATE_TIME)
+		select
+		#vmId#,
+		#startTime#,
+		#endTime#,
+		#periodTime#,
+		#runTime#,
+		caset.standard_id,
+		standt.standard_name,
+		caset.own_user,
+		caset.res_pool_id,
+		caset.res_pool_part_id,
+		#createTime#
+		from
+		comp_case_vm_t caset
+		left join
+		comp_standard_vm_t standt
+		on
+		caset.standard_id = standt.standard_id
+		where
+		caset.vm_id = #vmId# and caset.res_pool_id
+		= #resPoolId# and
+		caset.res_pool_part_id = #resPoolPartId#
+	</insert>
+</sqlMap>

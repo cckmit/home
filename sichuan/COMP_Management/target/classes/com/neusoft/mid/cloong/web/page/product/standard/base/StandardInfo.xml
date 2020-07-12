@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="StandardSyn">
+	<!-- 同步删除失败，更新 -->
+	<update id="deleteSynFailure" parameterClass="map">
+		update comp_standard_syn_t set STATUS='7'
+		where
+		<iterate property="StandardSynchronizeResult" conjunction="OR">
+			(
+			res_pool_id =#StandardSynchronizeResult[].resPoolId#
+			AND res_pool_part_id=#StandardSynchronizeResult[].resPoolPartId#
+			AND TEMPLATE_ID=#StandardSynchronizeResult[].templateId#
+			)
+		</iterate>
+	</update>
+	<!-- 同步删除成功，更新 -->
+	<update id="deleteSynSuccess" parameterClass="map">
+		update comp_standard_syn_t set STATUS='6'
+		where
+		<iterate property="StandardSynchronizeResult" conjunction="OR">
+			(
+			res_pool_id =#StandardSynchronizeResult[].resPoolId#
+			AND res_pool_part_id=#StandardSynchronizeResult[].resPoolPartId#
+			AND TEMPLATE_ID=#StandardSynchronizeResult[].templateId#
+			)
+		</iterate>
+	</update>
+	
+	<!-- 同步表   删除，更新 -->
+	<update id="deleteStandardSynSuccess" parameterClass="java.lang.String">
+		update comp_standard_syn_t set STATUS='4'
+		where
+		STANDARD_ID=#standardId# AND (STATUS='1')
+	</update>
+	
+	<!-- 查询同步表是否存在中间态 -->
+	<select id="queryIntermediateStateByStandardId" parameterClass="java.lang.String" resultClass="int">
+		SELECT COUNT(*) FROM COMP_STANDARD_SYN_T
+		WHERE 
+		STANDARD_ID=#standardId# AND (STATUS='0' OR STATUS='5')
+	</select>
+	
+	
+	<!-- 查询同步表是否存在同步成功数据 可用、不可用 -->
+	<select id="querySynByStandardId" parameterClass="java.lang.String" resultClass="int">
+		SELECT COUNT(*) FROM COMP_STANDARD_SYN_T
+		WHERE 
+		STANDARD_ID=#standardId# AND (STATUS='2' OR STATUS='3')
+	</select>
+	
+	<!-- 查询调用同步删除后，是否存在未同步过的数据 -->
+	<select id="queryUnSynByStandardId" parameterClass="java.lang.String" resultClass="int">
+		SELECT COUNT(*) FROM COMP_STANDARD_SYN_T
+		WHERE 
+		STANDARD_ID=#standardId# AND (STATUS='1')
+	</select>
+	
+	<!-- 查询同步表中的规格ID对应资源池ID -->
+	<select id="queryHaveTemplateIdByStandardId" parameterClass="java.lang.String" resultClass="java.lang.String">
+		SELECT distinct TEMPLATE_ID templateId  FROM COMP_STANDARD_SYN_T
+		WHERE 
+		STANDARD_ID=#standardId#
+	</select>
+	
+	<!-- 规格修改时，查询规格同步状态为：可用 的数量 -->
+	<select id="getCountSyn" parameterClass="java.lang.String" resultClass="int">
+		SELECT count(*) FROM COMP_STANDARD_SYN_T
+		WHERE 
+		status = '2' AND
+		STANDARD_ID=#standardId#
+	</select>
+	<!-- 规格修改时，查询规格同步状态为：同步发送成功 的数量 -->
+	<select id="getCountSyning" parameterClass="java.lang.String" resultClass="int">
+		SELECT count(*) FROM COMP_STANDARD_SYN_T
+		WHERE 
+		status = '0' AND
+		STANDARD_ID=#standardId#
+	</select>
+	<!-- 修改时，更新同步表 可用 状态为5 -->
+	<update id="modifySynUsable" parameterClass="java.lang.String">
+		update comp_standard_syn_t set STATUS='5'
+		where
+		status = '2' AND
+		STANDARD_ID=#standardId#
+	</update>
+	
+</sqlMap>

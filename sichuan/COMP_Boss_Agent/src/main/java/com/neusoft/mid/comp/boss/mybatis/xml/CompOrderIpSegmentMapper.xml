@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.neusoft.mid.comp.boss.mybatis.xmlmapper.CompOrderIpSegmentMapper">
+
+	<resultMap id="ResultMap" type="com.neusoft.mid.comp.boss.mybatis.bean.CompCaseIpsegmentT">
+		<result column="IP_SUBNET" property="ipSubnet" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<select id="selectIpSubnet" resultMap="ResultMap">
+		SELECT
+		ip.IP_SUBNET AS ipSubnet
+		FROM
+			`comp_order_t` o
+		LEFT JOIN `comp_case_ipsegment_t` ip ON o.CASE_ID = ip.CASE_ID
+		WHERE o.CASE_TYPE = '12'
+		AND o.`STATUS` = '0'
+		AND ip.RELEASED = '2'
+	</select>
+
+
+</mapper>

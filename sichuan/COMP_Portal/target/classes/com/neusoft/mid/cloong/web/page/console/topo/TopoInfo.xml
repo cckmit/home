@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="topo">
+	
+ 	<typeAlias alias="vmResultInfo"
+		type="com.neusoft.mid.cloong.web.page.console.host.vm.info.VMResultInfo" />
+	<typeAlias alias="diskResultInfo"
+		type="com.neusoft.mid.cloong.web.page.console.disk.info.DiskInfo" />
+	<typeAlias alias="resultInfos"
+		type="com.neusoft.mid.cloong.web.page.console.topo.info.ResultInfos" />
+		
+	<select id="queryVmByApp4TOPO" parameterClass="java.lang.String"
+		resultClass="vmResultInfo">
+		select vm.CASE_ID caseId, vm.VM_ID vmId, vm.VM_NAME vmName, vm.APP_ID appId
+		from comp_case_vm_t vm, comp_authority_user_app_t userApp 
+		where vm.APP_ID = userApp.APP_ID 
+		and (`STATUS` = '2' or `STATUS` = '4' or `STATUS` = '6') 
+		and USER_ID = #userId#
+	</select>
+	
+	<select id="queryEbsByApp4TOPO" parameterClass="java.lang.String"
+		resultClass="diskResultInfo">
+		select ebs.CASE_ID caseId, ebs.EBS_ID diskId, ebs.EBS_NAME diskName, ebs.APP_ID businessId
+		from comp_case_ebs_t ebs, comp_authority_user_app_t userApp
+		where ebs.APP_ID = userApp.APP_ID 
+		and (`STATUS` = '2' or `STATUS` = '3' or `STATUS` = '5') 
+		and userApp.USER_ID = #userId#
+	</select>
+	
+	<select id="queryEbsByAppUp4TOPO" parameterClass="java.lang.String"
+		resultClass="diskResultInfo">
+		select ebs.CASE_ID caseId, ebs.EBS_ID diskId, ebs.EBS_NAME diskName, ebs.APP_ID businessId, HOST_ID hostId
+		from comp_case_ebs_t ebs, comp_authority_user_app_t userApp
+		where ebs.APP_ID = userApp.APP_ID 
+		and `STATUS` = '4' 
+		and userApp.USER_ID = #userId#
+	</select>
+	
+	<select id="sumVmEbsEBSup" parameterClass="java.lang.String"
+		resultClass="resultInfos">
+		select sum(ebs_count) ebsCount, sum(ebs_up_count) ebsUpCount, sum(vm_count) vmCount, APP_ID appId, APP_NAME appName from 
+		(select count(ebs.CASE_ID)ebs_count, '0' ebs_up_count, '0' vm_count, ebs.APP_ID, app.APP_NAME from comp_case_ebs_t ebs, comp_authority_user_app_t userApp, comp_app_t app 
+		where ebs.APP_ID = userApp.APP_ID and ebs.APP_ID = app.APP_ID and (`STATUS` = '2' or `STATUS` = '3' or `STATUS` = '5') and userApp.USER_ID = #userId#
+		group by ebs.APP_ID
+		union
+		select '0' ebs_count, '0' ebs_up_count, count(vm.CASE_ID)vm_count, vm.APP_ID, app.APP_NAME from comp_case_vm_t vm, comp_authority_user_app_t userApp, comp_app_t app 
+		where vm.APP_ID = userApp.APP_ID and vm.APP_ID = app.APP_ID and (`STATUS` = '2' or `STATUS` = '4' or `STATUS` = '6') and USER_ID = #userId#
+		group by vm.APP_ID
+		union
+		select '0' ebs_count, count(ebs.CASE_ID)ebs_up_count, '0' vm_count, ebs.APP_ID, app.APP_NAME from comp_case_ebs_t ebs, comp_authority_user_app_t userApp, comp_app_t app 
+		where ebs.APP_ID = userApp.APP_ID and ebs.APP_ID = app.APP_ID and `STATUS` = '4' and userApp.USER_ID = #userId#
+		group by ebs.APP_ID) A
+		group by A.APP_ID
+	</select>
+	 <select id="showapplist" parameterClass="java.util.HashMap"
+		resultClass="resultInfos">
+		/**showapplist**/			
+		SELECT DISTINCT
+		userapp.APP_ID appId,
+		app.APP_NAME appName,
+		#userId# userId
+		FROM	
+		comp_authority_user_app_t userapp
+		LEFT JOIN comp_app_t app ON app.APP_ID = userapp.APP_ID
+		WHERE
+			userapp.USER_ID = #userId#
+		 <isNotEmpty prepend="and" property="resPoolId">
+			app.RES_POOL_ID = #resPoolId#
+		 </isNotEmpty>
+		</select>
+		
+	<select id="ipsubnet" parameterClass="java.lang.String"
+	resultClass="resultInfos">
+		SELECT DISTINCT
+	ipsegment.ipsubnet,
+vlan.VLAN_ID subnetend
+FROM
+	(
+		SELECT
+			IP_SUBNET ipsubnet,
+			IPSEGMENT_ID subnetstart
+		FROM
+			comp_case_ipsegment_t
+		WHERE
+			APP_ID = #appid#
+		AND RELEASED IN (0, 2)
+	) ipsegment,
+	comp_vlan_ipsegment_bind_t vlan
+WHERE
+ipsegment.subnetstart = vlan.IPSEGMENT_ID
+	</select>
+	<select id="ipsubnetbyuser" parameterClass="java.lang.String"
+	resultClass="resultInfos">
+		SELECT DISTINCT
+vlan.VLAN_ID subnetend,
+ipsubnet.ipsubnet ipsubnet
+FROM
+(SELECT DISTINCT
+	net.IP_SUBNET ipsubnet,
+net.IPSEGMENT_ID subnetstart
+FROM
+	(
+		SELECT DISTINCT
+			vm1.APP_ID appid
+		FROM
+			(
+				SELECT
+					APP_ID appid1
+				FROM
+					comp_authority_user_app_t
+				WHERE
+					USER_ID = #userId#
+			) ipsegment,
+			comp_case_vm_t vm1
+		WHERE
+			vm1.APP_ID = ipsegment.appid1
+		AND vm1. STATUS IN (0, 1, 2, 4, 6)
+	) app,
+	comp_case_ipsegment_t net
+WHERE
+	net.APP_ID = app.appid
+AND RELEASED IN (0, 2)) ipsubnet,
+comp_vlan_ipsegment_bind_t vlan
+WHERE
+ ipsubnet.subnetstart = vlan.IPSEGMENT_ID
+	</select>
+		
+    <select id="pzhtopo" parameterClass="resultInfos"
+		resultClass="resultInfos">
+		/**pzhtopo**/
+		SELECT
+			iptable.ip ip,
+			iptable.status status,
+		 vmday.Per_Time Per_Time,
+		  iptable.vmname vmname,
+		  iptable.vmId vmId,
+		  iptable.resPoolId resPoolId,
+		  iptable.resPoolPartId resPoolPartId,
+			vmday.Cpu_Idle cpuidle,
+			vmday.Cpu_Speed cpuspeed,
+			vmday.Disk_Read diskread,
+			vmday.Disk_Write diskwrite,
+			vmday.Mem_Percent mempercent,
+			vmday.Bytes_In bytesin,
+			vmday.Bytes_Out bytesout
+		
+		FROM
+			(
+				SELECT
+					vm.VM_NAME vmname,
+					vm.vm_id vmId,
+					net.ip ip,
+					vm. STATUS status,
+					vm.res_pool_id resPoolId,
+					vm.res_pool_part_id resPoolPartId
+				FROM
+					(
+						SELECT
+							CASE_ID caseid,
+							IP ip							
+						FROM
+							comp_case_vm_net_t
+						WHERE
+						VLAN_ID= #subnetend#
+						
+					) net,
+					comp_case_vm_t vm
+				WHERE
+					vm.CASE_ID = net.caseid
+				AND vm. STATUS IN (0, 1, 2, 4, 6)
+			) iptable
+		LEFT JOIN
+			x86.vm_performance_tab vmday
+		ON
+			iptable.ip = vmday.Per_Hid
+		WHERE
+			NOT EXISTS (
+				SELECT
+					1
+				FROM
+					x86.vm_performance_tab vmday2
+				WHERE
+					vmday2.Per_Hid = vmday.Per_Hid
+				AND vmday2.Per_Time > vmday.Per_Time
+			)
+		
+    </select>
+
+	<select id="pzh2topo" parameterClass="resultInfos"
+			resultClass="resultInfos">
+		/**pzhtopo**/
+		SELECT
+			iptable.ip ip,
+			iptable.status status,
+		 vmday.Per_Time Per_Time,
+		  iptable.vmname vmname,
+		  iptable.vmId vmId,
+		  iptable.resPoolId resPoolId,
+		  iptable.resPoolPartId resPoolPartId,
+			vmday.Cpu_Idle cpuidle,
+			vmday.Cpu_Speed cpuspeed,
+			vmday.Disk_Read diskread,
+			vmday.Disk_Write diskwrite,
+			vmday.Mem_Percent mempercent,
+			vmday.Bytes_In bytesin,
+			vmday.Bytes_Out bytesout
+
+		FROM
+			(
+				SELECT
+					vm.VM_NAME vmname,
+					vm.vm_id vmId,
+					net.ip ip,
+					vm. STATUS status,
+					vm.res_pool_id resPoolId,
+					vm.res_pool_part_id resPoolPartId
+				FROM
+					(
+						SELECT
+							CASE_ID caseid,
+							IP ip
+						FROM
+							comp_case_vm_net_t
+						WHERE
+						VLAN_ID= #subnetend#
+
+					) net,
+					comp_case_vm_t vm
+				WHERE
+					vm.CASE_ID = net.caseid
+				AND vm. STATUS IN (0, 1, 2, 4, 6)
+			) iptable
+		LEFT JOIN
+			vm_performance_tab vmday
+		ON
+			iptable.ip = vmday.Per_Hid
+		WHERE
+			NOT EXISTS (
+				SELECT
+					1
+				FROM
+					vm_performance_tab vmday2
+				WHERE
+					vmday2.Per_Hid = vmday.Per_Hid
+				AND vmday2.Per_Time > vmday.Per_Time
+			)
+
+    </select>
+</sqlMap>

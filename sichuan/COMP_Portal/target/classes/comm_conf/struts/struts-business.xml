@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<!-- 这只浏览器时候缓存静态内容，默认值为true(生产环境下使用),开发阶段最好关闭 -->
+	<constant name="struts.serve.static.vrowserCache" value="false"></constant>
+	<!-- 当struts的配置文件修改后，系统是否自动重新加载该文件，默认为false(生产环境下使用),开发阶段最好打开 -->
+	<constant name="struts.serve.static.vrowserCache" value="true"></constant>
+	<constant name="struts.ui.theme" value="simple"></constant>
+
+	<package name="com.neusoft.mid.cloong.business" namespace="/business"
+		extends="struts-default">
+		<interceptors>
+			<interceptor name="authenticate" class="authenticateInterceptor" />
+			<interceptor name="turnPageInter" class="turnPageInterceptor" />
+			<interceptor-stack name="authStack">
+				<interceptor-ref name="authenticate" />
+				<interceptor-ref name="defaultStack" />
+				<interceptor-ref name="turnPageInter" />
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="authStack" />
+		<global-results>
+			<result name="error" type="chain">exceptionIntercepor
+			</result>
+			<result name="LOGIN" type="redirectAction">logout</result>
+		</global-results>
+		<global-exception-mappings>
+			<exception-mapping exception="java.lang.Exception"
+				result="error" />
+		</global-exception-mappings>
+		<action name="exceptionIntercepor" class="exceptionIntercepor">
+			<result name="success">/WEB-INF/pages/exception/error.jsp
+			</result>
+		</action>
+		<action name="businessList" class="businessManagerListAction">
+			<result name="success">/WEB-INF/pages/business/business_list.jsp
+			</result>
+		</action>
+		<action name="toBusinessCreate" class="com.opensymphony.xwork2.ActionSupport">
+			<result name="success">/WEB-INF/pages/business/business_create.jsp
+			</result>
+		</action>
+		<action name="businessDetail" class="businessDetailAction">
+			<result name="success">/WEB-INF/pages/business/business_detail.jsp</result>
+			<result name="edit">/WEB-INF/pages/business/business_edit.jsp</result>
+		</action>
+
+	</package>
+
+	<package name="com.neusoft.mid.cloong.business.json" extends="json-default">
+		<interceptors>
+			<interceptor name="authenticate" class="authenticateInterceptor" />
+			<interceptor name="turnPageInter" class="turnPageInterceptor" />
+			<interceptor-stack name="authStack">
+				<interceptor-ref name="authenticate" />
+				<interceptor-ref name="defaultStack" />
+				<interceptor-ref name="turnPageInter" />
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="authStack" />
+		<global-results>
+			<result name="LOGIN" type="redirectAction">logout</result>
+			<result name="error" type="chain">exceptionIntercepor</result>
+		</global-results>
+		<global-exception-mappings>
+			<exception-mapping exception="java.lang.Exception"
+				result="error" />
+		</global-exception-mappings>
+		<action name="businessCreate" class="businessCreateAction">
+			<result name="success" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">result\..+$</param>
+			</result>
+			<result name="error" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">result\..+$</param>
+			</result>
+		</action>
+		<action name="businessDel" class="businessDelAction">
+			<result name="success" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">result\..+$</param>
+			</result>
+			<result name="error" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">result\..+$</param>
+			</result>
+		</action>
+		<action name="hostList" class="hostListAction">
+			<result name="success" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="enumAsBean">true</param>
+				<param name="excludeProperties">ibatisDAO</param>
+			</result>
+		</action>
+        <action name="LBsubmitAction" class="loadBalanceAction" method="applyloadbalance">
+<!-- 			<result name="success">/WEB-INF/pages/console/loadbalance/LB_list.jsp -->
+<!-- 			</result> -->
+			<result name="success" type="redirectAction">
+				<param name="actionName">lbQueryListAction</param>
+				<param name="queryBusinessId">${appId}</param>
+				<param name="type">${type}</param>
+				<param name="nodeType">${nodeType}</param>
+				<param name="nodeId">${nodeId}</param>
+				<param name="treeNodeName">${treeNodeName}</param>
+				<param name="pnodeId">${pnodeId}</param>
+				<param name="pnodeName">${pnodeName}</param>
+				<param name="appId">${appId}</param>
+				<param name="curFun">${curFun}</param>
+				<param name="msg">${msg}</param>
+			</result>
+			<result name="failure">/WEB-INF/pages/console/business/loadbalance/LB_apply_commend.jsp
+			</result>
+		</action>
+		<action name="LBdelobjbusinfo" class="loadBalanceAction" method="delobjinfo">
+			<result name="success" type="json">
+			</result>
+		</action>
+		<action name="LBupdatebusAction" class="loadBalanceAction" method="updateLBinfos">
+			<result name="success" type="json">
+			</result>
+		</action>
+		<action name="LBdelbusinfo" class="loadBalanceAction" method="delLBinfos">
+			<result name="success" type="json">
+			</result>
+		</action>
+		<action name="LBaddobjbusinfo" class="loadBalanceAction" method="addobjinfo">
+			<result name="success" type="json">
+			</result>
+		</action>
+		<action name="businessUpdate" class="businessUpdateAction">
+			<result name="success" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">result\..+$</param>
+			</result>
+			<result name="error" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">result\..+$</param>
+			</result>
+		</action>
+		<action name="businessUnbind" class="businessUnbindAction">
+			<result name="success" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">result\..+$</param>
+			</result>
+			<result name="error" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">result\..+$</param>
+			</result>
+		</action>
+		<action name="businessBind" class="businessBindAction">
+			<result name="success" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">result\..+$</param>
+			</result>
+			<result name="error" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">result\..+$</param>
+			</result>
+		</action>
+
+	</package>
+</struts>

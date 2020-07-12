@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE validators PUBLIC 
+  		"-//Apache Struts//XWork Validator 1.0.2//EN"
+  		"http://struts.apache.org/dtds/xwork-validator-1.0.2.dtd">
+<validators>
+	<field name="resPoolId">
+		<field-validator type="requiredstring">
+			<param name="trim">true</param>
+            <message>资源池编码不能为空，请重新输入</message>  
+        </field-validator>
+		<field-validator type="stringlength">
+			<param name="maxLength">20</param>
+			<message>资源池编码最大长度为20</message>
+		</field-validator>
+		<field-validator type="regex">
+			<param name="expression"><![CDATA[^[a-zA-Z0-9-_]+$]]></param>
+			<message>资源池编码只由数字及英文中划线组成，请重新输入</message>
+		</field-validator>
+	</field>
+	<field name="resPoolName">
+		<field-validator type="requiredstring">
+			<param name="trim">true</param>
+            <message>资源池名称不能为空，请重新输入</message>  
+        </field-validator>
+		<field-validator type="stringlength">
+			<param name="maxLength">20</param>
+			<message>资源池名称最大长度为20</message>
+		</field-validator>
+	</field>
+	<field name="resPoolUrl">
+		<field-validator type="requiredstring">  
+			<param name="trim">true</param>
+            <message>URL不能为空，请重新输入</message>  
+        </field-validator>
+		<field-validator type="stringlength">
+			<param name="maxLength">100</param>
+			<message>URL最大长度为100</message>
+		</field-validator>
+	</field>
+	<field name="userPwd">
+		<field-validator type="requiredstring">  
+			<param name="trim">true</param>
+            <message>密码不能为空，请重新输入</message>  
+        </field-validator>
+		<field-validator type="stringlength">
+			<param name="maxLength">50</param>
+			<message>密码最大长度为50</message>
+		</field-validator>
+	</field>
+	<field name="description">
+		<field-validator type="stringlength">
+			<param name="maxLength">100</param>
+			<message>描述最大长度为100</message>
+		</field-validator>
+	</field>
+</validators>

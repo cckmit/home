@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 被2012 () 使用XMLSpy v编辑的 (http://www.altova.com) by -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:element name="BlockStorageTemplate">
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="TemplateID" type="xs:string"/>
+				<xs:element name="ResourceType" type="xs:string"/>
+				<xs:element name="MeasureMode" type="xs:string"/>
+				<xs:element name="TemplateDesc" type="xs:string"/>
+				<xs:element name="TemplateStatus" type="xs:string"/>
+				<xs:element name="TemplateCreator" type="xs:string"/>
+				<xs:element name="CreateTime" type="xs:string"/>
+				<xs:element name="ResourceInfo">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="VolumeSize" type="xs:string"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

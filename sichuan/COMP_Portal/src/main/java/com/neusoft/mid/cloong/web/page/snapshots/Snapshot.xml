@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+    
+<sqlMap namespace="SnapshotInfo">
+	
+	<typeAlias alias="SnapshotBean"
+		type="com.neusoft.mid.cloong.web.page.snapshots.info.SnapshotBean" />
+	<typeAlias alias="SnapshotBeanQry"
+		type="com.neusoft.mid.cloong.web.page.snapshots.info.SnapshotBeanQry" />
+	<typeAlias alias="VMInstanceInfo"
+		type="com.neusoft.mid.cloong.web.page.console.host.vm.info.VMInstanceInfo" />
+	
+	<insert id="snapshotInsert"  parameterClass="SnapshotBean">
+		insert into
+		COMP_CASE_SNAPSHOT_T
+		(SNAPSHOT_ID,
+		 VM_ID,
+		 SNAPSHOT_NAME,
+		 SNAPSHOT_DESC,
+		 CREATE_USER,
+		 SNAPSHOT_TIME,
+		 SNAPSHOT_STATE)
+		 values
+		(#snapshot_id#,
+		 #vmId#,
+		 #snapshot_name#,
+		 #snapshot_desc#,
+	     #create_user#,
+	     #snapshot_time#,
+	     #snapshot_state#
+		)
+	</insert>
+	<update id="updateSnapshotStateTo6" parameterClass="SnapshotBean">
+	    update
+		COMP_CASE_SNAPSHOT_T
+		set
+		SNAPSHOT_STATE='6'
+		where
+		SNAPSHOT_ID=#snapshot_id# and VM_ID=#vmId#
+	</update>
+	<update id="updateSnapshotStateTo7" parameterClass="SnapshotBean">
+		update
+		COMP_CASE_SNAPSHOT_T
+		set
+		SNAPSHOT_STATE='7'
+		where
+		SNAPSHOT_ID=#snapshot_id# and VM_ID=#vmId#
+	</update>
+	<select id="querySnapshotById" parameterClass="SnapshotBean" resultClass="SnapshotBean">
+		select *
+		from COMP_CASE_SNAPSHOT_T
+		where SNAPSHOT_NAME=#snapshot_name# and VM_ID=#vmId#
+	</select>
+	<select id="querySnapshotByVMid" parameterClass="java.lang.String" resultClass="SnapshotBeanQry">
+		select   SNAPSHOT_ID,
+				 VM_ID,
+				 SNAPSHOT_NAME,
+				 SNAPSHOT_DESC,
+				 SNAPSHOT_TIME,
+				 SNAPSHOT_STATE
+		from     COMP_CASE_SNAPSHOT_T
+		where    VM_ID=#vmId# 
+	</select>
+	<select id="queryStatusBySnapIdOwner" parameterClass="java.util.Map"
+		resultClass="diskDetail">
+		SELECT
+		SNAPSHOT_ID,
+		SNAPSHOT_STATE,
+		SNAPSHOT_NAME,
+		SNAPSHOT_TIME
+		VM_ID
+		FROM
+		COMP_CASE_SNAPSHOT_T
+		<isNotEmpty prepend="where" property="snapshotIds">
+			<iterate property="snapshotIds" open="(" close=")" conjunction="OR">
+				SNAPSHOT_ID=#snapshotIds[]#
+			</iterate>
+		</isNotEmpty>
+	</select>
+	<update id="updateSnapshotStateTo3" parameterClass="SnapshotBean">
+	    update
+		COMP_CASE_SNAPSHOT_T
+		set
+		SNAPSHOT_STATE='3'
+		where
+		SNAPSHOT_ID=#snapshot_id# and VM_ID=#vmId#
+	</update>
+	<update id="updateVMSnapshotStatus" parameterClass="VMInstanceInfo">
+		update
+		COMP_CASE_VM_T
+		set
+		STATUS=#status# ,
+		UPDATE_TIME=#updateTime#,
+		UPDATE_USER=#updateUser#
+		where VM_ID=#vmId#
+	</update>
+</sqlMap>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="publicIp">
+	<typeAlias alias="PublicIp" type="com.neusoft.mid.cloong.identity.bean.PublicIpBean" />
+	<typeAlias alias="String" type="java.lang.String" />
+	 
+	  <select id="queryPublicIp" parameterClass="java.util.List" resultClass="PublicIp">
+					SELECT
+							ip,
+							network_ip as publicIp
+					 FROM
+					 		comp_ip_publicip_bind_t
+					  WHERE
+					     ip IN
+					     <iterate open="(" close=")" conjunction=",">    
+							            #privateIpList[]# 
+					   </iterate>  
+ 	  </select>
+ 	  
+</sqlMap>

@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="PMResultInfo">
+	
+	<typeAlias alias="PMResultInfo"
+		type="com.neusoft.mid.cloong.web.page.console.host.pm.info.PMResultInfo" />
+	<typeAlias alias="PmErrorInfo"
+		type="com.neusoft.mid.cloong.web.page.console.host.pm.info.PMDelFailErrorInfo" />	
+		
+	<select id="queryPmUserListAll" parameterClass="PMResultInfo"
+		resultClass="PMResultInfo">
+		SELECT
+		    comp_case_pm_t.case_id caseId,
+			comp_case_pm_t.pm_id pmId,
+			pm_name pmName,
+			comp_case_pm_t.STATUS STATUS,
+		    iso_id isoId,
+			os_name isoName,
+			ifnull(group_concat(ip),'') ipStr,
+			comp_case_pm_t.create_time createTime,
+			ifnull(comp_order_t.EFFECTIVE_TIME,'') effectiveTime,
+			comp_order_t.create_time orderCreateTime,
+			length_time lengthTime,
+			ifnull(comp_order_t.EXPIRE_TIME,'') overTime,
+		    app_name appName
+		FROM comp_case_pm_t
+		LEFT JOIN comp_order_t ON comp_case_pm_t.order_id = comp_order_t.order_id
+		LEFT JOIN comp_app_t ON comp_case_pm_t.APP_ID = comp_app_t.APP_ID
+		LEFT JOIN comp_case_pm_net_t ON comp_case_pm_t.CASE_ID = comp_case_pm_net_t.CASE_ID
+		LEFT JOIN comp_os_t os ON comp_case_pm_t.ISO_ID = os.OS_ID
+		WHERE comp_case_pm_t.STATUS != #pmStatus#
+		AND comp_order_t.order_id IS NOT NULL
+		AND comp_order_t. STATUS != '2'
+		<isNotEmpty prepend="and" property="pmName">
+			Lower(pm_name) like CONCAT('%',#pmName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="ip">
+			ip like CONCAT('%',#ip#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="isoName">
+			os_name like CONCAT('%',#isoName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="pmId">
+			comp_case_pm_t.pm_id = #pmId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="appIdList">
+			comp_case_pm_t.APP_ID in
+			<iterate property="appIdList" conjunction="," close=")" open="(">
+				#appIdList[]#
+			</iterate>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="appId">
+			comp_app_t.APP_ID =#appId#
+		</isNotEmpty>
+		GROUP BY comp_case_pm_t.case_id desc
+		order by comp_order_t.EFFECTIVE_TIME desc,pm_name
+	</select>
+	
+	<!-- 查询所有物理机个数 -->
+	<select id="countPmUserListAll" parameterClass="PMResultInfo"
+		resultClass="int">
+		SELECT
+			count(distinct comp_case_pm_t.case_id)
+		FROM comp_case_pm_t
+		LEFT JOIN comp_order_t ON comp_case_pm_t.order_id = comp_order_t.order_id
+		LEFT JOIN comp_app_t ON comp_case_pm_t.APP_ID = comp_app_t.APP_ID
+		LEFT JOIN comp_case_pm_net_t ON comp_case_pm_t.CASE_ID = comp_case_pm_net_t.CASE_ID
+		LEFT JOIN comp_os_t os ON comp_case_pm_t.ISO_ID = os.OS_ID
+		WHERE comp_case_pm_t.STATUS != #pmStatus#
+		AND comp_order_t.order_id IS NOT NULL
+		AND comp_order_t. STATUS != '2'
+		<isNotEmpty prepend="and" property="pmName">
+			Lower(pm_name) like CONCAT('%',#pmName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="ip">
+			ip like CONCAT('%',#ip#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="isoName">
+			os_name like CONCAT('%',#isoName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="pmId">
+			comp_case_pm_t.pm_id = #pmId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="appIdList">
+			comp_case_pm_t.APP_ID in
+			<iterate property="appIdList" conjunction="," close=")" open="(">
+				#appIdList[]#
+			</iterate>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="appId">
+			comp_app_t.APP_ID =#appId#
+		</isNotEmpty>
+	</select>
+	
+	<select id="queryPmUserListStatus" parameterClass="PMResultInfo"
+		resultClass="PMResultInfo">
+		SELECT
+		    comp_case_pm_t.case_id caseId,
+			comp_case_pm_t.pm_id pmId,
+			pm_name pmName,
+			comp_case_pm_t.STATUS STATUS,
+		    iso_id isoId,
+			os_name isoName,
+			comp_case_pm_t.create_time createTime,
+			ifnull(comp_order_t.EFFECTIVE_TIME,'') effectiveTime,
+			comp_order_t.create_time orderCreateTime,
+			length_time lengthTime,
+			ifnull(comp_order_t.EXPIRE_TIME,'') overTime,
+		    ifnull(group_concat(ip),'') ipStr,
+			app_name appName
+		FROM comp_case_pm_t
+		LEFT JOIN comp_order_t ON comp_case_pm_t.order_id = comp_order_t.order_id
+		LEFT JOIN comp_app_t ON comp_case_pm_t.APP_ID = comp_app_t.APP_ID
+		LEFT JOIN comp_case_vm_net_t ON comp_case_pm_t.CASE_ID = comp_case_vm_net_t.CASE_ID
+		LEFT JOIN comp_os_t os ON comp_case_pm_t.ISO_ID = os.OS_ID
+		WHERE comp_case_pm_t.STATUS != #pmStatus#
+		AND comp_order_t.order_id IS NOT NULL
+		<!--  AND comp_case_pm_t.STATUS = #queryStatus#-->
+		<isNotEmpty prepend="and" property="pmName">
+			Lower(pm_name) like CONCAT('%',#pmName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="ip">
+			ip like CONCAT('%',#ip#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="isoName">
+			os_name like CONCAT('%',#isoName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="pmId">
+			comp_case_pm_t.pm_id = #pmId#
+		</isNotEmpty>
+		<isNotNull property="statusList" prepend="and">
+			comp_case_pm_t.status in
+			<iterate property="statusList" conjunction="," close=")" open="(">
+				#statusList[]#
+			</iterate>
+		</isNotNull>
+		<isNull property="statusList" prepend="and">
+			comp_case_pm_t.status is null
+		</isNull>
+		<isNotEmpty prepend="and" property="appIdList">
+			comp_case_pm_t.APP_ID in
+			<iterate property="appIdList" conjunction="," close=")" open="(">
+				#appIdList[]#
+			</iterate>
+		</isNotEmpty>
+		GROUP BY comp_case_pm_t.case_id desc
+		order by comp_order_t.EFFECTIVE_TIME desc,pm_name
+	</select>
+	
+	<select id="countPmUserListStatus" parameterClass="PMResultInfo"
+		resultClass="PMResultInfo">
+		SELECT
+			count(distinct comp_case_pm_t.case_id)
+		FROM comp_case_pm_t
+		LEFT JOIN comp_order_t ON comp_case_pm_t.order_id = comp_order_t.order_id
+		LEFT JOIN comp_app_t ON comp_case_pm_t.APP_ID = comp_app_t.APP_ID
+		LEFT JOIN comp_case_vm_net_t ON comp_case_pm_t.CASE_ID = comp_case_vm_net_t.CASE_ID
+		LEFT JOIN comp_os_t os ON comp_case_pm_t.ISO_ID = os.OS_ID
+		WHERE comp_case_pm_t.STATUS != #pmStatus#
+		AND comp_order_t.order_id IS NOT NULL
+		<!--  AND comp_case_pm_t.STATUS = #queryStatus#-->
+		<isNotEmpty prepend="and" property="pmName">
+			Lower(pm_name) like CONCAT('%',#pmName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="ip">
+			ip like CONCAT('%',#ip#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="isoName">
+			os_name like CONCAT('%',#isoName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="pmId">
+			comp_case_pm_t.pm_id = #pmId#
+		</isNotEmpty>
+		<isNotNull property="statusList" prepend="and">
+			comp_case_pm_t.status in
+			<iterate property="statusList" conjunction="," close=")" open="(">
+				#statusList[]#
+			</iterate>
+		</isNotNull>
+		<isNull property="statusList" prepend="and">
+			comp_case_pm_t.status is null
+		</isNull>
+		<isNotEmpty prepend="and" property="appIdList">
+			comp_case_pm_t.APP_ID in
+			<iterate property="appIdList" conjunction="," close=")" open="(">
+				#appIdList[]#
+			</iterate>
+		</isNotEmpty>
+	</select>
+	
+	<select id="queryResPoolByPmId" parameterClass="java.lang.String"
+		resultClass="PMResultInfo">
+		SELECT
+			pm_id pmId,
+			comp_case_pm_t.res_pool_id resPoolId,
+			res_pool_part_id resPoolPartId,
+			comp_case_pm_t.STATUS STATUS,
+			comp_order_t.EFFECTIVE_TIME effectiveTime,
+			length_time lengthTime,
+			comp_order_t.EXPIRE_TIME overTime
+		FROM
+			comp_case_pm_t
+		LEFT JOIN comp_order_t ON comp_case_pm_t.order_id = comp_order_t.order_id
+		WHERE
+			PM_ID = #pmId#
+		and comp_case_pm_t.STATUS!='3'
+	</select>
+	
+	<select id="queryStatusByPmIdOwner" parameterClass="java.util.Map"
+		resultClass="PMResultInfo">
+		SELECT pm_id pmId,
+		comp_case_pm_t.status status,
+		OWN_USER owner,
+		comp_order_t.EFFECTIVE_TIME effectiveTime,
+		length_time lengthTime,
+		comp_order_t.EXPIRE_TIME overTime
+		FROM comp_case_pm_t LEFT JOIN comp_order_t ON
+		comp_case_pm_t.order_id=comp_order_t.order_id 
+		WHERE OWN_USER=#ownUser#
+		<isNotEmpty prepend="and" property="pmIds">
+			<iterate property="pmIds" open="(" close=")" conjunction="OR">
+				PM_ID=#pmIds[]#
+			</iterate>
+		</isNotEmpty>
+	</select>
+	
+	<insert id="insertPmDelFailErrorInfo" parameterClass="PmErrorInfo">
+		insert
+		into COMP_PM_DEL_FAIL_T
+		values(#pmId#,#failCause#,#failCode#,#resourcePoolId#,#resourcePoolPartId#,#createTime#,#serialNum#)
+	</insert>
+</sqlMap>

@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+    
+<sqlMap namespace="historyPerformance">
+
+	<typeAlias alias="historyPerformanceInfo" type="com.neusoft.mid.cloong.web.page.report.historyPerformance.info.HistoryPerformanceInfo"/>
+
+    <sql id="whereBody">
+		FROM   COMP_STA_DEVICE_APP_DAY_T T
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="deviceType">
+				T.DEVICE_TYPE = #deviceType#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="appId">
+				T.APP_ID = #appId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ T.REPORT_DATE >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ T.REPORT_DATE <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+		ORDER BY T.REPORT_DATE
+	</sql>
+	
+	<!-- 取得CPU使用率统计数据-对应折线图 -->
+	<select id="getCpuHistoryPerformance" parameterClass="historyPerformanceInfo" resultClass="historyPerformanceInfo">
+		SELECT DATE_FORMAT(T.REPORT_DATE,'%Y-%m-%d') AS reportDate,
+		       T.CPU_AVE AS cpuAve,
+		       T.CPU_MAX AS cpuMax,
+		       T.CPU_MAX_ID AS cpuMaxId,
+		       T.CPU_MIN AS cpuMin,
+		       T.CPU_MIN_ID AS cpuMinId
+		<include refid="whereBody"/>
+	</select>
+
+    <!-- 取得CPU使用率超标设备统计数据-对应柱状图 -->
+	<select id="getCpuHistoryPerformanceOver" parameterClass="historyPerformanceInfo" resultClass="historyPerformanceInfo">
+		SELECT DATE_FORMAT(T.REPORT_DATE,'%Y-%m-%d') AS reportDate,
+		       T.DEVICE_NUM AS deviceNum,
+		       T.CPU_OVER_NUM AS cpuOverNum,
+		       T.CPU_OVER_AVE AS cpuOverAve,
+		       T.CPU_NOT_OVER_NUM AS cpuNotOverNum,
+		       T.CPU_NOT_OVER_AVE AS cpuNotOverAve
+		<include refid="whereBody"/>
+	</select>
+	
+	<!-- 取得CPU使用率导出数据 -->
+	<select id="getCpuHistory" parameterClass="historyPerformanceInfo" resultClass="historyPerformanceInfo">
+		SELECT DATE_FORMAT(T.REPORT_DATE,'%Y-%m-%d') AS reportDate,
+		       T.CPU_AVE AS cpuAve,
+		       T.CPU_MAX AS cpuMax,
+		       T.CPU_MAX_ID AS cpuMaxId,
+		       T.CPU_MIN AS cpuMin,
+		       T.CPU_MIN_ID AS cpuMinId,
+		       T.DEVICE_NUM AS deviceNum,
+		       T.CPU_OVER_NUM AS cpuOverNum,
+		       T.CPU_OVER_AVE AS cpuOverAve,
+		       T.CPU_NOT_OVER_NUM AS cpuNotOverNum,
+		       T.CPU_NOT_OVER_AVE AS cpuNotOverAve
+		<include refid="whereBody"/>
+	</select>
+	
+	<!-- 取得内存使用率统计数据-对应折线图 -->
+	<select id="getMemHistoryPerformance" parameterClass="historyPerformanceInfo" resultClass="historyPerformanceInfo">
+		SELECT DATE_FORMAT(T.REPORT_DATE,'%Y-%m-%d') AS reportDate,
+		       T.MEM_AVE AS memAve,
+		       T.MEM_MAX AS memMax,
+		       T.MEM_MAX_ID AS memMaxId,
+		       FORMAT(T.MEM_MAX_FREE / (1024 * 1024), 2) AS memMaxFree,
+		       T.MEM_MIN AS memMin,
+		       T.MEM_MIN_ID AS memMinId,
+		       FORMAT(T.MEM_MIN_FREE / (1024 * 1024), 2) AS memMinFree
+		<include refid="whereBody"/>
+	</select>
+
+    <!-- 取得内存使用率超标设备统计数据-对应柱状图 -->
+	<select id="getMemHistoryPerformanceOver" parameterClass="historyPerformanceInfo" resultClass="historyPerformanceInfo">
+		SELECT DATE_FORMAT(T.REPORT_DATE,'%Y-%m-%d') AS reportDate,
+		       T.DEVICE_NUM AS deviceNum,
+		       T.MEM_OVER_NUM AS memOverNum,
+		       T.MEM_OVER_AVE AS memOverAve,
+		       FORMAT(T.MEM_OVER_FREE_AVE / (1024 * 1024), 2) AS memOverFreeAve,
+		       T.MEM_NOT_OVER_NUM AS memNotOverNum,
+		       T.MEM_NOT_OVER_AVE AS memNotOverAve,
+		       FORMAT(T.MEM_NOT_OVER_FREE_AVE / (1024 * 1024), 2) AS memNotOverFreeAve
+		<include refid="whereBody"/>
+	</select>
+	
+	<!-- 取得内存使用率导出数据 -->
+	<select id="getMemHistory" parameterClass="historyPerformanceInfo" resultClass="historyPerformanceInfo">
+		SELECT DATE_FORMAT(T.REPORT_DATE,'%Y-%m-%d') AS reportDate,
+		       T.MEM_AVE AS memAve,
+		       T.MEM_MAX AS memMax,
+		       T.MEM_MAX_ID AS memMaxId,
+		       FORMAT(T.MEM_MAX_FREE / (1024 * 1024), 2) AS memMaxFree,
+		       T.MEM_MIN AS memMin,
+		       T.MEM_MIN_ID AS memMinId,
+		       FORMAT(T.MEM_MIN_FREE / (1024 * 1024), 2) AS memMinFree,
+		       T.DEVICE_NUM AS deviceNum,
+		       T.MEM_OVER_NUM AS memOverNum,
+		       T.MEM_OVER_AVE AS memOverAve,
+		       FORMAT(T.MEM_OVER_FREE_AVE / (1024 * 1024), 2) AS memOverFreeAve,
+		       T.MEM_NOT_OVER_NUM AS memNotOverNum,
+		       T.MEM_NOT_OVER_AVE AS memNotOverAve,
+		       FORMAT(T.MEM_NOT_OVER_FREE_AVE / (1024 * 1024), 2) AS memNotOverFreeAve
+		<include refid="whereBody"/>
+	</select>
+	
+	<!-- 取得磁盘使用率统计数据-对应折线图 -->
+	<select id="getDiskHistoryPerformance" parameterClass="historyPerformanceInfo" resultClass="historyPerformanceInfo">
+		SELECT DATE_FORMAT(T.REPORT_DATE,'%Y-%m-%d') AS reportDate,
+		       T.DISK_AVE AS diskAve,
+		       T.DISK_MAX AS diskMax,
+		       T.DISK_MAX_ID AS diskMaxId,
+		       T.DISK_MIN AS diskMin,
+		       T.DISK_MIN_ID AS diskMinId
+		<include refid="whereBody"/>
+	</select>
+
+    <!-- 取得磁盘使用率超标设备统计数据-对应柱状图 -->
+	<select id="getDiskHistoryPerformanceOver" parameterClass="historyPerformanceInfo" resultClass="historyPerformanceInfo">
+		SELECT DATE_FORMAT(T.REPORT_DATE,'%Y-%m-%d') AS reportDate,
+		       T.DEVICE_NUM AS deviceNum,
+		       T.DISK_RANGEl_NUM AS diskRange1Num,
+		       T.DISK_RANGE2_NUM AS diskRange2Num,
+		       T.DISK_RANGE3_NUM AS diskRange3Num
+		<include refid="whereBody"/>
+	</select>
+	
+	<!-- 取得磁盘使用率导出数据 -->
+	<select id="getDiskHistory" parameterClass="historyPerformanceInfo" resultClass="historyPerformanceInfo">
+		SELECT DATE_FORMAT(T.REPORT_DATE,'%Y-%m-%d') AS reportDate,
+		       T.DISK_AVE AS diskAve,
+		       T.DISK_MAX AS diskMax,
+		       T.DISK_MAX_ID AS diskMaxId,
+		       T.DISK_MIN AS diskMin,
+		       T.DISK_MIN_ID AS diskMinId,
+		       T.DEVICE_NUM AS deviceNum,
+		       T.DISK_RANGEl_NUM AS diskRange1Num,
+		       T.DISK_RANGE2_NUM AS diskRange2Num,
+		       T.DISK_RANGE3_NUM AS diskRange3Num
+		<include refid="whereBody"/>
+	</select>
+	
+	<!-- 取得CPU、内存、磁盘的使用率统计和内存超标设备统计列表的总数 -->
+	<select id="getHistoryPerformanceCount"  parameterClass="historyPerformanceInfo" resultClass="java.lang.Integer">
+		SELECT COUNT(*)
+		<include refid="whereBody"/>
+	</select>
+	
+	<!-- 取得业务列表 -->
+	<select id="getAppList" resultClass="historyPerformanceInfo">
+		SELECT  APP_ID AS appId,
+		        APP_NAME AS appName
+		FROM    COMP_APP_T
+	</select>
+
+</sqlMap>

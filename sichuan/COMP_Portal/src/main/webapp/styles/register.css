@@ -1,0 +1,255 @@
+@charset "utf-8";
+/* CSS Document */
+* {
+	margin: 0;
+	padding: 0;
+}
+body, input, textarea, button {
+	font: 12px/18px "\5FAE\8F6F\96C5\9ED1", Helvetica, Arial, Verdana, "\5B8B\4F53";
+	color: #555555;
+	word-wrap: break-word;
+	background:#f2f4f6;
+}
+body{
+	background: url(../images/head_bg.png) repeat-x #FFFFFF;
+}
+table {
+	border-collapse: collapse;
+}
+span {
+	vertical-align: baseline;
+}
+ol, ul, menu {
+	list-style: none;
+}
+h1, h2, h3, h4, h5, h6 {
+	font-size: 14px;
+	font-weight: bold;
+}
+dt {
+	font-weight: bold;
+}
+em {
+	font-style: normal;
+}
+a {
+	color: #0066cc;
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: underline;
+}
+img {
+	border: none;
+}
+/* 注册 */
+
+/* 头整体样式 */
+.register-head{
+	width:1000px;
+	margin:0 auto;
+	height:110px;
+}
+/* logo样式 */
+.register-head-logo{
+	margin:20px 0 0 25px;
+	background-image:url(../images/ico_logo.png);
+	height:51px;
+	width:200px;
+	float:left;
+}
+/* 头右浮动按钮 */
+.register-head-r{
+	margin-top:40px;
+	float:right;
+}
+/* 内容显示区域 */
+.register-info{
+	width:1000px;
+	margin:0 auto;
+	clear:both;
+}
+h1{
+	font-size:22px;
+	color:#222222;
+}
+/*详情内容*/
+.register-con{
+	border:1px solid #d6d7d9;
+	clear:both;
+	background:#f9fafb;
+}
+/*底边*/
+.register-time{
+	clear:both;
+	height:5px;
+	margin-top:20px;
+	border-top:1px solid #d7d9da;
+	background:#f0f3f5;
+}
+/*详细信息标题*/
+.register-title{
+	padding:0 20px;
+	height:59px;
+	line-height:59px;
+	padding-bottom:4px;
+	background:url(../images/detail_title_bg.png) repeat-x #f1f4f6;
+}
+
+.register-line{
+	border:1px solid #dfdfdf;
+	border-bottom:0;
+	color:#dfdfdf;
+	height:1px;
+	width:100%;
+	clear:both;
+	margin: 15px 0 20px 0;
+}
+.register-detail-info{
+	padding:0 29px;
+}
+
+.register-detail{
+	float:left;
+	width:100%;
+	margin: 5px 0;
+}
+.register-detail span{
+	float:left;
+	display:block;
+	width:80px;
+}
+.register-detail input{
+	float:left;
+	width:200px;
+}
+.register-detail-state{
+	clear:both;
+	width:310px;
+	margin-left:80px;
+	padding:5px 0;
+}
+.register-success{
+	background: url(../images/ico_opt_select.png) no-repeat;
+	height: 18px;
+    margin:2px 0 0 10px;
+	padding-left:20px;
+}
+.register-error{
+	background: url(../images/ico_error.png) no-repeat;
+	height:18px;
+    margin:2px 0 0 10px;
+	padding-left:20px;
+	color:#F00;
+}
+.register-head-btn{
+	float:left;
+	padding:20px 0 0 20px;
+}
+.register-head-btn li{
+	line-height:29px;
+	width:200px;
+	float:left;
+	background:url(../images/register_btn_bg.png) no-repeat;
+	margin-right: 25px;
+}
+.register-head-btn span{
+	float:left;
+	line-height:29px;
+	margin-left:25px;
+	font-size:12px;
+	font-weight:bold;
+	color:#333;
+}
+.register-head-btn span.head{
+	font-size:16px;
+	font-weight:normal;
+}
+.register-head-btn li.selected{
+	background:url(../images/register_btn_se_bg.png) no-repeat;
+}
+.register-head-btn li.selected span{
+	color:#FFF;
+}
+.register-detail .achieve-btn{
+	padding-bottom: 0px;
+	padding-left: 18px;
+}
+.register-detail .achieve-btn li{
+	border:none;
+	line-height:18px;
+	width:100px;
+}
+.register-detail .achieve-btn a{
+	padding:0;
+	width:100px;
+}
+
+.register-btn{
+	float:left;
+	padding-left: 20px;
+	padding-bottom: 20px;
+}
+.register-btn li{
+	line-height:20px;
+	float:left;
+	background-color:#3cb4f0;
+	border:1px solid #349dd2;
+	color:#FFF;
+	/*圆角*/
+	-moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius:3px;
+	margin-right: 15px;
+	width:100px;
+}
+.register-btn a{
+	display:block;
+	width:100px;
+	color:#FFF;
+	line-height:20px;
+	padding: 3px 0;
+	text-align:center;
+	text-decoration:none;
+}
+.fr{
+	float:right;
+}
+.register-message{
+	margin: 0 auto;
+	padding-top:80px;
+	width:200px;
+}
+.register-frame{
+	border:1px solid #dfdfdf;
+	margin:20px 0;
+}
+.register-main-info{
+	height:246px;
+	margin: 20px;
+}
+.verify-number{
+	margin-left: 20px;
+	text-align:center;
+	border:1px solid #999;
+	height:18px;
+	display:block;
+	/*圆角*/
+	-moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius:3px;
+}
+.register-detail .input-number{
+	width:80px;
+}
+.register-margin{
+	margin:50px 110px 0 150px;
+}
+/* 等待下次发送背景颜色 */
+.register-detail .achieve-btn-de{
+	background:#CCC;
+	/*圆角*/
+	-moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius:3px;
+}

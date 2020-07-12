@@ -1,0 +1,6 @@
+COMP_PORTAL部署说明
+1 配置连接资源池代理系统的URL
+	打开：工程目录/WEB-INF/classes/comm_conf/other/Properties.properties文件，修改resourcePoolProxyUrl和resourcePoolProxyOperatorUrl。
+2 配置log4j日志文件生成目录
+          设置tomcat环境变量comp_portal_log，让其指向指定的日志目录
+    

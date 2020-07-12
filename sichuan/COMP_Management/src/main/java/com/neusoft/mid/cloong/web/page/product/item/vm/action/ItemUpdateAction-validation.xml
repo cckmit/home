@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE validators PUBLIC 
+  		"-//Apache Struts//XWork Validator 1.0.2//EN"
+  		"http://struts.apache.org/dtds/xwork-validator-1.0.2.dtd">
+<validators>
+	<field name="itemId">
+		<field-validator type="requiredstring">
+			<param name="trim">true</param>
+            <message>条目不存在，请返回条目列表重新选择</message>  
+        </field-validator>
+    </field>
+	<field name="itemName">
+		<field-validator type="requiredstring">
+			<param name="trim">true</param>
+            <message>条目名称不能为空，请重新输入</message>  
+        </field-validator>
+		<field-validator type="stringlength">
+			<param name="maxLength">20</param>
+			<message>条目名称最大长度为20</message>
+		</field-validator>
+	</field>
+	<field name="catalogId">
+		<field-validator type="requiredstring">  
+			<param name="trim">true</param>
+            <message>条目分类不能为空，请重新输入</message>  
+        </field-validator> 
+	</field>
+	<field name="description">
+		<field-validator type="stringlength">
+			<param name="maxLength">100</param>
+			<message>条目描述最大长度为100</message>
+		</field-validator>
+	</field>
+	<field name="standardId">
+		<field-validator type="requiredstring">
+			<param name="trim">true</param>
+            <message>关联资源规格不能为空，请重新输入</message>  
+        </field-validator>
+	</field>
+</validators>

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:cxf="http://cxf.apache.org/core" xmlns:jaxws="http://cxf.apache.org/jaxws"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context-2.5.xsd
+http://cxf.apache.org/core
+http://cxf.apache.org/schemas/core.xsd
+http://cxf.apache.org/jaxws
+http://cxf.apache.org/schemas/jaxws.xsd">
+
+	<import resource="classpath:META-INF/cxf/cxf.xml" />
+	<import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" />
+	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
+	<!-- 模板状态上报接口 -->
+	<jaxws:endpoint id="reportService" implementor="#privateCloudPortTypeImpl"
+		address="/reportService">
+		<jaxws:inInterceptors>
+			<bean class="org.apache.cxf.interceptor.LoggingInInterceptor" />
+		</jaxws:inInterceptors>
+		<jaxws:outInterceptors>
+			<bean class="org.apache.cxf.interceptor.LoggingOutInterceptor" />
+		</jaxws:outInterceptors>
+	</jaxws:endpoint>
+	<bean id="privateCloudPortTypeImpl"
+		class="com.neusoft.mid.cloong.resourcePool.webservice.privateCloud.serverPort.TemplateStatusServicePortImpl">
+		<property name="reportTemplateJob" ref="reportTemplateJob" />
+	</bean>
+
+
+	<!-- 私有云资源状态(性能、告警等)上报接口 -->
+	<jaxws:endpoint id="cycReportResService"
+		implementor="#cmccPrivateResourceReportNofifyServicePort" address="/cycReportResService">
+		<jaxws:inInterceptors>
+			<bean class="org.apache.cxf.interceptor.LoggingInInterceptor" />
+		</jaxws:inInterceptors>
+		<jaxws:outInterceptors>
+			<bean class="org.apache.cxf.interceptor.LoggingOutInterceptor" />
+		</jaxws:outInterceptors>
+	</jaxws:endpoint>
+	<bean id="cmccPrivateResourceReportNofifyServicePort"
+		class="com.neusoft.mid.cloong.resourcePool.webservice.privateCloud.serverPort.ResourceStatusNotifyServicePortImpl">
+		<property name="resStatCountJob" ref="resStatCountJob"></property>
+		<property name="resStatusJob" ref="resStatusJob"></property>
+	</bean>
+
+	<!-- 资源池容量上报 add by liunan 2015 01-09 -->
+	<jaxws:endpoint id="reportResourceStateService"
+		implementor="#publicCloudReportResourceImpl" address="/reportResourceStateService">
+		<jaxws:inInterceptors>
+			<bean class="com.neusoft.mid.cloong.ServiceReadReqInteceptor" />
+			<bean class="org.apache.cxf.interceptor.LoggingInInterceptor" />
+		</jaxws:inInterceptors>
+		<jaxws:outInterceptors>
+			<bean class="com.neusoft.mid.cloong.ServiceWriteRespInteceptor" />
+			<bean class="org.apache.cxf.interceptor.LoggingOutInterceptor" />
+		</jaxws:outInterceptors>
+	</jaxws:endpoint>
+	<bean id="publicCloudReportResourceImpl"
+		class="com.neusoft.mid.cloong.resourcePool.webservice.publicCloud.serverPort.publicCloudReportResourceImpl">
+		<property name="reportResourceStateContrl">
+			<ref bean="reportResourceStateContrl" />
+		</property>
+		<property name="authorization">
+			<ref bean="authorization" />
+		</property>
+	</bean>
+
+	<!-- 配置型数据增量上报接口 -->
+	<jaxws:endpoint id="reportConfigurationService"
+		implementor="#reportConfigurationServiceBean" address="/reportConfigurationService">
+		<jaxws:inInterceptors>
+			<bean class="com.neusoft.mid.cloong.ServiceReadReqInteceptor" />
+			<bean class="org.apache.cxf.interceptor.LoggingInInterceptor" />
+		</jaxws:inInterceptors>
+		<jaxws:outInterceptors>
+			<bean class="com.neusoft.mid.cloong.ServiceWriteRespInteceptor" />
+			<bean class="org.apache.cxf.interceptor.LoggingOutInterceptor" />
+		</jaxws:outInterceptors>
+	</jaxws:endpoint>
+	<bean id="reportConfigurationServiceBean"
+		class="com.neusoft.mid.cloong.resourcePool.webservice.publicCloud.configuration.ResourceConfigurationImpl">
+		<property name="dao" ref="ibatisDAOProxy" />
+		<property name="resourceTypeMap">
+			<map>
+				<entry key="VM" value="${reportConfiguration.CIId.VM}" />
+				<entry key="PM" value="${reportConfiguration.CIId.PM}" />
+				<entry key="BS" value="${reportConfiguration.CIId.BS}" />
+				<entry key="MC" value="${reportConfiguration.CIId.MC}" />
+				<entry key="MCPART" value="${reportConfiguration.CIId.MCPART}" />
+				<entry key="RAID" value="${reportConfiguration.CIId.RAID}" />
+				<entry key="SW" value="${reportConfiguration.CIId.SW}" />
+				<entry key="SWIF" value="${reportConfiguration.CIId.SWIF}" />
+				<entry key="RT" value="${reportConfiguration.CIId.RT}" />
+				<entry key="RTIF" value="${reportConfiguration.CIId.RTIF}" />
+				<entry key="FW" value="${reportConfiguration.CIId.FW}" />
+			</map>
+		</property>
+	</bean>
+	
+	<!-- 对接4A接口  -->
+	<bean id="FourAIntegrateImpl" class="com.neusoft.mid.cloong.fourA.integrate.ws.impl.FourAIntegrateImpl" >
+		<property name="userService" ref="userService"></property>
+		<property name="roleId"><value>${roleId}</value></property>
+		<property name="appId"><value>${appId}</value></property>
+	</bean>
+	
+	<jaxws:endpoint id="FourAIntegrateWS"
+		implementor="#FourAIntegrateImpl"
+		address="/FourAIntegrateWS">
+		<jaxws:inInterceptors>
+			<bean class="com.neusoft.mid.cloong.fourA.integrate.ws.logging.interceptor.MyLoggingInInterceptor" />
+		</jaxws:inInterceptors>
+		<jaxws:outInterceptors>
+			<bean class="com.neusoft.mid.cloong.fourA.integrate.ws.logging.interceptor.MyLoggingOutInterceptor" />
+		</jaxws:outInterceptors>
+	</jaxws:endpoint>
+</beans>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="ItemTypeInfo">
+	<typeAlias alias="ItemTypeInfo"
+		type="com.neusoft.mid.cloong.web.page.product.item.vm.info.ItemTypeInfo" />
+	<select id="queryItemType" resultClass="ItemTypeInfo">
+		SELECT
+		catalog_id catalogId,
+		catalog_name catalogName
+		FROM
+		COMP_CATALOG_T
+		WHERE
+		catalog_type = #itemType#
+	</select>
+</sqlMap>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="RaidInfo">
+	<typeAlias alias="raidInfo" type="com.neusoft.mid.cloong.web.page.resourceManagement.info.RaidInfo" />
+	
+	<!-- 查询存储阵列列表 -->
+	<select id="queryRaidInfos" parameterClass="raidInfo" resultClass="raidInfo">
+		SELECT  P.RAID_ID raidId,
+				P.RAID_NAME raidName,
+				P.VENDOR_NAME vendorName,
+				P.SA_TYPE saType,
+				P.SA_IP saIp,
+				P.SA_CAPACITY saCapacity,
+				P.CACHE_CAPACITY cacheCapacity,
+				P.ASSET_STATE assetState,
+				P.ASSET_SLA_TYPE assetSlaType,
+				DATE_FORMAT(
+					P.UPDATE_TIME,
+					'%Y-%m-%d %H:%i:%s'
+				) updateTime
+		  FROM  COMP_RM_RAID_T P
+		  WHERE 1=1
+		<dynamic prepend="">
+			<isNotEmpty prepend="and" property="raidId">
+				upper(RAID_ID) like
+				upper(CONCAT('%',trim(#raidId#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="raidName">
+				upper(RAID_NAME) like
+				upper(CONCAT('%',trim(#raidName#),'%'))
+			</isNotEmpty>
+		</dynamic>
+		ORDER BY updateTime DESC
+	</select>
+	
+	<!-- 查询存储阵列列表 数目-->
+	<select id="countQueryRaid" parameterClass="raidInfo" resultClass="java.lang.Integer">
+		SELECT  count(*)
+		  FROM  COMP_RM_RAID_T P
+		  WHERE 1=1
+		<dynamic prepend="">
+			<isNotEmpty prepend="and" property="raidId">
+				upper(RAID_ID) like
+				upper(CONCAT('%',trim(#raidId#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="raidName">
+				upper(RAID_NAME) like
+				upper(CONCAT('%',trim(#raidName#),'%'))
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<!-- 查看存储阵列详情 -->
+	<select id="queryRaidInfo" parameterClass="raidInfo" resultClass="raidInfo">
+		SELECT  P.RAID_ID raidId,
+				P.RAID_NAME raidName,
+				P.VENDOR_NAME vendorName,
+				P.SA_TYPE saType,
+				P.SA_MICROCODE_VER saMicrocodeVer,
+				P.SA_CAPACITY saCapacity,
+				P.SA_IP saIp,
+				P.RELATED_EQP_ID relatedEqpId,
+				P.CACHE_CAPACITY cacheCapacity,
+				P.DISK_IDS diskIds,
+				P.DISK_SPECIFICATION diskSpecification,
+				P.HBA_IDS hbaIds,
+				R.RES_POOL_NAME resPoolName,
+				P.HBA_TYPES hbaTypes,
+				P.HBA_NUM hbaNum,
+				P.DISK_ADAPTOR_ID diskAdaptorId,
+				P.DISK_ADAPTOR_TYPE diskAdaptorType,
+				P.EQP_SERIALNUM eqpSerialnum,
+				P.ASSET_STATE assetState,
+				P.ASSET_SLA_TYPE assetSlaType,
+				DATE_FORMAT(
+					P.UPDATE_TIME,
+					'%Y-%m-%d %H:%i:%s'
+				) updateTime
+		 FROM  COMP_RM_RAID_T P
+		 LEFT JOIN COMP_RES_POOL_T R ON P.RES_POOL_ID = R.RES_POOL_ID
+		  <dynamic prepend="WHERE">
+			<isNotEmpty prepend="" property="raidId">
+				P.RAID_ID = #raidId#
+			</isNotEmpty>
+			<isEmpty prepend="" property="raidId">
+				1=1
+				ORDER BY updateTime DESC
+			</isEmpty>
+		  </dynamic>
+	</select>
+	
+</sqlMap>

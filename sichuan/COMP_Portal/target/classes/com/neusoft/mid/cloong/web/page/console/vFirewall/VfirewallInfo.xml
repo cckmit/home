@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="vFirewall">
+	<typeAlias alias="vfw"
+		type="com.neusoft.mid.cloong.web.page.console.vFirewall.info.VfirewallInfo" />
+	<typeAlias alias="vfwRule"
+		type="com.neusoft.mid.cloong.web.page.console.vFirewall.info.VfirewallRuleInfo" />
+	<typeAlias alias="vfwInstance"
+		type="com.neusoft.mid.cloong.web.page.vFirewall.order.info.VfwInstanceInfo" />
+	<typeAlias alias="OrderInfo"
+		type="com.neusoft.mid.cloong.web.page.host.vm.order.info.OrderInfo" />
+	<typeAlias alias="vfwCreateFail"
+		type="com.neusoft.mid.cloong.vfw.core.VFWCreateFail" />
+	<typeAlias alias="vfwDelFail" type="com.neusoft.mid.cloong.vfw.core.VFWDelFail" />
+	<typeAlias alias="vfwRulesDelFail"
+		type="com.neusoft.mid.cloong.vfw.core.VFWRulesDelFail" />
+	<typeAlias alias="vfwRulesCreateFail"
+		type="com.neusoft.mid.cloong.vfw.core.VFWRulesCreateFail" />
+
+
+	<!--虚拟防火墙 list -->
+	<select id="getVfwList" parameterClass="vfw" resultClass="vfw">
+		SELECT
+		t.CASE_ID AS caseId,
+		t.FW_ID AS fwId,
+		t.FW_NAME AS fwName,
+		t.`STATUS` AS
+		STATUS,
+		t.ORDER_ID AS orderId,
+		t.APP_ID AS appId,
+		app.APP_NAME AS
+		appName,
+		t.RES_POOL_ID AS resPoolId,
+		pool.RES_POOL_NAME
+		AS resPoolName,
+		t.RES_POOL_PART_ID AS resPoolPartId,
+		part.RES_POOL_PART_NAME AS
+		resPoolPartName,
+		t.DESCRIPTION AS
+		description,
+		t.CREATE_TIME AS
+		createTime,
+		t.CREATE_USER AS createUser,
+		t.UPDATE_TIME AS updateTime,
+		t.UPDATE_USER AS updateUser
+		FROM
+		`comp_case_fw_t` t
+		LEFT JOIN comp_app_t
+		app ON t.APP_ID = app.APP_ID
+		LEFT JOIN comp_res_pool_t pool ON
+		t.RES_POOL_ID = pool.RES_POOL_ID
+		LEFT
+		JOIN comp_res_pool_part_t part ON
+		t.RES_POOL_PART_ID =
+		part.RES_POOL_PART_ID WHERE t.`STATUS` not in
+		('4')
+		<isNotEmpty prepend="and" property="appIdList">
+			t.APP_ID in
+			<iterate property="appIdList" conjunction="," close=")" open="(">
+				#appIdList[]#
+			</iterate>
+		</isNotEmpty>
+		ORDER BY t.CASE_ID DESC
+	</select>
+
+	<!-- 虚拟防火墙数量 -->
+	<select id="getVfwListCount" parameterClass="vfw" resultClass="java.lang.Integer">
+		SELECT
+		count(*)
+		FROM
+		`comp_case_fw_t` t
+		LEFT JOIN comp_app_t app ON
+		t.APP_ID = app.APP_ID
+		LEFT JOIN comp_res_pool_t pool ON t.RES_POOL_ID =
+		pool.RES_POOL_ID
+		LEFT JOIN comp_res_pool_part_t part ON
+		t.RES_POOL_PART_ID =
+		part.RES_POOL_PART_ID WHERE t.`STATUS` not in
+		('4')
+		<isNotEmpty prepend="and" property="appIdList">
+			t.APP_ID in
+			<iterate property="appIdList" conjunction="," close=")" open="(">
+				#appIdList[]#
+			</iterate>
+		</isNotEmpty>
+	</select>
+
+
+	<!-- 创建虚拟防火墙实例 -->
+	<insert id="createVfwInstanceInfo" parameterClass="vfwInstance">
+		INSERT INTO
+		`comp_case_fw_t` (`CASE_ID`, `FW_ID`, `FW_NAME`,
+		`ORDER_ID`, `APP_ID`,
+		`RES_POOL_ID`, `RES_POOL_PART_ID`,
+		`CREATE_TIME`, `CREATE_USER`,
+		`STATUS`, `DESCRIPTION`, `UPDATE_TIME`,
+		`UPDATE_USER`) VALUES
+		(#caseId#, #fwId#, #fwName#, #orderId#, #appId#,
+		#resPoolId#,
+		#resPoolPartId#, #createTime#,
+		#createUser#, #status#,
+		#description#,
+		#updateTime#, #updateUser#);
+	</insert>
+
+	<!-- 创建虚拟防火墙订单 -->
+	<insert id="createVfwOrder" parameterClass="OrderInfo">
+		insert into
+		COMP_ORDER_T(ORDER_ID,
+		STATUS,
+		EFFECTIVE_TIME,
+		EXPIRE_TIME,
+		LENGTH_TIME,
+		LENGTH_UNIT,
+		CREATE_TIME,
+		CREATE_USER,
+		UPDATE_TIME,
+		UPDATE_USER,
+		CASE_TYPE,
+		PARENT_ID,
+		CASE_ID,
+		APP_ID,
+		RES_POOL_ID
+		)
+		values
+		(#orderId#,#status#,#effectiveTime#,#expireTime#,#lengthTime#,#lengthUnit#,#createTime#,#createUser#,#updateTime#,#updateUser#,#caseType#,#parentId#,#caseId#,#appId#,#resPoolId#)
+	</insert>
+
+
+	<select id="getVfwDetail" parameterClass="vfw" resultClass="vfw">
+		SELECT
+		t.CASE_ID AS caseId,
+		t.FW_ID AS fwId,
+		t.FW_NAME AS fwName,
+		t.`STATUS` AS
+		STATUS,
+		t.ORDER_ID AS orderId,
+		t.APP_ID AS appId,
+		app.APP_NAME AS
+		appName,
+		t.RES_POOL_ID AS resPoolId,
+		pool.RES_POOL_NAME
+		AS resPoolName,
+		t.RES_POOL_PART_ID AS resPoolPartId,
+		part.RES_POOL_PART_NAME AS
+		resPoolPartName,
+		t.DESCRIPTION AS
+		description,
+		t.CREATE_TIME AS
+		createTime,
+		t.CREATE_USER AS createUser,
+		t.UPDATE_TIME AS updateTime,
+		t.UPDATE_USER AS updateUser
+		FROM
+		`comp_case_fw_t` t
+		LEFT JOIN comp_app_t
+		app ON t.APP_ID = app.APP_ID
+		LEFT JOIN comp_res_pool_t pool ON
+		t.RES_POOL_ID = pool.RES_POOL_ID
+		LEFT
+		JOIN comp_res_pool_part_t part ON
+		t.RES_POOL_PART_ID =
+		part.RES_POOL_PART_ID
+		WHERE t.CASE_ID=#caseId#
+	</select>
+
+	<select id="getVfwRuleByFwId" parameterClass="vfw" resultClass="vfwRule">
+		SELECT
+		FW_ID AS fwId,
+		FW_RULE_ID AS fwRuleId,
+		FW_RULE_NAME AS fwRuleName,
+		PROTOCOL AS protocol,
+		SOURCE_IP AS sourceIp,
+		SOURCE_PORT AS sourcePort,
+		DESTINATION_IP AS destinationIp,
+		DESTINATION_PORT AS destinationPort,
+		ACT_TYPE AS actType,
+		CREATE_TIME AS createTime,
+		CREATE_USER AS
+		createUser
+		FROM
+		comp_case_fw_rules_t WHERE FW_ID =#fwId#
+	</select>
+
+	<!-- 添加虚拟防火墙规则 -->
+	<insert id="addVfwRule" parameterClass="vfwRule">
+		INSERT INTO
+		`comp_case_fw_rules_t` (
+		`FW_ID`,
+		`FW_RULE_ID`,
+		`FW_RULE_NAME`,
+		`PROTOCOL`,
+		`SOURCE_IP`,
+		`SOURCE_PORT`,
+		`DESTINATION_IP`,
+		`DESTINATION_PORT`,
+		`ACT_TYPE`,
+		`CREATE_TIME`,
+		`CREATE_USER`
+		)
+		VALUES
+		(
+		#fwId#,
+		#fwRuleId#,
+		#fwRuleName#,
+		#protocol#,
+		#sourceIp#,
+		#sourcePort#,
+		#destinationIp#,
+		#destinationPort#,
+		#actType#,
+		#createTime#,
+		#createUser#
+		)
+	</insert>
+
+	<!-- 删除虚拟防火墙规则 -->
+	<delete id="delVfwRule" parameterClass="vfwRule">
+		DELETE FROM
+		comp_case_fw_rules_t WHERE FW_RULE_NAME=#fwRuleName# and
+		FW_ID=#fwId#
+	</delete>
+
+	<select id="getVfwDetailByFwId" resultClass="vfw"
+		parameterClass="java.lang.String">
+		SELECT
+		t.CASE_ID AS caseId,
+		t.FW_ID AS fwId,
+		t.FW_NAME AS
+		fwName,
+		t.`STATUS` AS
+		STATUS,
+		t.ORDER_ID AS orderId,
+		t.APP_ID AS appId,
+		app.APP_NAME AS
+		appName,
+		t.RES_POOL_ID AS resPoolId,
+		pool.RES_POOL_NAME
+		AS resPoolName,
+		t.RES_POOL_PART_ID AS resPoolPartId,
+		part.RES_POOL_PART_NAME AS
+		resPoolPartName,
+		t.DESCRIPTION AS
+		description,
+		t.CREATE_TIME AS
+		createTime,
+		t.CREATE_USER AS createUser,
+		t.UPDATE_TIME AS updateTime,
+		t.UPDATE_USER AS updateUser
+		FROM
+		`comp_case_fw_t` t
+		LEFT JOIN comp_app_t
+		app ON t.APP_ID = app.APP_ID
+		LEFT JOIN comp_res_pool_t pool ON
+		t.RES_POOL_ID = pool.RES_POOL_ID
+		LEFT
+		JOIN comp_res_pool_part_t part ON
+		t.RES_POOL_PART_ID =
+		part.RES_POOL_PART_ID
+		WHERE t.FW_ID=#fwId#
+	</select>
+
+	<update id="deleteVfw" parameterClass="java.lang.String">
+		update
+		comp_case_fw_t set
+		STATUS='4' where FW_ID=#virfwid#
+	</update>
+
+	<insert id="insertVFWCreateFail" parameterClass="vfwCreateFail">
+		INSERT INTO
+		`comp_fw_create_fail_t` (
+		`FAIL_CAUSE`,
+		`FAIL_CODE`,
+		`SERIAL_NUM`,
+		`RES_POOL_ID`,
+		`RES_POOL_PART_ID`,
+		`APP_ID`,
+		`FW_NAME`,
+		`CREATE_TIME`,
+		`NUM`
+		)
+		VALUES
+		(
+		#failCause#,
+		#failCode#,
+		#serialNum#,
+		#resPoolId#,
+		#resPoolPartId#,
+		#appId#,
+		#fwName#,
+		#createTime#,
+		#num#
+		)
+	</insert>
+
+	<insert id="insertVFWDelFail" parameterClass="vfwDelFail">
+		INSERT INTO
+		`comp_fw_del_fail_t` (
+		`FAIL_CAUSE`,
+		`FAIL_CODE`,
+		`SERIAL_NUM`,
+		`RES_POOL_ID`,
+		`RES_POOL_PART_ID`,
+		`APP_ID`,
+		`FW_ID`,
+		`CREATE_TIME`
+		)
+		VALUES
+		(
+		#failCause#,
+		#failCode#,
+		#serialNum#,
+		#resPoolId#,
+		#resPoolPartId#,
+		#appId#,
+		#fwId#,
+		#createTime#
+		)
+	</insert>
+
+	<insert id="insertVfwRulesDelFail" parameterClass="vfwRulesDelFail">
+		INSERT INTO
+		`comp_fw_rules_del_fail_t` (
+		`FAIL_CAUSE`,
+		`FAIL_CODE`,
+		`SERIAL_NUM`,
+		`RES_POOL_ID`,
+		`RES_POOL_PART_ID`,
+		`APP_ID`,
+		`FW_ID`,
+		`CREATE_TIME`
+		)
+		VALUES
+		(
+		#failCause#,
+		#failCode#,
+		#serialNum#,
+		#resPoolId#,
+		#resPoolPartId#,
+		#appId#,
+		#fwId#,
+		#createTime#
+		)
+	</insert>
+
+	<insert id="insertVfwRulesCreateFail" parameterClass="vfwRulesCreateFail">
+		INSERT INTO
+		`comp_fw_rules_create_fail_t` (
+		`FAIL_CAUSE`,
+		`FAIL_CODE`,
+		`SERIAL_NUM`,
+		`RES_POOL_ID`,
+		`RES_POOL_PART_ID`,
+		`APP_ID`,
+		`FW_ID`,
+		`CREATE_TIME`
+		)
+		VALUES
+		(
+		#failCause#,
+		#failCode#,
+		#serialNum#,
+		#resPoolId#,
+		#resPoolPartId#,
+		#appId#,
+		#fwId#,
+		#createTime#
+		)
+	</insert>
+</sqlMap>

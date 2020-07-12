@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="VmImageInfo">
+	<typeAlias alias="vmImage"
+		type="com.neusoft.mid.cloong.web.page.common.vm.image.VmImage" />
+	<typeAlias alias="String" type="java.lang.String" />
+
+	<select id="getVmImages" resultClass="vmImage">
+	SELECT OS_ID osId,
+			OS os,
+			OS_VER osVer, 
+			OS_TYPE osType, 
+			OS_NAME osName, 
+			DESCRIPTION osDesc
+	  FROM COMP_OS_T
+	  <dynamic prepend="where">
+		  	<isNotEmpty prepend="AND" property="osId">
+	                OS_ID = #osId# 
+	        </isNotEmpty>
+		  	<isNotEmpty prepend="AND" property="os">
+	                OS = #os# 
+	        </isNotEmpty>
+		  	<isNotEmpty prepend="AND" property="osVer">
+	                OS_VER = #osVer# 
+	        </isNotEmpty>
+		  	<isNotEmpty prepend="AND" property="osType">
+	                OS_TYPE = #osType# 
+	        </isNotEmpty>
+		  	<isNotEmpty prepend="AND" property="osName">
+	                OS_NAME = #osName# 
+	        </isNotEmpty>
+		  	<isNotEmpty prepend="AND" property="osDesc">
+	                DESCRIPTION = #osDesc# 
+	        </isNotEmpty>
+	  </dynamic>
+	</select>
+</sqlMap>

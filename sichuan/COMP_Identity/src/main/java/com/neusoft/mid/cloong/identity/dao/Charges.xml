@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="ChargesInfo">
+		<typeAlias alias="charges" type="com.neusoft.mid.cloong.identity.bean.ChargesInfo" />
+		<typeAlias alias="int" type="java.lang.Integer"/>
+		<typeAlias alias="string" type="java.lang.String"/>
+		
+		<!-- 列表展示 -->
+		<select id="queryAllCharges" parameterClass="charges" resultClass="charges">
+				SELECT
+						id ,
+						hour_price as hourPrice,
+						month_price as monthPrice,
+						cpu_number as cpuNumber,
+						memory_size as memorySize,
+						charges_type as chargesType,
+						create_time as createTime,
+						update_time as updateTime,
+						create_user as createUser
+					FROM
+						comp_charges_t
+					WHERE
+							charges_type=#chargesType#
+					<isNotEmpty prepend="and" property="cpuNumber">
+							cpu_number = #cpuNumber#
+					</isNotEmpty>
+					<isNotEmpty prepend="and" property="memorySize">
+						 memory_size =#memorySize#
+					</isNotEmpty>
+					<isNotEmpty prepend="and" property="hourPrice">
+							hour_price like CONCAT('%',#hourPrice#,'%')
+					</isNotEmpty>
+					<isNotEmpty prepend="and" property="monthPrice">
+							month_price like CONCAT('%',#monthPrice#,'%')
+					</isNotEmpty>
+					<isNotEmpty prepend="and" property="createTime">
+							<![CDATA[ create_time>=#createTime#  ]]>
+					</isNotEmpty>
+						<isNotEmpty prepend="and" property="endTime">
+							<![CDATA[ create_time<=#endTime#  ]]>
+					</isNotEmpty>
+					<isNotEmpty prepend="and" property="createUser">
+							create_user like CONCAT('%',#createUser#,'%')
+					</isNotEmpty>
+		</select>
+		<!-- 查询个数 用于分页 -->
+		<select id="queryCountCharges" parameterClass="charges" resultClass="int">
+				SELECT
+						COUNT(*)
+					FROM
+						comp_charges_t
+					WHERE
+							charges_type=#chargesType#
+					<isNotEmpty prepend="and" property="cpuNumber">
+							cpu_number = #cpuNumber#
+					</isNotEmpty>
+					<isNotEmpty prepend="and" property="memorySize">
+						 memory_size =#memorySize#
+					</isNotEmpty>
+					<isNotEmpty prepend="and" property="hourPrice">
+							hour_price like CONCAT('%',#hourPrice#,'%')
+					</isNotEmpty>
+					<isNotEmpty prepend="and" property="monthPrice">
+							month_price like CONCAT('%',#monthPrice#,'%')
+					</isNotEmpty>
+					<isNotEmpty prepend="and" property="createTime">
+							<![CDATA[ create_time>=#createTime#  ]]>
+					</isNotEmpty>
+						<isNotEmpty prepend="and" property="endTime">
+							<![CDATA[ create_time<=#endTime#  ]]>
+					</isNotEmpty>
+					<isNotEmpty prepend="and" property="createUser">
+							create_user like CONCAT('%',#createUser#,'%')
+					</isNotEmpty>
+		</select>
+		
+		<!-- 添加 -->
+		<insert id="insertCharges" parameterClass="charges">
+				INSERT INTO comp_charges_t (
+							hour_price,
+							month_price,
+							cpu_number,
+							memory_size,
+							charges_type,
+							create_time,
+							update_time,
+							create_user,
+							`desc`
+							)
+						VALUES
+						    ( #hourPrice#,
+						      #monthPrice#,
+						      #cpuNumber#,
+						      #memorySize#,
+						      #chargesType#,
+						      CURRENT_TIMESTAMP,
+						      CURRENT_TIMESTAMP,
+						      #createUser#,
+						      #desc#
+							)
+		</insert>
+		
+		<!-- 更新 -->
+		<update id="updateCharges" parameterClass="charges">
+					UPDATE    comp_charges_t
+					SET
+						hour_price =#hourPrice#,
+						month_price=#monthPrice#,
+						<isNotEmpty  property="cpuNumber">
+							cpu_number = #cpuNumber#,
+						</isNotEmpty>
+						<isNotEmpty  property="memorySize">
+							memory_size=#memorySize#,
+						</isNotEmpty>
+						charges_type= #chargesType#,
+						update_time = CURRENT_TIMESTAMP,
+						create_user= #createUser#,
+						`desc` = #desc#
+					WHERE
+							id = #id#
+		</update>
+		
+		<!-- 删除 -->
+		<delete id="delCharges" parameterClass="string">
+					DELETE FROM  comp_charges_t  WHERE id=#id#
+		</delete>
+		
+		<select id="findChargesById" parameterClass="charges" resultClass="charges">
+				SELECT
+						id ,
+						hour_price as hourPrice,
+						month_price as monthPrice,
+						cpu_number as cpuNumber,
+						memory_size as memorySize,
+						charges_type as chargesType,
+						create_time as createTime,
+						update_time as updateTime,
+						create_user as createUser,
+						`desc`
+					FROM
+						comp_charges_t
+					WHERE
+							id = #id#  
+		</select>
+		
+		<!-- 通过cpu和内存大小查询资费信息是否存在 -->
+		<select id="findChargesCount"  parameterClass="charges" resultClass="int">
+				SELECT
+					COUNT(*)
+				FROM
+					comp_charges_t
+				<dynamic prepend="WHERE">
+					<isNotEmpty prepend="And" property="id">
+						 <![CDATA[ id <> #id# ]]>
+					</isNotEmpty>
+					<isNotEmpty prepend="And" property="cpuNumber">
+							cpu_number =#cpuNumber#
+					</isNotEmpty>
+					<isNotEmpty prepend="And" property="memorySize">
+							memory_size =#memorySize#
+					</isNotEmpty>
+					<isNotEmpty prepend="And" property="chargesType">
+							charges_type= #chargesType#
+					</isNotEmpty>
+					<isEmpty property="cpuNumber">
+					<isNotEmpty prepend="And" property="hourPrice">
+							hour_price =#hourPrice#	
+					</isNotEmpty>
+					<isNotEmpty prepend="And" property="monthPrice">
+							month_price=#monthPrice#
+					</isNotEmpty>
+					</isEmpty>
+				</dynamic>
+		</select>
+		
+		<select id="findChargeInfo" parameterClass="charges" resultClass="charges">
+				SELECT
+						id ,
+						hour_price as hourPrice,
+						month_price as monthPrice,
+						cpu_number as cpuNumber,
+						memory_size as memorySize,
+						charges_type as chargesType,
+						create_time as createTime,
+						update_time as updateTime,
+						create_user as createUser
+					FROM
+						comp_charges_t
+					<dynamic prepend="WHERE">
+							<isNotEmpty prepend="And" property="cpuNumber">
+									cpu_number =#cpuNumber#
+							</isNotEmpty>
+							<isNotEmpty prepend="And" property="memorySize">
+									memory_size =#memorySize#
+							</isNotEmpty>
+							<isNotEmpty prepend="And" property="chargesType">
+									charges_type= #chargesType#
+							</isNotEmpty>
+					</dynamic>
+		</select>
+</sqlMap>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMapConfig 
+   PUBLIC "-//iBATIS.com//DTD SQL Map Config 2.0//EN" 
+   "http://www.ibatis.com/dtd/sql-map-config-2.dtd">
+<sqlMapConfig>
+	<settings cacheModelsEnabled="true" enhancementEnabled="true" lazyLoadingEnabled="true"
+		maxRequests="32" maxSessions="10" maxTransactions="5" useStatementNamespaces="false" />
+		
+	<typeHandler javaType="com.neusoft.mid.cloong.identity.bean.core.UserStatus"
+
+		callback="com.neusoft.mid.cloong.identity.bean.core.UserStatusHandler" />
+		
+	<typeHandler javaType="com.neusoft.mid.cloong.identity.bean.core.RoleStatus"
+
+		callback="com.neusoft.mid.cloong.identity.bean.core.RoleStatusHandler" />
+		
+	<sqlMap resource="com/neusoft/mid/cloong/host/vm/VMInfo.xml" />
+	<sqlMap resource="com/neusoft/mid/cloong/ebs/EBSInfo.xml" />
+	<sqlMap resource="com/neusoft/mid/cloong/ip/IPInfo.xml" />
+	<sqlMap resource="com/neusoft/mid/cloong/vlan/VlanInfo.xml" />
+	<sqlMap resource="com/neusoft/mid/cloong/host/vmbak/VmBakInfo.xml" />
+	<sqlMap resource="com/neusoft/mid/cloong/ResourcePoolInfo.xml" />
+	<sqlMap resource="com/neusoft/mid/cloong/order/info/Order.xml" />
+	<sqlMap resource="com/neusoft/mid/cloong/stardard/StandardInfo.xml" />
+	<sqlMap resource="com/neusoft/mid/cloong/generator/TemplateGenerator.xml" />
+	<sqlMap resource="com/neusoft/mid/cloong/common/StandardResPoolIdInfo.xml" />
+	<sqlMap resource="com/neusoft/mid/cloong/host/pm/PMInfo.xml" />
+	<sqlMap resource="com/neusoft/mid/cloong/resourcePool/businessOpt/resStat/notify/dao/PMResCount.xml" />
+	<sqlMap resource="com/neusoft/mid/cloong/resourcePool/businessOpt/resStat/notify/dao/VMResCount.xml" />
+	<sqlMap resource="com/neusoft/mid/cloong/resourcePool/businessOpt/resStat/notify/dao/EBSResCount.xml" />
+	<sqlMap resource="com/neusoft/mid/cloong/resourcePool/businessOpt/resStat/notify/dao/VMBAKResCount.xml" />
+	<sqlMap resource="com/neusoft/mid/cloong/resourcePool/businessOpt/resStat/notify/dao/BaseResCount.xml" />
+
+	<!-- report resource status interface -->
+	<sqlMap
+		resource="com/neusoft/mid/cloong/resourcePool/businessOpt/resStat/CycReportResStatus/dao/PMVm.xml" />
+	<sqlMap
+		resource="com/neusoft/mid/cloong/resourcePool/businessOpt/resStat/CycReportResStatus/dao/PMSrv.xml" />
+	<sqlMap
+		resource="com/neusoft/mid/cloong/resourcePool/businessOpt/resStat/CycReportResStatus/dao/PMMc.xml" />
+	<sqlMap
+		resource="com/neusoft/mid/cloong/resourcePool/businessOpt/resStat/CycReportResStatus/dao/PMMcp.xml" />
+	<sqlMap
+		resource="com/neusoft/mid/cloong/resourcePool/webservice/publicCloud/serverPort/ReportResourceState.xml" />
+
+	<sqlMap resource="com/neusoft/mid/cloong/resourcePool/webservice/publicCloud/configuration/ResourceConfiguration.xml" />
+	
+	<sqlMap
+		resource="com/neusoft/mid/cloong/resourcePool/businessOpt/resStat/CycReportResStatus/dao/PMRaid.xml" />
+	<sqlMap
+		resource="com/neusoft/mid/cloong/resourcePool/businessOpt/resStat/CycReportResStatus/dao/PMBs.xml" />
+	<sqlMap
+		resource="com/neusoft/mid/cloong/resourcePool/businessOpt/resStat/CycReportResStatus/dao/PMSwitch.xml" />
+	<sqlMap
+		resource="com/neusoft/mid/cloong/resourcePool/businessOpt/resStat/CycReportResStatus/dao/PMSwitchPort.xml" />
+		
+	<sqlMap
+		resource="com/neusoft/mid/cloong/resourcePool/businessOpt/resStat/CycReportResStatus/dao/PMFirewall.xml" />
+	<sqlMap
+		resource="com/neusoft/mid/cloong/resourcePool/businessOpt/resStat/CycReportResStatus/dao/PMRouter.xml" />
+		
+	<sqlMap resource="com/neusoft/mid/cloong/identity/dao/User.xml" />
+	
+</sqlMapConfig> 

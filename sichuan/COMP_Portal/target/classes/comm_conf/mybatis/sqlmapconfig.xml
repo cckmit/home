@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMapConfig 
+   PUBLIC "-//iBATIS.com//DTD SQL Map Config 2.0//EN" 
+   "http://www.ibatis.com/dtd/sql-map-config-2.dtd">
+<sqlMapConfig>
+	<settings cacheModelsEnabled="true" enhancementEnabled="true"
+		lazyLoadingEnabled="true" maxRequests="32" maxSessions="10"
+		maxTransactions="5" useStatementNamespaces="false" />
+	<typeHandler javaType="com.neusoft.mid.cloong.host.vm.core.VMStatus"
+		callback="com.neusoft.mid.cloong.host.vm.core.VMStatusHandler" />
+	<typeHandler javaType="com.neusoft.mid.cloong.host.pm.core.PMStatus"
+		callback="com.neusoft.mid.cloong.host.pm.core.PMStatusHandler" />
+	<typeHandler javaType="com.neusoft.mid.cloong.identity.bean.core.UserStatus"
+		callback="com.neusoft.mid.cloong.identity.bean.core.UserStatusHandler" />
+	<typeHandler javaType="com.neusoft.mid.cloong.vmbak.core.VmBakStatus"
+		callback="com.neusoft.mid.cloong.vmbak.core.VmBakStatusHandler" />
+	<sqlMap resource="com/neusoft/mid/cloong/identity/dao/Identity.xml" />
+	<sqlMap resource="com/neusoft/mid/cloong/identity/dao/User.xml" />
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/console/host/pm/PMInfo.xml" />
+	<sqlMap
+		resource="com/neusoft/mid/cloong/web/page/console/host/pm/PMResultInfo.xml" />
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/console/vmbak/VmBakInfo.xml" />
+	<sqlMap
+		resource="com/neusoft/mid/cloong/web/page/console/vmbak/VmBakResultInfo.xml" />
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/console/host/vm/VMInfo.xml" />
+	<sqlMap
+		resource="com/neusoft/mid/cloong/web/page/console/host/vm/VMResultInfo.xml" />
+	<sqlMap
+		resource="com/neusoft/mid/cloong/web/page/portal/product/host/hostInfo.xml" />
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/common/vm/image/imageInfo.xml" />
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/user/order/OrderInfo.xml" />
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/console/disk/DiskInfo.xml" />
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/ebs/order/EBSInfo.xml" />
+	<sqlMap
+		resource="com/neusoft/mid/cloong/web/page/portal/product/ebs/ProductEbsInfo.xml" />
+	<sqlMap resource="com/neusoft/mid/cloong/identity/dao/Register.xml" />
+	<sqlMap
+		resource="com/neusoft/mid/cloong/web/page/portal/product/vmbak/ProductVmbakInfo.xml" />
+	<sqlMap
+		resource="com/neusoft/mid/cloong/web/page/console/business/dao/BusinessViewInfo.xml" />
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/business/dao/BusinessInfo.xml" />
+
+	<sqlMap resource="com/neusoft/mid/cloong/web/app/action/App.xml" />
+
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/console/vlan/VlanInfo.xml" />
+	
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/console/vlan3Phase/VlanInfo3Phase.xml" />
+		
+	<sqlMap
+		resource="com/neusoft/mid/cloong/web/page/console/ipSegment/ipSegmentInfo.xml" />
+
+	<!-- 性能展示查询 -->
+	<sqlMap
+		resource="com/neusoft/mid/cloong/web/page/console/host/RealTimePerformance.xml" />
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/snapshots/Snapshot.xml" />
+
+	<!-- 资费展示 -->
+	<sqlMap resource="com/neusoft/mid/cloong/identity/dao/Charges.xml" />
+
+	<sqlMap
+		resource="com/neusoft/mid/cloong/web/page/console/vFirewall/VfirewallInfo.xml" />
+	<sqlMap
+		resource="com/neusoft/mid/cloong/web/page/console/fileStore/FileStoreInfo.xml" />
+	<sqlMap
+		resource="com/neusoft/mid/cloong/web/page/console/dataBackup/DataBackupInfo.xml" />
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/console/topo/TopoInfo.xml" />
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/console/ip/IpInfo.xml" />
+	
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/console/boss/order/BossOrderInfo.xml" />
+	
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/console/performance/PerformanceViewInfo.xml" />
+	
+	<!-- add by huxin -->
+	<sqlMap resource="com/neusoft/mid/cloong/web/alarm/AlarmInfo.xml" />
+	<sqlMap resource="com/neusoft/mid/cloong/mail/AlarmInfos.xml" />
+</sqlMapConfig>

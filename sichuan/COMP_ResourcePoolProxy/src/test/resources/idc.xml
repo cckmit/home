@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="idc">
+
+	<insert id="insertTheSinglePmRecordByData" parameterClass="java.util.HashMap">
+		replace 
+		into COMP_RM_PM_T 
+		(PM_ID,PM_NAME,PM_INSTANCE_ID,IP,NETMASK,CLUSTER_IP,SERVER_TYPE,CPU_NUM,CPU_TYPE,
+		CPU_FREQUENCY,NUC_NUM_PER_CPU,MEMORY_SIZE,MEMORY_NUM,DISK_SIZE,DISK_NUM,IF_NUM,
+		MAINBORD_NUM,POWERMODULE_NUM,FAN_NUM,VENDOR_NAME,RUN_TIME,CUR_STATUS,SERIALNUM,
+			APP_ID,
+		RES_POOL_ID,RES_POOL_PART_ID,OS_TYPE,ETHADA_NUM,ETHADA_TYPE,SCSIADA_NUM,HBA_NUM,
+		HBA_TYPE,USED_FLAG,HV_INFO,HVPOOL_ID,SWITCH_IF_RELATIONS,ASSET_ORIGIN_TYPE,
+		ASSET_STATE,ASSET_SLA_TYPE,MACHINEROOM_ID,CABINET_ID,CREATE_FLAG,UPDATE_TIME)
+		values 
+		(#eqp_id#,#eqp_name#,#instance_id#,#eqp_ip#,#eqp_netmask#,#cluster_ip#,#server_type#,
+		#cpu_num#,#cpu_type#,#cpu_frequency#,#nuc_num_per_cpu#,#memory_size#,#memory_num#,
+		#disk_size#,#disk_num#,#if_num#,#mainbord_num#,#powermodule_num#,#fan_num#,#vendor_name#,
+		#run_time#,#cur_status#,#eqp_serialnum#,
+		<isNotEmpty property="app_id">
+			#app_id#,
+		</isNotEmpty>
+		<isEmpty property="app_id">
+			(
+				select 
+					app_id
+				from
+					comp_rm_pm_t p 
+				where
+					p.PM_ID = #eqp_id#
+			),
+		</isEmpty>
+		#rc_id#,#zone_id#,#os_type#,#ethada_num#,
+		#ethada_type#,#scsiada_num#,#hba_num#,#hba_type#,#used_flag#,#hv_info#,#hvpool_id#,
+		#switch_if_relations#,#asset_origin_type#,#asset_state#,#asset_sla_type#,#Object_Zone_ID#,
+		#Object_Cluster_ID#,null,DATE_FORMAT(NOW(),'%Y%m%d%H%i%S'));
+	</insert>
+	
+	<insert id="insertTheSingleVmRecordByData" parameterClass="java.util.HashMap">
+	
+		replace
+		into comp_rm_vm_t
+		values
+		(#instance_id#,#eqp_name#,#eqp_id#,#vm_ip#,#vm_netmask#,#cluster_ip#,#cpu_num#,#cpu_frequency#,
+		#memory_size#,#disk_size#,#run_time#,#cur_status#,#app_id#,#rc_id#,#zone_id#,#v_ethada_num#,
+		#v_scsiada_num#,#v_fchba_num#,#os_type#,#vm_os#,#parent_id#,#CREAT_FLAG#,DATE_FORMAT(NOW(),'%Y%m%d%H%i%S'));
+	
+	</insert>
+	
+	<insert id="insertTheSingleEbsRecordByData" parameterClass="java.util.HashMap">
+	
+		replace
+		into comp_rm_ebs_t
+		values
+		(#instance_id#,#eqp_name#,#eqp_id#,#tier#,#vol_size#,#vol_status#,#app_id#,#rc_id#,
+		#parent_type#,#parent_id#,#CREAT_FLAG#,DATE_FORMAT(NOW(),'%Y%m%d%H%i%S'));
+	
+	</insert>
+	
+	<select id="getVmOwnership" parameterClass="java.lang.String" resultClass="java.lang.Integer">
+		SELECT
+			count(*)
+		FROM
+			`comp_case_vm_t` v
+		WHERE
+			v.VM_ID = #instance_id#;
+	</select>
+	
+	<select id="getEbsOwnership" parameterClass="java.lang.String" resultClass="java.lang.Integer">
+		SELECT
+			count(*)
+		FROM
+			`comp_case_ebs_t` v
+		WHERE
+			v.EBS_ID = #instance_id#;
+	</select>
+
+	<select id="validatePmInstance" parameterClass="java.lang.String" resultClass="java.lang.Integer">
+	
+		SELECT
+			count(*)
+		FROM
+			`comp_rm_pm_t` v
+		WHERE
+			v.PM_ID = #pm_id#;
+	
+	</select>
+	
+	<select id="validateVmInstance" parameterClass="java.lang.String" resultClass="java.lang.Integer">
+	
+		SELECT
+			count(*)
+		FROM
+			`comp_rm_vm_t` v
+		WHERE
+			v.VM_ID = #vm_id#;
+	
+	</select>
+	
+	<select id="validateEbsInstance" parameterClass="java.lang.String" resultClass="java.lang.Integer">
+	
+		SELECT
+			count(*)
+		FROM
+			`comp_rm_ebs_t` v
+		WHERE
+			v.EBS_ID = #EBS_ID#;
+	
+	</select>
+	
+	<delete id="deletePm" parameterClass="java.lang.String">
+		delete from comp_rm_pm_t
+		where
+			PM_ID = #pm_id#;
+	</delete>
+
+	<delete id="deleteVm" parameterClass="java.lang.String">
+		delete from comp_rm_vm_t
+		where
+			VM_ID = #vm_id#;
+	</delete>
+	
+	<delete id="deleteEbs" parameterClass="java.lang.String">
+		delete from comp_rm_ebs_t
+		where 
+			EBS_ID = #ebs_id#;
+	</delete>
+
+</sqlMap>

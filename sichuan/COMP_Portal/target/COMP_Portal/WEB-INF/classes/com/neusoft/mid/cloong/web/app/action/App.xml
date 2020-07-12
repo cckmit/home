@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="App">
+<typeAlias alias="app" type="com.neusoft.mid.cloong.web.app.info.App" />
+
+    <!-- 业务列表 -->
+    <select id="queryAppList" resultClass="app" parameterClass="app">
+        SELECT APP_ID appId,
+			   APP_NAME appName,
+			   description
+		  FROM COMP_APP_T
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="and" property="appName">
+				UPPER(APP_NAME) like UPPER(CONCAT('%',#appName#,'%'))
+			</isNotEmpty>
+		</dynamic>
+		ORDER BY CONVERT(appName USING gbk) 
+	</select>
+	
+	<!-- 业务列表数目 -->
+	<select id="countApp"  resultClass="java.lang.Integer" parameterClass="app">
+		SELECT COUNT(*)
+		  FROM COMP_APP_T 
+		<dynamic prepend="WHERE"> 
+			<isNotEmpty prepend="and" property="appName">
+				UPPER(APP_NAME) like UPPER(CONCAT('%',#appName#,'%'))
+			</isNotEmpty>
+		</dynamic>
+	</select>
+</sqlMap>

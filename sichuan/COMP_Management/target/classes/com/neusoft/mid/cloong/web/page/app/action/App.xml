@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="App">
+<typeAlias alias="app" type="com.neusoft.mid.cloong.web.page.app.info.App" />
+<typeAlias alias="userInfo" type="com.neusoft.mid.cloong.identity.bean.UserBean"/>
+
+	    <!-- 业务列表 -->
+	    <select id="queryAppList" resultClass="app" parameterClass="app">
+            SELECT app.APP_ID,
+				   APP_NAME,
+			app.RES_POOL_ID respoolId,
+			comp_res_pool_t.RES_POOL_NAME respoolName,
+				   app.DESCRIPTION,
+				   app.CREATE_FLAG,
+				   user.user_name APP_CONTACTS,
+				<!--    CONTACT_PHONE, -->
+				   app.CREATE_USER,
+				   date_format(app.CREATE_TIME, '%Y-%m-%d %T') CREATE_TIME,
+				   app.UPDATE_USER,
+				   date_format(app.UPDATE_TIME, '%Y-%m-%d %T') UPDATE_TIME
+			      FROM (comp_app_t app,comp_authority_user_app_t ua,comp_authority_user_t user)
+			LEFT JOIN comp_res_pool_t  ON comp_res_pool_t .RES_POOL_ID = app .RES_POOL_ID
+			      WHERE app.APP_ID = ua.APP_ID AND ua.APPBIND_STATUS='2' AND user.USER_ID = app.CREATE_USER
+				<isNotEmpty prepend="and" property="app_id_tmp">
+					UPPER(app.APP_ID) like UPPER(CONCAT('%',#app_id_tmp#,'%'))
+				</isNotEmpty>
+				<isNotEmpty prepend="and" property="app_name_tmp">
+					UPPER(APP_NAME) like UPPER(CONCAT('%',#app_name_tmp#,'%'))
+				</isNotEmpty>
+				<isNotEmpty prepend="and" property="startTime">
+					<![CDATA[  app.CREATE_TIME >= #startTime#  ]]>
+				</isNotEmpty>
+				<isNotEmpty prepend="and" property="endTime">
+					<![CDATA[  app.CREATE_TIME <= #endTime#  ]]>
+				</isNotEmpty>
+			GROUP BY app.APP_ID
+			ORDER BY app.CREATE_TIME DESC, app.UPDATE_TIME DESC
+		</select>
+		
+		<!-- 业务列表数目 -->
+		<select id="queryAppCount"  resultClass="java.lang.Integer" parameterClass="app">
+			SELECT COUNT(DISTINCT app.app_id)
+			FROM comp_app_t app,comp_authority_user_app_t ua,comp_authority_user_t user
+			WHERE app.APP_ID = ua.APP_ID AND ua.APPBIND_STATUS='2' AND user.USER_ID = app.CREATE_USER
+				<isNotEmpty prepend="and" property="app_id_tmp">
+					UPPER(app.APP_ID) like UPPER(CONCAT('%',#app_id_tmp#,'%'))
+				</isNotEmpty>
+				<isNotEmpty prepend="and" property="app_name_tmp">
+					UPPER(APP_NAME) like UPPER(CONCAT('%',#app_name_tmp#,'%'))
+				</isNotEmpty>
+				<isNotEmpty prepend="and" property="startTime">
+					<![CDATA[  app.CREATE_TIME >= #startTime#  ]]>
+				</isNotEmpty>
+				<isNotEmpty prepend="and" property="endTime">
+					<![CDATA[  app.CREATE_TIME <= #endTime#  ]]>
+				</isNotEmpty>
+		</select>
+		
+		
+		<!-- 业务列表 -->
+    <select id="queryUserAppList" resultClass="app" parameterClass="app">
+        SELECT APP_ID app_id,
+			   APP_NAME app_name,
+			   description
+		  FROM COMP_APP_T
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="and" property="app_name">
+				UPPER(APP_NAME) like UPPER(CONCAT('%',#app_name#,'%'))
+			</isNotEmpty>
+		</dynamic>
+		ORDER BY CONVERT(app_name USING gbk) 
+	</select>
+	
+	<!-- 业务列表数目 -->
+	<select id="countApp"  resultClass="java.lang.Integer" parameterClass="app">
+		SELECT COUNT(*)
+		  FROM COMP_APP_T 
+		<dynamic prepend="WHERE"> 
+			<isNotEmpty prepend="and" property="app_name">
+				UPPER(APP_NAME) like UPPER(CONCAT('%',#app_name#,'%'))
+			</isNotEmpty>
+		</dynamic>
+	</select> 
+		
+		<!-- 业务信息详情 -->
+        <select id="getApp" resultClass="app" parameterClass="java.lang.String">
+			SELECT APP_ID,
+			       APP_NAME,
+				app.RES_POOL_ID respoolId,
+				comp_res_pool_t.RES_POOL_NAME respoolName,
+			       app.DESCRIPTION,
+			       app.CREATE_FLAG,
+			       user.user_name APP_CONTACTS,
+			     <!--   CONTACT_PHONE, -->
+			       app.CREATE_USER,
+			       date_format(app.CREATE_TIME, '%Y-%m-%d %T') CREATE_TIME,
+			       app.UPDATE_USER,
+			       date_format(app.UPDATE_TIME, '%Y-%m-%d %T') UPDATE_TIME
+			FROM   COMP_APP_T app left join comp_authority_user_t user on app.APP_CONTACTS = user.user_id
+			LEFT JOIN comp_res_pool_t  ON comp_res_pool_t .RES_POOL_ID = app .RES_POOL_ID
+		    WHERE  APP_ID = #app_id#
+	    </select> 
+	
+		<!-- 插入业务信息 -->
+		<insert id="insertApp" parameterClass="app">
+			INSERT INTO  COMP_APP_T 
+			(
+				APP_ID,
+			    APP_NAME,
+			    DESCRIPTION,
+			    CREATE_FLAG,
+			    APP_CONTACTS,
+			<!--     CONTACT_PHONE, -->
+			    CREATE_USER,
+			    CREATE_TIME,
+				RES_POOL_ID
+			)
+			VALUES 
+			(
+				#app_id#,
+				#app_name#,
+				#description#,
+				'0',
+				#app_contacts#,
+			<!-- 	#contact_phone#, -->
+				#create_user#,
+				date_format(SYSDATE(),'%Y%m%d%H%i%s'),
+				#respoolId#
+			)
+		</insert>
+		
+		<!-- 修改业务信息 -->
+		<update id="updateApp" parameterClass="app">
+			UPDATE COMP_APP_T 
+			   SET APP_NAME=#app_name#,
+			       DESCRIPTION=#description#,
+			       APP_CONTACTS=#app_contacts#,
+					RES_POOL_ID=#respoolId#,
+			 <!--       CONTACT_PHONE=#contact_phone#, -->
+			       UPDATE_USER=#update_user#,
+			       UPDATE_TIME=date_format(SYSDATE(),'%Y%m%d%H%i%s')
+			 WHERE APP_ID=#app_id#
+		</update>
+		
+		<!-- 查看业务ID是否重复 -->
+		<select id="getCountByApp_id" resultClass="java.lang.Integer" parameterClass="app">
+		     SELECT COUNT(*)
+               FROM COMP_APP_T
+              WHERE UPPER(APP_ID) = UPPER(TRIM(#app_id#))
+	    </select>
+
+		<!-- 查看业务名称是否重复 -->
+		<select id="getCountByApp_name" resultClass="java.lang.Integer" parameterClass="app">
+		     SELECT COUNT(*)
+               FROM COMP_APP_T
+              WHERE UPPER(APP_NAME) = UPPER(TRIM(#app_name#))
+              <dynamic prepend="">
+			      <isNotEmpty prepend="and" property="app_id">
+				      <![CDATA[  APP_ID <> #app_id#  ]]>
+				  </isNotEmpty>
+			  </dynamic>
+               
+	   </select>
+	
+		<!-- 删除业务信息 -->
+		<delete id="deleteApp" parameterClass="java.lang.String">
+	        DELETE FROM COMP_APP_T WHERE APP_ID =#app_id#
+	    </delete>
+	    
+	    <!-- 查看业务下是否绑定物理机 -->
+		<select id="getvCountPMByApp_ID" resultClass="java.lang.Integer" parameterClass="java.lang.String">
+		     SELECT COUNT(PM_ID)
+               FROM COMP_APP_T T,COMP_RM_PM_T V
+              WHERE T.APP_ID = V.APP_ID
+                AND T.APP_ID = #app_id#  
+	   </select>
+	    <!-- 查看业务下是否绑定虚拟机 -->
+		<select id="getvCountVMByApp_ID" resultClass="java.lang.Integer" parameterClass="java.lang.String">
+		     SELECT COUNT(VM_ID)
+               FROM COMP_APP_T T,COMP_RM_VM_T V
+              WHERE T.APP_ID = V.APP_ID
+                AND T.APP_ID = #app_id#  
+	   </select>
+	   <!-- 查看业务下是否绑定虚拟硬盘 -->
+		<select id="getvCountEBSByApp_ID" resultClass="java.lang.Integer" parameterClass="java.lang.String">
+		     SELECT COUNT(EBS_ID)
+               FROM COMP_APP_T T,COMP_RM_EBS_T E
+              WHERE T.APP_ID = E.APP_ID
+                AND T.APP_ID = #app_id#  
+	   </select>
+	   
+	<!-- 用户列表 -->
+    <select id="queryAppUserList" resultClass="userInfo" parameterClass="userInfo">
+        SELECT USER_ID  userId,
+			   USER_NAME userName
+		  FROM COMP_AUTHORITY_USER_T
+		 WHERE STATUS = '0' 
+		<dynamic prepend="">
+			<isNotEmpty prepend="and" property="userName">
+				UPPER(User_NAME) like UPPER(CONCAT('%',#userName#,'%'))
+			</isNotEmpty>
+		</dynamic>
+		ORDER BY CONVERT(userName USING gbk) 
+	</select>
+	
+	<!-- 用户列表数目 -->
+	<select id="countUser"  resultClass="java.lang.Integer" parameterClass="userInfo">
+		SELECT COUNT(*)
+		  FROM COMP_AUTHORITY_USER_T 
+		 WHERE STATUS = '0' 
+		<dynamic prepend=""> 
+			<isNotEmpty prepend="and" property="userName">
+				UPPER(User_NAME) like UPPER(CONCAT('%',#userName#,'%'))
+			</isNotEmpty>
+		</dynamic>
+	</select> 
+	
+	<!-- 查询业务联系人 -->
+	<select id="queryUsersbyAppId"  resultClass="userInfo" parameterClass="String">
+		SELECT user.user_id userId, user.user_name userName
+		  FROM COMP_APP_T app, COMP_AUTHORITY_USER_T user 
+		 WHERE app.app_contacts = user.user_id
+		   AND app.app_id = #app_id#
+	</select> 
+	   
+	   <!-- 查询用户绑定的业务个数 -->
+	   <select id="getUserAppCount" resultClass="java.lang.Integer" parameterClass="String">
+	   			SELECT
+						COUNT(*)
+					FROM
+						comp_authority_user_app_t
+					WHERE
+						APP_ID =#app_id#
+	   </select>
+</sqlMap>

@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="PerformanceView">
+	<typeAlias alias="vmInfo"
+		type="com.neusoft.mid.cloong.web.page.console.host.vm.info.VMInstanceInfo" />
+	<typeAlias alias="vmNetInfo"
+		type="com.neusoft.mid.cloong.web.page.console.host.vm.info.vmNet" />
+	<typeAlias alias="PMResourceInfoNew"
+		type="com.neusoft.mid.cloong.web.page.console.performance.PMResourceInfoNew" />
+	<typeAlias alias="mibDomain"
+		type="com.neusoft.mid.cloong.web.page.console.performance.MibinfoDomain" />
+	<typeAlias alias="VMInstanceInfo"
+		type="com.neusoft.mid.cloong.web.page.console.host.vm.info.VMInstanceInfo" />
+	<typeAlias alias="NetInfo"
+		type="com.neusoft.mid.cloong.web.page.console.host.vm.info.NetInfo" />
+		
+		
+	<select id="queryVmsByAppId" parameterClass="vmInfo" resultClass="vmInfo">
+		SELECT 
+			VM_ID vmId,
+			VM_NAME as vmName
+		FROM comp_case_vm_t vm
+		WHERE vm.APP_ID = #appId#
+		AND vm.`STATUS` != '3'
+	</select>
+	
+	<select id="selectIpByVmId" parameterClass="vmNetInfo" resultClass="vmNetInfo">
+		SELECT 
+			VM_ID vmId,
+			IP ip
+		FROM comp_case_vm_net_t vn
+		WHERE vn.VM_ID = #vmId#
+	</select>
+	
+	<select id="selectVmResource" parameterClass="PMResourceInfoNew" resultClass="PMResourceInfoNew">
+		SELECT   *   FROM   x86.vm_performance_tab   
+		WHERE <![CDATA[ PER_TIME >= #per_time#  ]]>
+		and <![CDATA[ PER_TIME <=NOW()  ]]>
+		AND PER_HID= #per_hid#
+		ORDER BY PER_TIME ASC  
+	</select>
+
+	<select id="selectVm2Resource" parameterClass="PMResourceInfoNew" resultClass="PMResourceInfoNew">
+		SELECT   *   FROM   vm_performance_tab
+		WHERE <![CDATA[ PER_TIME >= #per_time#  ]]>
+		and <![CDATA[ PER_TIME <=NOW()  ]]>
+		AND PER_HID= #per_hid#
+		ORDER BY PER_TIME ASC
+	</select>
+	
+	<!-- 查询基本的Tab指标(除进程的指标,以及黑名单中配置的指标，以及未分组的指标) -->
+	<select id="getAlreadyConfTabIndex" resultClass="mibDomain">
+		SELECT
+		a.OID as oid,
+		a.MIB_NAME as mibName,
+		CASE a.MIB_GROUP WHEN 0 THEN 'CPU' WHEN 1 THEN '磁盘' WHEN 2 THEN '内存' WHEN 3 THEN '流量' WHEN  4 THEN '网络' WHEN 7 THEN '曙光设备故障' ELSE '其它' END as indexGroup,
+		CASE a.MIB_UNIT WHEN 0 THEN '%' WHEN 1 THEN '个' WHEN 2 THEN 'MHz' WHEN 3 THEN 'MB' WHEN 4 THEN 'GB' 
+		WHEN 5 THEN 'Bytes/sec' WHEN 6 THEN 'KB' WHEN 7 THEN 's' WHEN 8 THEN 'packets/sec' WHEN 9 THEN '无单位'  
+		WHEN 10 THEN 'degrees C' WHEN 11 THEN 'Volts' WHEN 12 THEN 'RPM' WHEN 13 THEN 'Watts' WHEN 14 THEN 'KB/s' WHEN 15 THEN 'Mb/s' END AS indexUnit,
+		a.COLOME_NAME as colomeName,
+		a.SHOW_LINE as ifShowLine
+		FROM njdb.mals_nm_mib_t a
+		WHERE a.type_id = '2'
+		AND a.MIB_GROUP not IN ('',5,6,7,99)
+		ORDER BY a.MIB_GROUP
+	</select>
+	
+	<select id="getVmPerfDetail" parameterClass="java.lang.String"
+		resultClass="VMInstanceInfo">
+		SELECT
+		case1.CASE_ID caseId,
+		case1.PARAM_FLAG paramFlag,
+		case1.VM_ID vmId,
+		case1.VM_NAME vmName,
+		case1.VM_PASSWORD vmPassword,
+		case1.STANDARD_ID
+		standardId,
+		case1.UserName userName,
+		<!-- case1.STATUS status, -->
+		case1.RES_POOL_ID resPoolId,
+		case1.RES_POOL_NAME resPoolName,
+		case1.RES_POOL_PART_NAME resPoolPartName,
+		case1.RES_POOL_PART_ID
+		resPoolPartId,
+		case1.ORDER_ID orderId,
+		case1.CPU_NUM cpuNum,
+		case1.RAM_SIZE ramSize,
+		case1.DISC_SIZE discSize,
+		case1.ISO_ID isoId,
+		case1.ISO_DESCRIPTION isoDescription,
+		case1.ISO_NAME isoName,
+		case1.DESCRIPTION description,
+		case1.BAND_WIDTH bandWidth,
+		case1.NETWORK_IP networkIp,
+		app.APP_ID appId,
+		app.APP_NAME appName,
+		order1.LENGTH_TIME hours,
+		order1.EFFECTIVE_TIME createTime,
+		order1.EXPIRE_TIME expireTime,
+		item.ITEM_NAME itemName,
+		item.ITEM_ID
+		itemId,
+		case1.BOSS_ORDER_ID vmBossOrderId
+		FROM
+		COMP_CASE_VM_T case1
+		LEFT JOIN comp_app_t app ON case1.APP_ID =
+		app.APP_ID
+		LEFT JOIN COMP_ORDER_T order1 ON case1.ORDER_ID =
+		order1.ORDER_ID AND
+		order1. STATUS != '2'
+		LEFT JOIN COMP_ITEM_T item ON
+		case1.ITEM_ID =
+		item.ITEM_ID
+		WHERE
+		VM_ID=#vmId#
+	</select>
+	
+	<select id="getPerfNet" parameterClass="java.lang.String"
+		resultClass="NetInfo">
+		SELECT
+			eth,
+			net.vlan_id vlanId,
+			VLAN_NAME vlanName,
+			ip,
+			IP_DEFAULT_GATEWAY gateway,
+			comp_case_ipsegment_t.START_IP startIp,
+			comp_case_ipsegment_t.END_IP endIp,
+			comp_case_ipsegment_t.IPSEGMENT_ID ipSegmentId,
+			net.IP_TYPE ipType
+		FROM
+			comp_case_vm_net_t net
+		LEFT OUTER JOIN comp_vlan_ipsegment_bind_t ON net.VLAN_ID = comp_vlan_ipsegment_bind_t.VLAN_ID
+		AND comp_vlan_ipsegment_bind_t. STATUS != '1'
+		LEFT OUTER JOIN comp_case_vlan_t ON net.VLAN_ID = comp_case_vlan_t.VLAN_ID
+		AND comp_case_vlan_t.CANCELED = '0'
+		LEFT OUTER JOIN comp_case_ipsegment_t ON comp_case_ipsegment_t.IPSEGMENT_ID = comp_vlan_ipsegment_bind_t.IPSEGMENT_ID
+		AND comp_case_ipsegment_t.RELEASED = '0'
+		WHERE
+			net.VM_ID =#vmId#
+	</select>
+	
+	<select id="getPerfPublicIpByIp" parameterClass="java.util.List"
+		resultClass="java.lang.String">
+		SELECT DISTINCT
+		network_ip AS publicIp
+		FROM
+		comp_ip_publicip_bind_t
+		WHERE
+		ip IN
+		<iterate conjunction="," open="(" close=")">
+			#ipList[]#
+		</iterate>
+	</select>
+	
+	<!-- 查询物理机的历史信息（最近一周） -->
+	<select id="getWeekResource" resultClass="PMResourceInfoNew">
+		SELECT
+		*
+		FROM
+		x86.vm_performance_hour_tab
+		WHERE <![CDATA[PER_TIME >= #per_time# and PER_TIME <=NOW()]]> 
+		AND PER_HID= #per_hid#  ORDER BY PER_TIME ASC
+	</select>
+
+	<select id="getWeek2Resource" resultClass="PMResourceInfoNew">
+		SELECT
+		*
+		FROM
+		vm_performance_hour_tab
+		WHERE <![CDATA[PER_TIME >= #per_time# and PER_TIME <=NOW()]]>
+		AND PER_HID= #per_hid#  ORDER BY PER_TIME ASC
+	</select>
+	
+	<!-- 查询物理机的历史信息（最近一个月） -->
+	<select id="getMouthResource" resultClass="PMResourceInfoNew">
+		SELECT
+		*
+		FROM
+		x86.vm_performance_day_tab
+		WHERE <![CDATA[PER_TIME >= #per_time# and PER_TIME <=NOW()]]> 
+		AND PER_HID= #per_hid#  ORDER BY PER_TIME ASC
+	</select>
+
+	<select id="getMouth2Resource" resultClass="PMResourceInfoNew">
+		SELECT
+		*
+		FROM
+		vm_performance_day_tab
+		WHERE <![CDATA[PER_TIME >= #per_time# and PER_TIME <=NOW()]]>
+		AND PER_HID= #per_hid#  ORDER BY PER_TIME ASC
+	</select>
+	
+</sqlMap>

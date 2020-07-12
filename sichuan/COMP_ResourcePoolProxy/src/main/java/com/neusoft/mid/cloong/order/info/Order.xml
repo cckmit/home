@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="Order">
+	<typeAlias alias="OrderInfo" type="com.neusoft.mid.cloong.order.info.OrderInfo" />
+	<!-- 更新虚拟机备份订单为生效,及开始计费时间、到期时间 -->
+	<update id="updateOrder" parameterClass="java.util.Map">
+		update
+		COMP_ORDER_T
+		set
+		STATUS=#orderStatus#
+		<isNotEmpty prepend="," property="effectiveTime">
+			EFFECTIVE_TIME=#effectiveTime#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="expireTime">
+			EXPIRE_TIME=#expireTime#
+		</isNotEmpty>
+		where ORDER_ID=#orderId#
+	</update>
+
+</sqlMap>

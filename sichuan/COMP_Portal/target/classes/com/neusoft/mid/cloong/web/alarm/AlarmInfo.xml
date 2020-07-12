@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="alarmInfo">
+
+	<typeAlias alias="alarm" type="com.neusoft.mid.cloong.web.alarm.AlarmInfoBean" />
+
+	<!--<select id="getAlarmListByAppIds" parameterClass="java.util.Map" resultClass="alarm">
+		SELECT
+			ta.rid AS rid,
+			ta.maxEventTime AS eventTime,
+			ta.text AS text
+		FROM
+			nmsdb.t_alarm_temp_copy3 ta,
+			(
+			SELECT
+				cvn.IP AS IP
+			FROM
+				comp_case_vm_t cv,
+				comp_case_vm_net_t cvn
+			WHERE
+				cv.CASE_ID = cvn.CASE_ID AND cv.APP_ID IN
+				<iterate property="appList" open="(" conjunction="," close=")">
+					#appList[]#
+				</iterate>
+				<isNotEmpty property="vmIp" prepend="AND">
+					cvn.IP = #vmIp#
+				</isNotEmpty>
+			) t
+		WHERE 
+			(ta.pid IS NULL OR ta.pid = '') AND (ta.rid = t.IP) AND (ta.maxEventTime > DATE_SUB(NOW(),INTERVAL #time# MINUTE)) ORDER BY ta.maxEventTime desc
+	</select>-->
+    <!--<select id="getAlarmListByAppIds" parameterClass="java.util.Map" resultClass="alarm">
+        SELECT
+        ta.rid AS rid,
+        ta.maxEventTime AS eventTime,
+        ta.text AS text
+        FROM
+        nmsdb.t_alarm_temp ta WHERE ta.deviceType = '2' and  ta.objectID in
+        (
+        SELECT
+        cv.vm_id as vm_id    FROM     comp_case_vm_t cv   WHERE
+        cv.APP_ID IN
+        <iterate property="appList" open="(" conjunction="," close=")">
+            #appList[]#
+        </iterate>
+        <isNotEmpty property="vmIp" prepend="AND">
+            ta.rid = #vmIp#
+        </isNotEmpty>
+        ) AND
+        (ta.pid IS NULL OR ta.pid = '') ORDER BY ta.maxEventTime desc
+    </select>-->
+
+    <!--<select id="getAlarmListByAppIds" parameterClass="java.util.Map" resultClass="alarm">
+        (SELECT
+        ta.rid AS rid,
+        ta.maxEventTime AS eventTime,
+        ta.text AS TEXT
+        FROM
+        nmsdb.t_alarm_temp ta FORCE INDEX (objectIDUnion)
+        INNER JOIN
+        (
+        SELECT
+        cv.vm_id AS vm_id FROM comp_case_vm_t cv WHERE
+        cv.APP_ID IN
+        <iterate property="appList" open="(" conjunction="," close=")">
+            #appList[]#
+        </iterate>
+        ) cv
+        ON ta.objectId=cv.vm_id
+        WHERE
+        ta.deviceType = '2' AND
+        (ta.pid IS NULL OR ta.pid = '')
+        <isNotEmpty property="vmIp" prepend="AND">
+            ta.rid = #vmIp#
+        </isNotEmpty>)
+        ORDER BY
+        eventTime DESC
+    </select>-->
+
+    <select id="getAlarmListByAppIds" parameterClass="java.util.Map" resultClass="alarm">
+        (SELECT
+        ta.rid AS rid,
+        ta.maxEventTime AS eventTime,
+        ta.text AS TEXT
+        FROM
+        nmsdb.t_alarm_temp ta FORCE INDEX (objectIDUnion)
+        INNER JOIN
+        (
+        SELECT
+        cv.vm_id AS vm_id FROM comp_case_vm_t cv WHERE
+        cv.APP_ID IN
+        <iterate property="appList" open="(" conjunction="," close=")">
+            #appList[]#
+        </iterate>
+        ) cv
+        ON ta.objectId=cv.vm_id
+        WHERE
+        ta.deviceType = '2' AND
+        (ta.pid IS NULL OR ta.pid = '')
+        <isNotEmpty property="vmIp" prepend="AND">
+            ta.rid = #vmIp#
+        </isNotEmpty>)
+        union all
+        (SELECT
+        ta.rid AS rid,
+        ta.maxEventTime AS eventTime,
+        ta.text AS TEXT
+        FROM
+        t_alarm_temp ta FORCE INDEX (objectIDUnion)
+        INNER JOIN
+        (
+        SELECT
+        cv.vm_id AS vm_id FROM comp_case_vm_t cv WHERE
+        cv.APP_ID IN
+        <iterate property="appList" open="(" conjunction="," close=")">
+            #appList[]#
+        </iterate>
+        ) cv
+        ON ta.objectId=cv.vm_id
+        WHERE
+        ta.deviceType = '2' AND
+        (ta.pid IS NULL OR ta.pid = '')
+        <isNotEmpty property="vmIp" prepend="AND">
+            ta.rid = #vmIp#
+        </isNotEmpty>)
+        ORDER BY
+        eventTime DESC
+    </select>
+
+    <select id="getAlarmCountByAppIds" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+        select t1.num1+t2.num2 from
+        (SELECT
+        COUNT(ta.objectID) num1
+        FROM
+        nmsdb.t_alarm_temp ta FORCE INDEX (objectIDUnion)
+        INNER JOIN
+        (
+        SELECT
+        cv.vm_id AS vm_id    FROM     comp_case_vm_t cv   WHERE
+        cv.APP_ID IN
+        <iterate property="appList" open="(" conjunction="," close=")">
+            #appList[]#
+        </iterate>
+        )  cv
+        ON  ta.objectId=cv.vm_id
+        WHERE ta.deviceType = '2' AND
+        (ta.pid IS NULL OR ta.pid = '')
+        <isNotEmpty property="vmIp" prepend="AND">
+            ta.rid = #vmIp#
+        </isNotEmpty>)t1,
+        (SELECT
+        COUNT(ta.objectID) num2
+        FROM
+        t_alarm_temp ta FORCE INDEX (objectIDUnion)
+        INNER JOIN
+        (
+        SELECT
+        cv.vm_id AS vm_id    FROM     comp_case_vm_t cv   WHERE
+        cv.APP_ID IN
+        <iterate property="appList" open="(" conjunction="," close=")">
+            #appList[]#
+        </iterate>
+        )  cv
+        ON  ta.objectId=cv.vm_id
+        WHERE ta.deviceType = '2' AND
+        (ta.pid IS NULL OR ta.pid = '')
+        <isNotEmpty property="vmIp" prepend="AND">
+            ta.rid = #vmIp#
+        </isNotEmpty>)t2
+    </select>
+
+    <!--<select id="getAlarmCountByAppIds" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+        SELECT
+        COUNT(ta.objectID)
+        FROM
+        nmsdb.t_alarm_temp ta FORCE INDEX (objectIDUnion)
+        INNER JOIN
+        (
+        SELECT
+        cv.vm_id AS vm_id    FROM     comp_case_vm_t cv   WHERE
+        cv.APP_ID IN
+        <iterate property="appList" open="(" conjunction="," close=")">
+            #appList[]#
+        </iterate>
+        )  cv
+        ON  ta.objectId=cv.vm_id
+        WHERE ta.deviceType = '2' AND
+        (ta.pid IS NULL OR ta.pid = '')
+        <isNotEmpty property="vmIp" prepend="AND">
+            ta.rid = #vmIp#
+        </isNotEmpty>
+    </select>-->
+
+    <!--<select id="getAlarm3ListByAppIds" parameterClass="java.util.Map" resultClass="alarm">
+        (SELECT
+        ta.rid AS rid,
+        ta.maxEventTime AS eventTime,
+        ta.text AS TEXT
+        FROM
+        t_alarm_temp ta FORCE INDEX (objectIDUnion)
+        INNER JOIN
+        (
+        SELECT
+        cv.vm_id AS vm_id FROM comp_case_vm_t cv WHERE
+        cv.APP_ID IN
+        <iterate property="appList" open="(" conjunction="," close=")">
+            #appList[]#
+        </iterate>
+        ) cv
+        ON ta.objectId=cv.vm_id
+        WHERE
+        ta.deviceType = '2' AND
+        (ta.pid IS NULL OR ta.pid = '')
+        <isNotEmpty property="vmIp" prepend="AND">
+            ta.rid = #vmIp#
+        </isNotEmpty>)
+        ORDER BY
+        eventTime DESC
+    </select>-->
+
+    <!--<select id="getAlarm3CountByAppIds" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+        SELECT
+        COUNT(ta.objectID)
+        FROM
+        t_alarm_temp ta FORCE INDEX (objectIDUnion)
+        INNER JOIN
+        (
+        SELECT
+        cv.vm_id AS vm_id    FROM     comp_case_vm_t cv   WHERE
+        cv.APP_ID IN
+        <iterate property="appList" open="(" conjunction="," close=")">
+            #appList[]#
+        </iterate>
+        )  cv
+        ON  ta.objectId=cv.vm_id
+        WHERE ta.deviceType = '2' AND
+        (ta.pid IS NULL OR ta.pid = '')
+        <isNotEmpty property="vmIp" prepend="AND">
+            ta.rid = #vmIp#
+        </isNotEmpty>
+    </select>-->
+
+</sqlMap>

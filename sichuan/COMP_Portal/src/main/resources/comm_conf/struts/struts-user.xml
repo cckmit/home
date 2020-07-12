@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<!-- 这只浏览器时候缓存静态内容，默认值为true(生产环境下使用),开发阶段最好关闭 -->
+	<constant name="struts.serve.static.vrowserCache" value="false"></constant>
+	<!-- 当struts的配置文件修改后，系统是否自动重新加载该文件，默认为false(生产环境下使用),开发阶段最好打开 -->
+	<constant name="struts.serve.static.vrowserCache" value="true"></constant>
+	<constant name="struts.ui.theme" value="simple"></constant>
+
+	<package name="com.neusoft.mid.cloong.web.page.userCenter"
+		namespace="/userCenter" extends="struts-default">
+		<interceptors>
+			<interceptor name="authenticate" class="authenticateInterceptor" />
+			<interceptor name="turnPageInter" class="turnPageInterceptor" />
+			<interceptor-stack name="authStack">
+				<interceptor-ref name="authenticate" />
+				<interceptor-ref name="defaultStack" />
+				<interceptor-ref name="turnPageInter" />
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="authStack" />
+		<global-results>
+			<result name="error" type="chain">exceptionIntercepor
+			</result>
+			<result name="LOGIN" type="redirectAction">logout</result>
+		</global-results>
+		<global-exception-mappings>
+			<exception-mapping exception="java.lang.Exception"
+				result="error" />
+		</global-exception-mappings>
+		
+		<action name="exceptionIntercepor" class="exceptionIntercepor">
+			<result name="success">/WEB-INF/pages/exception/error.jsp
+			</result>
+		</action>
+
+		<action name="orderQuery" class="OrderQueryAction">
+			<result name="success">
+				/WEB-INF/pages/userCenter/orders/user_orders_list.jsp
+			</result>
+			<result name="failure">
+				/WEB-INF/pages/userCenter/orders/user_orders_list.jsp
+			</result>
+		</action>
+		
+		<action name="userInfo" class="UserInfoAction">
+			<result name="success">
+				/WEB-INF/pages/userCenter/userInfo/user_info.jsp
+			</result>
+			<result name="error">
+				/WEB-INF/pages/userCenter/userInfo/user_info.jsp
+			</result>
+		</action>
+		
+		<action name="userUpdate" class="UserInfoAction">
+			<result name="success">/WEB-INF/pages/userCenter/userInfo/user_info_edit.jsp</result>
+			<result name="error" type="chain"> 
+	          <param name="actionName">userInfo</param>
+	        </result>
+			<result name="failure" type="chain"> 
+	          <param name="actionName">userInfo</param>
+	        </result>
+		</action>
+		
+		<action name="userUpdateSave" class="UserUpdateSaveAction">
+			<result name="success" type="chain">
+				<param name="actionName">userInfo</param>
+				<param name="msg">${msg}</param>
+			</result>
+			<result name="error" type="chain">
+				<param name="actionName">userInfo</param>
+				<param name="errMsg">${errMsg}</param>
+			</result>
+		</action>
+		
+		<action name="modifyPassword" class="ModifyPasswordAction">
+			<result name="success">/WEB-INF/pages/userCenter/userInfo/modifyPassword.jsp</result>
+			<result name="error">/WEB-INF/pages/userCenter/userInfo/modifyPassword.jsp</result>
+		</action>
+		
+		<action name="modifyPasswordUpdate" class="ModifyPasswordUpdateAction">
+			<result name="success">/WEB-INF/pages/userCenter/userInfo/modifyPassword.jsp</result>
+			<result name="error">/WEB-INF/pages/userCenter/userInfo/modifyPassword.jsp</result>
+		</action>
+		
+		<action name="closeAccount" class="closeAccountAction">
+			<result name="success">/WEB-INF/pages/userCenter/userInfo/user_info.jsp</result>
+			<result name="error">/WEB-INF/pages/userCenter/userInfo/user_info.jsp</result>
+		</action>
+		
+		<action name="ebsItemInfo" class="ebsItemInfoAction">
+			<result name="success">/WEB-INF/pages/product/item/ebs/ebs_modify.jsp</result>
+			<result name="error" type="chain"> 
+	          <param name="actionName">ebsItems</param>
+	        </result>
+			<result name="failure" type="chain"> 
+	          <param name="actionName">ebsItems</param>
+	        </result>
+		</action>
+		
+	</package>
+	<package name="com.neusoft.mid.cloong.web.page.userCenter.json"
+		extends="json-default">
+		<interceptors>
+			<interceptor name="authenticate" class="authenticateInterceptor" />
+			<interceptor name="turnPageInter" class="turnPageInterceptor" />
+			<interceptor-stack name="authStack">
+				<interceptor-ref name="authenticate" />
+				<interceptor-ref name="jsonValidationWorkflowStack" />
+				<interceptor-ref name="defaultStack" />
+				<interceptor-ref name="turnPageInter" />
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="authStack" />
+		<global-results>
+			<result name="error" type="chain">exceptionIntercepor
+			</result>
+			<result name="LOGIN" type="redirectAction">logout</result>
+		</global-results>
+		<global-exception-mappings>
+			<exception-mapping exception="java.lang.Exception"
+				result="error" />
+		</global-exception-mappings>
+		
+		<action name="exceptionIntercepor" class="exceptionIntercepor">
+			<result name="success">/WEB-INF/pages/exception/error.jsp
+			</result>
+		</action>
+		<action name="orderQueryJson" class="OrderQueryJsonAction">
+			<result name="success" type="json" />
+			<result name="error" type="json" />
+		</action>
+		<action name="vmOrderInto" class="VMOrderDetailQueryAction">
+			<result name="success" type="json" />
+			<result name="error" type="json" />
+		</action>
+		<action name="vmModifyOrderInto" class="VMModifyOrderDetailQueryAction">
+			<result name="success" type="json" />
+			<result name="error" type="json" />
+		</action>
+		<action name="ebsOrderInto" class="EBSOrderDetailQueryAction">
+			<result name="success" type="json" />
+			<result name="error" type="json" />
+		</action>
+		<action name="pmOrderInto" class="PMOrderDetailQueryAction">
+			<result name="success" type="json" />
+			<result name="error" type="json" />
+		</action>
+		<action name="bkOrderInto" class="BKOrderDetailQueryAction">
+			<result name="success" type="json" />
+			<result name="error" type="json" />
+		</action>
+		<!-- 快照订单查看详情 -->
+		<action name="vmSnapshotOrderInto" class="vmSnapshotOrderDetailQueryAction">
+			<result name="success" type="json" />
+			<result name="error" type="json" />
+		</action>
+		
+		<!-- 通用订单详情 -->
+		<action name="orderDetail" class="OrderDetailAction">
+			<result name="success" type="json" />
+			<result name="error" type="json" />
+		</action>
+	</package>
+</struts>

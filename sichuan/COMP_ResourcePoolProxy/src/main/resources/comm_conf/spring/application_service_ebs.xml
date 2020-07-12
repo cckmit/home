@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
+    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+
+	<!-- EBS创建 -->
+	<bean id="ebsCreateProcessor" class="com.neusoft.mid.cloong.ebs.impl.EBSCreateProcessor">
+		<property name="ibatisDAO" ref="ibatisDAOProxy" />
+		<property name="ebsCreator" ref="ebsCreator" />
+		<property name="resourcePoolCacheService" ref="resourcePoolCacheService" />
+		<property name="transactonGen" ref="transactonGen" />
+		<property name="timeStampgen" ref="timeStampgen" />
+		<property name="acquireStandardResPoolId" ref="acquireStandardResPoolId" />
+		<property name="ebsQuery" ref="ebsQuery" />
+		<property name="ebsCreateResultQueryInterval" value="${nextQueryEBSStatusInterval}" />
+		<property name="ebsCreateStatQueryTask" ref="CreateEBSQueryStatTaskExecutor" />
+	</bean>
+	<bean id="ebsCreator" class="com.neusoft.mid.cloong.ebs.impl.EBSCreateImpl">
+		<property name="common" ref="privateWebServiceClientFactory" />
+		<property name="timeout">
+			<value>${requestTimeout}</value>
+		</property>
+	</bean>
+	<bean id="CreateEBSQueryStatTaskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<property name="corePoolSize" value="0" />
+		<property name="keepAliveSeconds" value="2000" />
+		<property name="maxPoolSize" value="10" />
+		<property name="queueCapacity" value="500" />
+	</bean>
+
+	<!-- 系统启动后,为所有处于创建中的块存储查询是否创建完毕 -->
+	<bean id="createEBSStateQueryService" class="com.neusoft.mid.cloong.ebs.impl.CreateEBSStateQueryService">
+		<property name="ebsCreateStatQueryTask">
+			<ref bean="CreateEBSQueryStatTaskExecutor" />
+		</property>
+		<property name="ibatisDAO">
+			<ref bean="ibatisDAOProxy" />
+		</property>
+		<property name="transactonGen" ref="transactonGen" />
+		<property name="timeStampgen" ref="timeStampgen" />
+		<property name="ebsQuery" ref="ebsQuery" />
+		<property name="interval" value="${nextQueryVMStatusInterval}" />
+	</bean>
+
+	<!-- EBS查询 -->
+	<bean id="ebsQuery" class="com.neusoft.mid.cloong.ebs.impl.EBSQueryImpl">
+		<property name="common" ref="privateWebServiceClientFactory" />
+		<property name="timeout">
+			<value>${requestTimeout}</value>
+		</property>
+	</bean>
+
+	<!-- EBS挂载 -->
+	<bean id="ebsAttachProcessor" class="com.neusoft.mid.cloong.ebs.impl.EBSAttachProcessor">
+		<property name="attach" ref="attach" />
+		<property name="transactonGen" ref="transactonGen" />
+		<property name="timeStampgen" ref="timeStampgen" />
+		<property name="resourcePoolCacheService" ref="resourcePoolCacheService" />
+	</bean>
+	<bean id="attach" class="com.neusoft.mid.cloong.ebs.impl.EBSAttachImpl">
+		<property name="common" ref="privateWebServiceClientFactory" />
+		<property name="timeout">
+			<value>${requestTimeout}</value>
+		</property>
+	</bean>
+
+	<!-- EBS卸载 -->
+	<bean id="ebsDetachProcessor" class="com.neusoft.mid.cloong.ebs.impl.EBSDetachProcessor">
+		<property name="detach" ref="detach" />
+		<property name="transactonGen" ref="transactonGen" />
+		<property name="timeStampgen" ref="timeStampgen" />
+		<property name="resourcePoolCacheService" ref="resourcePoolCacheService" />
+	</bean>
+	<bean id="detach" class="com.neusoft.mid.cloong.ebs.impl.EBSDetachImpl">
+		<property name="common" ref="privateWebServiceClientFactory" />
+		<property name="timeout">
+			<value>${requestTimeout}</value>
+		</property>
+	</bean>
+
+	<!-- EBS删除 -->
+	<bean id="ebsDeleteProcessor" class="com.neusoft.mid.cloong.ebs.impl.EBSDeleteProcessor">
+		<property name="delete" ref="delete" />
+		<property name="transactonGen" ref="transactonGen" />
+		<property name="timeStampgen" ref="timeStampgen" />
+		<property name="resourcePoolCacheService" ref="resourcePoolCacheService" />
+	</bean>
+	<bean id="delete" class="com.neusoft.mid.cloong.ebs.impl.EBSDeleteImpl">
+		<property name="common" ref="privateWebServiceClientFactory" />
+		<property name="timeout">
+			<value>${requestTimeout}</value>
+		</property>
+	</bean>
+
+	<!-- EBS修改 -->
+	<bean id="ebsModifyProcessor" class="com.neusoft.mid.cloong.ebs.impl.EBSModifyProcessor">
+		<property name="ebsModify" ref="ebsModify" />
+		<property name="transactonGen" ref="transactonGen" />
+		<property name="timeStampgen" ref="timeStampgen" />
+		<property name="resourcePoolCacheService" ref="resourcePoolCacheService" />
+	</bean>
+	<bean id="ebsModify" class="com.neusoft.mid.cloong.ebs.impl.EBSModifyImpl">
+		<property name="common" ref="privateWebServiceClientFactory" />
+		<property name="timeout">
+			<value>${requestTimeout}</value>
+		</property>
+	</bean>
+
+
+
+
+
+
+
+
+</beans>

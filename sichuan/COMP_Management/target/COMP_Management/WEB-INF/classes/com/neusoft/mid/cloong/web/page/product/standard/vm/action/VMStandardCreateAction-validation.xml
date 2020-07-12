@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE validators PUBLIC 
+  		"-//Apache Struts//XWork Validator 1.0.2//EN"
+  		"http://struts.apache.org/dtds/xwork-validator-1.0.2.dtd">
+<validators>
+	<field name="standardName">
+		<field-validator type="requiredstring">
+			<param name="trim">true</param>
+			<message>规格名称不能为空，请重新输入</message>
+		</field-validator>
+		<field-validator type="stringlength">
+			<param name="maxLength">20</param>
+			<message>规格名称最大长度为20</message>
+		</field-validator>
+	</field>
+	<field name="cpuNum">
+		<field-validator type="requiredstring">
+			<param name="trim">true</param>
+			<message>cpu数量不能为空，请重新输入</message>
+		</field-validator>
+		<field-validator type="stringlength">
+			<param name="maxLength">10</param>
+			<message>cpu数量最大长度为10</message>
+		</field-validator>
+		<field-validator type="regex">
+			<param name="expression"><![CDATA[^[0-9]{1,10}$]]></param>
+			<message>cpu数量只能填写数字，请重新输入</message>
+		</field-validator>
+	</field>
+	<field name="ram">
+		<field-validator type="requiredstring">
+			<param name="trim">true</param>
+			<message>内存容量不能为空，请重新输入</message>
+		</field-validator>
+		<field-validator type="stringlength">
+			<param name="maxLength">10</param>
+			<message>内存容量最大长度为10</message>
+		</field-validator>
+		<field-validator type="regex">
+			<param name="expression"><![CDATA[^[0-9]{1,10}$]]></param>
+			<message>内存容量只能填写数字，请重新输入</message>
+		</field-validator>
+	</field>
+	<field name="discSize">
+		<field-validator type="requiredstring">
+			<param name="trim">true</param>
+			<message>磁盘空间不能为空，请重新输入</message>
+		</field-validator>
+		<field-validator type="stringlength">
+			<param name="maxLength">10</param>
+			<message>磁盘空间最大长度为10</message>
+		</field-validator>
+		<field-validator type="regex">
+			<param name="expression"><![CDATA[^[0-9]{1,10}$]]></param>
+			<message>磁盘空间只能填写数字，请重新输入</message>
+		</field-validator>
+	</field>
+	<field name="description">
+		<field-validator type="stringlength">
+			<param name="maxLength">100</param>
+			<message>描述信息最大长度为100</message>
+		</field-validator>
+	</field>
+</validators>

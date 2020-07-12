@@ -1,0 +1,647 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="User">
+	<typeAlias alias="userInfo"
+		type="com.neusoft.mid.cloong.identity.bean.UserBean" />
+	<typeAlias alias="Integer" type="java.lang.Integer" />
+	<typeAlias alias="queryUserInfo"
+		type="com.neusoft.mid.cloong.identity.bean.query.QueryUserInfo" />
+	<typeAlias alias="roleInfo"
+		type="com.neusoft.mid.cloong.identity.bean.RoleBean" />
+	<typeAlias alias="userAppBean" type="com.neusoft.mid.cloong.identity.bean.UserAppBean"/>
+
+	<!-- 通用用户属性查询条件 -->
+	<sql id="queryUserInfoWhere">
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="and" property="userId">
+				upper(u.USER_ID) like
+				upper(CONCAT('%',trim(#userId#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="userName">
+				upper(USER_NAME) like
+				upper(CONCAT('%',trim(#userName#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="queryStatus">
+				STATUS =
+				trim(#queryStatus#)
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="mobile">
+				upper(MOBILE) like
+				upper(CONCAT('%',trim(#mobile#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="email">
+				upper(EMAIL) like
+				upper(CONCAT('%',trim(#email#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="address">
+				upper(ADDRESS) like
+				upper(CONCAT('%',trim(#address#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="desc">
+				upper(u.DESCRIPTION) LIKE
+				upper(CONCAT('%',trim(#desc#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="createUserId">
+				u.CREATE_USER like
+				CONCAT('%',trim(#createUserId#),'%')
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="telphone">
+				upper(TELPHONE) like
+				upper(CONCAT('%',trim(#address#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="fax">
+				upper(FAX) like
+				upper(CONCAT('%',trim(#fax#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="departmentName">
+				upper(u.DEPARTMENT_NAME)
+				like
+				upper(CONCAT('%',trim(#departmentName#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="afterCreateTime">
+				u.CREATE_TIME >=
+				#afterCreateTime#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="beforeCreateTime">
+				<![CDATA[
+				 u.CREATE_TIME <=
+				#beforeCreateTime#
+				]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="appName">
+				upper(a.APP_NAME) like	CONCAT('%',trim(#appName#),'%')
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="roleId">
+				r.ROLE_ID =#roleId#
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+	<!-- 查询用户列表信息 -->
+	<select id="queryUserInfos" parameterClass="queryUserInfo"
+		resultClass="userInfo">
+		SELECT 
+			u.USER_ID as userId,
+			USER_NAME as userName,
+			up.APP_ID as appId,
+			a.APP_NAME as appName,
+			PASSWORD as password,
+			u.CREATE_TIME as createTime,
+			u.UPDATE_TIME as updateTime,
+			STATUS
+			as status,
+			LOCK_TIME as lockTime,
+			MOBILE as mobile,
+			EMAIL as email,
+			ADDRESS as address,
+			u.DESCRIPTION as "desc",
+			u.CREATE_USER as
+			createUserId,
+			LOGIN_FAILED_TIME as loginFailedTime,
+			TELPHONE as
+			telphone,
+			FAX as fax,
+			DEPARTMENT_NAME as departmentName
+		FROM
+		COMP_AUTHORITY_USER_T u
+		LEFT OUTER JOIN 
+		comp_authority_user_app_t up
+		ON u.USER_ID = up.USER_ID 
+	    LEFT OUTER JOIN
+		comp_app_t a
+		ON up.APP_ID = a.APP_ID
+		LEFT JOIN 
+			comp_authority_user_role_t r
+		ON
+			u.USER_ID=r.USER_ID
+		<include refid="queryUserInfoWhere" />
+		GROUP BY u.USER_ID
+		ORDER BY u.CREATE_TIME DESC
+	</select>
+
+	<!-- 查询用户列表信息数目 -->
+	<select id="countQueryUser" parameterClass="queryUserInfo"
+		resultClass="Integer">
+		select
+		  count(0)
+		  FROM
+	   (
+		  select count(0) as count
+		FROM
+		COMP_AUTHORITY_USER_T u
+		LEFT OUTER JOIN 
+		comp_authority_user_app_t up
+		ON u.USER_ID = up.USER_ID 
+	    LEFT OUTER JOIN
+		comp_app_t a
+		ON up.APP_ID = a.APP_ID
+		LEFT JOIN 
+			comp_authority_user_role_t r
+		ON
+			u.USER_ID=r.USER_ID
+		<include refid="queryUserInfoWhere" />
+		GROUP BY u.USER_ID
+		)s
+	</select>
+
+	<!-- 通过用户ID精确查询用户信息 -->
+	<select id="queryUserInfoById" parameterClass="String"
+		resultClass="userInfo">
+		select USER_ID as userId,
+		USER_NAME as userName,
+		PASSWORD
+		as password,
+		CREATE_TIME as createTime,
+		UPDATE_TIME as updateTime,
+		STATUS as status,
+		LOCK_TIME as lockTime,
+		MOBILE as mobile,
+		EMAIL as
+		email,
+		ADDRESS as address,
+		DESCRIPTION as "desc",
+		CREATE_USER as
+		createUserId,
+		LOGIN_FAILED_TIME as loginFailedTime,
+		TELPHONE as
+		telphone,
+		FAX as fax,
+		DEPARTMENT_NAME as departmentName
+		FROM
+		COMP_AUTHORITY_USER_T
+		WHERE USER_ID = #userId#
+	</select>
+
+	<!-- 通过用户名称查询角色信息 -->
+	<select id="queryUserRoleByUserId" parameterClass="String"
+		resultClass="roleInfo">
+		SELECT
+		COMP_AUTHORITY_ROLE_T.ROLE_ID roleId,
+		COMP_AUTHORITY_ROLE_T.NAME roleName,
+		COMP_AUTHORITY_ROLE_T.STATUS
+		status,
+		COMP_AUTHORITY_ROLE_T.DESCRIPTION description,
+		COMP_AUTHORITY_ROLE_T.CREATE_TIME createTime,
+		COMP_AUTHORITY_ROLE_T.CREATE_USER createUserId,
+		COMP_AUTHORITY_ROLE_T.STATUS status
+		FROM
+		COMP_AUTHORITY_ROLE_T,COMP_AUTHORITY_USER_ROLE_T
+		WHERE
+		COMP_AUTHORITY_ROLE_T.ROLE_ID = COMP_AUTHORITY_USER_ROLE_T.ROLE_ID
+		AND
+		COMP_AUTHORITY_USER_ROLE_T.USER_ID = #userId#
+		AND
+		COMP_AUTHORITY_ROLE_T.STATUS = '1'
+	</select>
+
+	<!-- 更新用户基本信息 -->
+	<update id="updateUserInfo" parameterClass="userInfo">
+		UPDATE COMP_AUTHORITY_USER_T
+		SET
+		UPDATE_TIME =#updateTime#
+		<dynamic>
+			<isNotNull prepend="," property="userName">
+				USER_NAME =
+				trim(#userName#)
+			</isNotNull>
+			<isNotNull prepend="," property="mobile">
+				MOBILE = trim(#mobile#)
+			</isNotNull>
+			<isNotNull prepend="," property="email">
+				EMAIL = trim(#email#)
+			</isNotNull>
+			<isNotNull prepend="," property="address">
+				ADDRESS = trim(#address#)
+			</isNotNull>
+			<isNotNull prepend="," property="desc">
+				DESCRIPTION =
+				trim(#desc#)
+			</isNotNull>
+			<isNotNull prepend="," property="telphone">
+				TELPHONE = trim(#telphone#)
+			</isNotNull>
+			<isNotNull prepend="," property="fax">
+				FAX = trim(#fax#)
+			</isNotNull>
+			<isNotNull prepend="," property="departmentName">
+				DEPARTMENT_NAME =
+				trim(#departmentName#)
+			</isNotNull>
+			<isNotNull prepend="," property="password">
+				PASSWORD = #password#
+			</isNotNull>
+			<isNotNull prepend="," property="status">
+				STATUS = trim(#status#)
+			</isNotNull>
+			<isNotNull  prepend="," property="chargesUserId">
+				CHARGES_USER_ID=trim(#chargesUserId#)
+			</isNotNull>
+		</dynamic>
+		WHERE USER_ID = trim(#userId#)
+	</update>
+
+	<!-- 删除用户和角色的绑定关系 -->
+	<delete id="deleteAllUserRoleRelation" parameterClass="userInfo">
+		DELETE
+		FROM COMP_AUTHORITY_USER_ROLE_T
+		WHERE USER_ID = #userId#
+	</delete>
+
+	<!-- 插入用户和角色的绑定关系 -->
+	<insert id="insertUserRoleRelation" parameterClass="java.util.HashMap">
+		INSERT INTO
+		COMP_AUTHORITY_USER_ROLE_T
+		(USER_ID,ROLE_ID) VALUES(#userId#,#roleId#)
+	</insert>
+
+	<!-- 创建用户基本信息 -->
+	<insert id="insertUserInfo" parameterClass="userInfo">
+		INSERT INTO
+		COMP_AUTHORITY_USER_T
+		(
+		USER_ID,
+		USER_NAME,
+		PASSWORD,
+		CREATE_TIME,
+		UPDATE_TIME,
+		STATUS,
+		MOBILE,
+		EMAIL,
+		ADDRESS,
+		DESCRIPTION,
+		CREATE_USER,
+		TELPHONE,
+		FAX,
+		DEPARTMENT_NAME
+		) VALUES(
+		trim(#userId#),
+		trim(#userName#),
+		#password#,
+		#createTime#,
+		#updateTime#,
+		trim(#status#),
+		trim(#mobile#),
+		#email#,
+		#address#,
+		#desc#,
+		#createUserId#,
+		#telphone#,
+		#fax#,
+		#departmentName#
+		)
+	</insert>
+
+	<!-- 查询一批用户中指定的状态的用户数目 -->
+	<select id="countUserByIdsAndStatus" parameterClass="java.util.HashMap"
+		resultClass="Integer">
+		select count(0) as count
+		FROM COMP_AUTHORITY_USER_T
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="and" property="userIds">
+				USER_ID IN
+				<iterate property="userIds" conjunction="," close=")" open="(">
+					#userIds[]#
+				</iterate>
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="status">
+				STATUS = #status#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+	<!-- 查询一批用户中指定的状态的用户数目 -->
+	<select id="countUserByMobileAndMail" parameterClass="userInfo"
+		resultClass="Integer">
+		<![CDATA[
+			select count(0) as count
+			FROM COMP_AUTHORITY_USER_T
+			WHERE USER_ID <> #userId#
+			AND (MOBILE = trim(#mobile#)
+			OR upper(EMAIL) = upper(trim(#email#)))
+			]]>
+	</select>
+
+	<select id="getSingleUser" parameterClass="java.lang.String"
+		resultClass="userInfo">
+		SELECT
+		USER_ID userId,USER_NAME userName,STATUS
+		status,PASSWORD,DATE_FORMAT(CREATE_TIME,'%Y-%m-%d %H:%i:%s') as createTime,
+		CREATE_USER createUserId,
+		UPDATE_TIME updateTime, LOGIN_FAILED_TIME
+		loginFailedTime,
+		LOCK_TIME
+		lockTime, MOBILE mobile,EMAIL email,ADDRESS
+		address, TELPHONE telphone,
+		FAX fax, DESCRIPTION "desc", DEPARTMENT_NAME departmentName,
+		SECURITY_QUESTION as security_question,
+		SECURITY_ANSWER as security_answer
+		FROM
+		COMP_AUTHORITY_USER_T
+		WHERE upper(USER_ID)=upper(#userId#)
+	</select>
+	
+	<select id="getUserForPortalLogin" parameterClass="java.lang.String"
+		resultClass="userInfo">
+		SELECT
+			COMP_AUTHORITY_USER_T.USER_ID userId,
+			USER_NAME userName,
+			STATUS STATUS,
+			PASSWORD,
+			CREATE_TIME createTime,
+			CREATE_USER createUserId,
+			UPDATE_TIME updateTime,
+			LOGIN_FAILED_TIME loginFailedTime,
+			LOCK_TIME lockTime,
+			MOBILE mobile,
+			EMAIL email,
+			ADDRESS address,
+			TELPHONE telphone,
+			FAX fax,
+			DESCRIPTION "desc",
+			DEPARTMENT_NAME departmentName,
+			group_concat(APP_ID) appIdStr,
+			IF_LOGIN ifLogin
+		FROM
+			COMP_AUTHORITY_USER_T
+		LEFT OUTER JOIN comp_authority_user_app_t ON COMP_AUTHORITY_USER_T.USER_ID = comp_authority_user_app_t.USER_ID AND APPBIND_STATUS = '2'
+		WHERE
+			upper(
+				COMP_AUTHORITY_USER_T.USER_ID
+			) = upper(#userId#)
+		GROUP BY
+			COMP_AUTHORITY_USER_T.USER_ID
+	</select>
+
+	<update id="updateUser" parameterClass="userInfo">
+		update
+		COMP_AUTHORITY_USER_T
+		set
+		USER_NAME=#userName# ,
+		MOBILE=#mobile# ,
+		EMAIL=#email# ,
+		ADDRESS=#address# ,
+		TELPHONE=#telphone# ,
+		FAX=#fax# ,
+		DESCRIPTION=#desc# ,
+		DEPARTMENT_NAME=#departmentName#,
+		UPDATE_TIME=#updateTime#<!-- ,
+		SECURITY_QUESTION = #security_question#,
+		SECURITY_ANSWER =#security_answer# -->
+		where USER_ID
+		=#userId#
+	</update>
+
+	<update id="updateUserState" parameterClass="userInfo">
+		update
+		COMP_AUTHORITY_USER_T
+		set
+		STATUS=#status# ,
+		LOGIN_FAILED_TIME=#loginFailedTime# ,
+		LOCK_TIME=#lockTime#
+		where USER_ID
+		=#userId#
+	</update>
+	
+	<update id="updateUserLogin" parameterClass="userInfo">
+		update
+		COMP_AUTHORITY_USER_T
+		set
+		IF_LOGIN=#ifLogin#
+		where USER_ID
+		=#userId#
+	</update>
+
+	<update id="updatePassword" parameterClass="userInfo">
+		update
+		COMP_AUTHORITY_USER_T
+		set
+		PASSWORD=#password#
+		where USER_ID =#userId#
+	</update>
+	
+	<!-- 修改时，是否存在重复电话号  -->
+	<select id="getCountMobile" parameterClass="userInfo"
+		resultClass="int">
+		SELECT
+		count(0)
+		FROM
+		COMP_AUTHORITY_USER_T
+		WHERE upper(USER_ID)!=upper(#userId#) AND MOBILE = #mobile#
+	</select>
+	<!-- 修改时，是否存在重复邮箱  -->
+	<select id="getCountEmail" parameterClass="userInfo"
+		resultClass="int">
+		SELECT
+		count(0)
+		FROM
+		COMP_AUTHORITY_USER_T
+		WHERE upper(USER_ID)!=upper(#userId#) AND EMAIL = #email#
+	</select>
+
+	<!--找回密码时  查询用户密保问题  2015-03-02 -->
+	<select id="findSecurityQuestionbyUserId" parameterClass="String" resultClass="userInfo">
+		 SELECT
+			SECURITY_QUESTION,
+			SECURITY_ANSWER
+		FROM
+			comp_authority_user_t
+		WHERE
+			USER_ID =#userId#
+	</select>
+	
+	<!-- 门户页  用户信息 查询用户与业务绑定信息  2015-03-05-->
+	<select id="queryAppsbyUserId" parameterClass="String" resultClass="userAppBean">
+		SELECT
+			u.USER_ID AS userId,
+			u.APPBIND_STATUS,
+			a.APP_NAME AS appName,
+			u.app_id as appId
+		FROM
+			comp_authority_user_app_t u,
+			comp_app_t a
+		WHERE
+			u.APP_ID = a.APP_ID
+		AND u.USER_ID =#userId#
+		AND u.APPBIND_STATUS IN ('1', '2')
+	</select>
+	<!-- 查询用户绑定未审批通过业务总数  20-->
+    <select id="getCountAppbindStatusByUserId" parameterClass="String" resultClass="int">
+    	SELECT
+			count(*)
+		FROM
+			comp_authority_user_app_t
+		WHERE
+			USER_ID =#userId#
+		AND APPBIND_STATUS = '1'
+    </select>
+    <insert id="insertUserApp" parameterClass="userAppBean">
+			insert into COMP_AUTHORITY_USER_APP_T 
+		(USER_ID ,
+	     APP_ID,
+		 APPBIND_STATUS
+		 )
+		 values 
+		(#userId#,
+		 #appId#,
+		 #appBind_status#
+		)
+	</insert>
+	
+	<!-- 查询待审批用户相关信息 -->
+	<sql id="queryUserApplyWhere">
+    	WHERE
+			(
+				`STATUS` = '4' or (u.`STATUS`='0' AND a.APPBIND_STATUS='1')
+			)
+		AND u.USER_ID = a.USER_ID
+		AND a.APP_ID =at.APP_ID
+			<isNotEmpty prepend="and" property="userName">
+				USER_NAME like
+				CONCAT('%',trim(#userName#),'%')
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="userId">
+				upper(u.USER_ID) like
+				upper(CONCAT('%',trim(#userId#),'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="beforeCreateTime">
+				u.UPDATE_TIME >=
+				#beforeCreateTime#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="afterCreateTime">
+				<![CDATA[
+				 u.UPDATE_TIME <=
+				CONCAT(#afterCreateTime#,'235959')
+				]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="appName">
+				upper(at.APP_NAME) like	CONCAT('%',trim(#appName#),'%')
+			</isNotEmpty>
+    </sql>
+	
+	<select id="queryUserApplyInfo" parameterClass="queryUserInfo" resultClass="userInfo">
+		SELECT
+			u.USER_ID as userId,
+			u.USER_NAME as userName,
+			u.MOBILE as mobile,
+			u.EMAIL as email,
+			u.DEPARTMENT_NAME as departmentName,
+			u.UPDATE_TIME as updateTime,
+			at.APP_NAME as appName,
+		  	u.`STATUS`,
+			a.APPBIND_STATUS as appBindStatus
+		FROM
+			comp_authority_user_t u,
+			comp_authority_user_app_t a,
+			comp_app_t at
+		<include refid="queryUserApplyWhere"/>
+		GROUP BY u.UPDATE_TIME desc
+	</select>
+	
+	<!-- 查询待审批用户个数 -->
+	<select id="queryUserApplyCount" parameterClass="queryUserInfo" resultClass="Integer">
+		SELECT
+			COUNT(0)
+		FROM
+			(
+				SELECT
+					COUNT(0)
+				FROM
+					comp_authority_user_t u,
+					comp_authority_user_app_t a,
+					comp_app_t at
+				<include refid="queryUserApplyWhere"/>
+				GROUP BY u.USER_ID
+			) s
+	</select>
+	<!-- 审批时修改业务相关信息 -->
+	<update id="updateUserAppInfo" parameterClass="userAppBean">
+		UPDATE
+			comp_authority_user_app_t
+		SET 
+		 APPBIND_STATUS = #appBind_status#,
+		 AUDIT_TIME = #auditTime#,
+		 AUDIT_USER = #auditUser#,
+		 AUDIT_INFO = #auditInfo#
+		WHERE
+			USER_ID =#userId# AND APPBIND_STATUS='1'
+	</update>
+	
+	<!-- 用户审批不通过删除注册用户绑定的业务信息(针对四川政企业务) -->
+	<delete id="delUserAppRelation" parameterClass="userAppBean">
+		DELETE
+		FROM
+			comp_authority_user_app_t
+		WHERE
+		  USER_ID = #userId#
+		AND APPBIND_STATUS = '1'
+	</delete>
+	<!-- 用户审批不通过删除注册用户添加的业务信息(针对四川政企业务) -->
+	<delete id="delAppInfo" parameterClass="userAppBean">
+		DELETE  FROM  comp_app_t
+			WHERE
+				app_id = (
+							SELECT
+								app_Id
+							FROM
+								(
+									SELECT
+										u.APP_ID
+									FROM
+										comp_app_t a,
+										comp_authority_user_app_t u
+									WHERE
+										a.APP_ID = u.APP_ID
+									   AND u.APPBIND_STATUS = '1'
+									   AND u.USER_ID =  #userId#
+								) AS a
+						)
+	</delete>
+	
+	<!-- 审批时删除原有绑定的业务 -->
+	<delete id="delUserApp" parameterClass="userAppBean">
+		DELETE
+		FROM
+			comp_authority_user_app_t
+		WHERE
+		  USER_ID = #userId#
+		AND APPBIND_STATUS = '2'
+	</delete>
+	<!-- 查询用户绑定的业务 -->
+	<select id="queryBingAppsbyUserId" parameterClass="String" resultClass="userAppBean">
+		SELECT
+			u.USER_ID AS userId,
+			u.APPBIND_STATUS,
+			a.APP_NAME AS appName,
+			u.app_id as appId
+		FROM
+			comp_authority_user_app_t u,
+			comp_app_t a
+		WHERE
+			u.APP_ID = a.APP_ID
+		AND u.USER_ID =#userId#
+		AND u.APPBIND_STATUS = '2'
+	</select>
+	
+	<select id="queryAuditInfo" parameterClass="String" resultClass="String">
+		select distinct AUDIT_INFO
+		from comp_authority_user_app_t
+		where AUDIT_TIME = (select MAX(AUDIT_TIME)
+							from comp_authority_user_app_t
+							where USER_ID = #userId#
+							and APPBIND_STATUS !='1')
+		and USER_ID = #userId#
+		and APPBIND_STATUS !='1'
+	</select>
+	
+	  <!-- 根据业务Id查询业务名称 -->
+	 <select id="findAppIdCount" resultClass="Integer" parameterClass="String">
+	 		SELECT
+	 				 COUNT(1)
+	 		FROM   
+	 				COMP_APP_T
+	 		WHERE
+	 				APP_ID =#appId#  
+	 </select>
+</sqlMap>

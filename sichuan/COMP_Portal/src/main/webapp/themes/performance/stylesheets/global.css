@@ -1,0 +1,129 @@
+@charset "utf-8";
+/* CSS Document */
+
+body{ background-color:#e1e3e6; color:#404040; font:12px/18px 'Microsoft Yahei','微软雅黑',Arial,Verdana; margin:0; padding:0; }
+a{ color:#404040; text-decoration:none;}
+a:hover{ text-decoration:none;}
+img{ border:none;}
+.wapper{ width:100%; height:70%;}
+.wapperzy{ width:100%; height:100%;}
+ul{ list-style:none;}
+
+.leftTreTit{ background:url(../images/leftTreTitBg.jpg) no-repeat; color:#FFF; font-weight:bold; height:26px; padding:7px 0 0 8px;}
+.leftTreTitHid{ background:url(../images/leftTreTitBgHid.jpg) no-repeat; color:#333; font-weight:bold; height:26px; padding:7px 0 0 8px;}
+.leftTreImg { height:100%;}
+.rightToolbar{ background:url(../images/toolbarBg.jpg) repeat-x; height:40px; padding:10px 16px;}
+.rightToolbarCrumbs{ float:left; width:750px;}
+.rightToolbar h3{ color:#222; font-size:14px; padding:0; margin:0}
+.rightToolbar td a{ color:#404040;}
+.rightToolButton{ float:right; width:30%; margin:7px 0 0 0; padding:0;}
+.rightToolButton li{ float:left; margin:2px; text-align:center;}
+.rightToolButton a{ display:block; width:82px; height:25px;  padding-top:2px;}
+
+/*服务流程内页按钮样式*/
+.rightToolButtonFw{ float:right; width:30%; margin:7px -258px 0 0; padding:0;}
+.rightToolButtonFw li{ float:left; margin:2px; text-align:center;}
+.rightToolButtonFw a{ display:block; width:82px; height:25px;  padding-top:2px;}
+
+
+/*交换机内页按钮样式*/
+.rightToolButtonjhj{ margin:7px 5px 0 0px; padding:0; }
+.rightToolButtonjhj li{ float:left; margin:2px; text-align:center;}
+.rightToolButtonjhj a{ display:block; width:82px; height:25px;  padding-top:2px;}
+
+.button{ background:url(../images/button.png) no-repeat; color:#222;}
+.buttonFoucs{ background:url(../images/buttonfoucs.png) no-repeat; color:#FFF;}
+
+.rightDisplay{ height:235px; padding:10px; width:100%;}
+
+/*服务流程内页图片*/
+.rightDisplayFw{ height:235px; padding:10px; width:98%; overflow:auto;}
+.rightDisplay ul{  height:22px; margin:0; padding:0;}
+.rightDisplay li{ float:left;}
+.rightDisplay a{ display:block; height:22px; margin-left:5px; text-align:center; width:72px;}
+.displayButton{ background:url(../images/disButton.png) no-repeat;}
+.displayButtonfoucs{ background:url(../images/disButtonfoucs.png) no-repeat; color:#fff;}
+.rightView{ height:183px; margin:25px 0 0px 5px;}
+.aynamicAnalysis { display:block; float:right; margin:8px 50px 0 0; width:100px;}
+
+/*交换机内页彩色按钮样式*/
+.rightDisplayJhj{ height:auto; padding:10px; width:90%; }
+.rightDisplayJhj ul{  height:22px; margin:0; padding:0;}
+.rightDisplayJhj li{ float:left; margin:5px;}
+.rightDisplayJhj a{ display:block; height:22px; line-height:22px; text-align:center; width:72px;}
+
+.rightDisplayJhjroute{padding:10px; width:95%; height:48px; overflow-y:scroll; border:1px solid;}
+.rightDisplayJhjroute ul{  height:22px; margin:0; padding:0;}
+.rightDisplayJhjroute li{ float:left; margin:5px;}
+.rightDisplayJhjroute a{ display:block; height:22px; line-height:22px; text-align:center; width:90px;}
+
+.displayButtonJhj{ background:url(../images/disButtonJhj.png) no-repeat;}
+.displayButtonfoucsJhj{ background:url(../images/disButtonfoucs.png) no-repeat; color:#fff;}
+.displayButtonGreenJhj{ background:url(../images/disButtonGreenJhj.png) no-repeat;}
+
+/*内页按钮*/
+.InsidePageButton {float:right; margin:8px; text-align:center;  }
+.InsidePageButton a{ display:block; width:82px; height:25px;  padding-top:2px;}
+
+/*翻页*/
+.pages{ background:url(../images/pageBg.jpg) repeat-x; height:47px; border-top:1px solid #a2a2a2; margin-top:5px;}
+.pages ul{ padding:0; margin:0;}
+.pages li{ float:left; margin:7px 0 0 10px;}
+
+/*基本信息模块*/
+.BasicInformation {background:url(../images/baseInforBg.jpg) repeat-x; border-bottom:1px solid #a2a2a2; float:left; color:#000101; height:60px; margin:0; padding:0; width:100% }
+.BasicInformation H3{margin:20px 0 0 20px; color:#000101; font-size:20px;line-height:1em;}
+.BasicInformation .H3-base{padding-left:20px; margin:7px 0 0 10px;font-size:14px;line-height:20px;}
+.BasicInformation .warn5{ background:url(../../default/images/ico_Warning5.png) no-repeat; }
+.BasicInformation .warn4{ background:url(../../default/images/ico_Warning4.png) no-repeat; }
+.BasicInformation .warn3{ background:url(../../default/images/ico_Warning3.png) no-repeat; }
+.BasicInformation .warn2{ background:url(../../default/images/ico_Warning2.png) no-repeat; }
+.BasicInformation .warn1{ background:url(../../default/images/ico_Warning1.png) no-repeat; }
+.BasicInformation .warn{position:fixed; top:23px;right:25px;}
+.BasicInformation ul{ margin-top:7px; padding:0; width:100%;}
+.BasicInformation li{ color:#FFF; float:left; height:22px; line-height:22px;margin-left:10px; text-align:center; width:82px; }
+.BasicInformation li a{display:block;color:#ffffff;}
+.BasicInformation .close{ position:fixed; top:3px; right:3px; *top:6px;}
+/*
+.BasicInformation .warn{margin-top:3px;}
+*/
+.baseTab ul{ margin:5px 0; padding:5px; width:90%;height:23px;border-top:1px solid #cccccc;}
+.baseTab li{ color:#FFF; float:left; height:22px; line-height:22px;margin-left:10px; text-align:center; width:82px; }
+.baseTab li a{display:block;color:#ffffff;}
+.pageButon1 { background:url(../images/baseButton.png) no-repeat;}
+.pageButonRed{ background:url(../images/baseButtonRed.png) no-repeat; }
+.baseTitl{cursor:pointer;background:url(../images/baseTitlBg.jpg) repeat-x; border-bottom:1px solid #a2a2a2; color:#000101; float:left; font-weight:bold; line-height:26px; height:26px; padding-left:10px; width:285px; }
+.baseTab{ float:left;width:285px; padding:10px 0 0 10px; overflow:auto;}
+.baseTab td{ height:30px; line-height:30px; white-space:nowrap;vertical-align:top;}
+.baseTab th{ background:url(../images/baseText.png) repeat-y; font-weight:normal; word-break:break-all; line-height:30px; height:30px;text-align:left; padding-left:7px; padding-right:7px;width:168px;}
+.baseTitl2{ background:url(../images/baseTitlBg.jpg) repeat-x; border-top:1px solid#a2a2a2; border-bottom:1px solid #a2a2a2; color:#000101; float:left; font-weight:bold; line-height:26px; height:26px; padding-left:10px; width:288px; }
+.baseTab input{border:1px solid #ABADB3; height:20px; width:190px;}
+.baseTab textarea{border:1px solid #ABADB3; height:60px; width:190px;}
+.baseTab .tdSelect{border:1px solid #ABADB3;height:20px;width:190px;}
+.baseTab .redStar{color:#C80000;}
+.baseInputTab{background:#EEEEEE;}
+/*交换机内页表格样式*/
+
+.tableJhj{margin:0 0.2%; width:99.5%;}
+.tableJhj p{ background:url(../images/indenGreenJhj.png) no-repeat; padding-left:30px; margin:0;}
+.tableJhj h6{background:url(../images/indenGrayJhj.png) no-repeat; padding-left:30px; margin:0; font-size:12px; font-weight:normal;}
+.tableJhj h5{background:url(../images/indenYellow.png) no-repeat; padding-left:30px; margin:0; font-size:12px; font-weight:normal;}
+
+.tableFwlc { margin-left:0.3%; width:99.5%;}
+.tableFwlc img{ float:left;}
+.tableFwlc p{ float:left; padding:0; margin:0;}
+
+/*����¼���ҳ*/
+/*.rightDisplayFwSj{ height:460px; margin:25px 0 0 25px; width:98%;}*/
+.rightDisplayFwSj{ margin:0 0 0 0; width:100%; overflow:auto;background-color:#ffffff;}
+.rightDisplayFwSj h3{ float:left; line-height:30px; padding:0; margin:0;}
+.rightDisplayFwSj p{ float:right; padding:0; margin:0; line-height:30px;}
+/*.rightDisplayFwSj span{ color:#F00; padding:0; margin:0;}*/
+.rightDisplayFwSj th{ font-weight:normal; padding:0; margin:0;}
+.rightDisplayFwSj label{line-height:35px;}
+.rightDisplayFwSj input{ font-family:"΢���ź�"�� }
+.serverEventButton { background:#eef0f3; border-top:1px solid #d9dadb; height:40px; padding:0; margin:0}
+.rightToolButtonjhjFwSj{float:left; margin:7px 0 0 30px; padding:0; width:80%;}
+.rightToolButtonjhjFwSj li{ float:left; margin-left:12px; text-align:center;width:82px}
+.rightToolButtonjhjFwSj a{ color:#FFF;  display:block; width:82px; height:24px; line-height:22px;}
+.buttonFwSj{ background:url(../images/baseButton.png) no-repeat; color:#222;}

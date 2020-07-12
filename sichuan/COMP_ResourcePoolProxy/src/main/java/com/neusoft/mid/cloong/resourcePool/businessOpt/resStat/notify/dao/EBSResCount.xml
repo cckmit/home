@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="EBSResCount">
+	<typeAlias alias="EBSResCountInfo"
+		type="com.neusoft.mid.cloong.resourcePool.businessOpt.resStat.notify.bean.EBSResCountBean" />
+	<select id="getCountEBSById" parameterClass="java.util.HashMap"
+		resultClass="java.lang.String">
+		select t.EBS_ID
+		from comp_ebs_res_count_t t
+		where t.ebs_id in (
+		<iterate property="consume" conjunction=",">
+			#consume[].netWorkResouseID#
+		</iterate>
+		<![CDATA[
+			)
+			and t.res_pool_id = #poolId#
+			and t.res_pool_part_id = #partId#
+			and ((t.start_time >= #startTime# and t.end_time <= #endTime#)
+			or (t.start_time<= #startTime# and t.end_time >= #endTime#)
+			or (t.start_time > #startTime# and t.start_time < #endTime# and
+			t.end_time > #endTime#)
+			or (t.start_time < #startTime# and t.end_time > #endTime# and t.end_time
+			< #endTime#)
+			)
+		]]>
+	</select>
+
+	<select id="getExistEBSId" parameterClass="java.util.HashMap"
+		resultClass="java.lang.String">
+		select ebs_id from(
+		<iterate property="consume" conjunction="UNION">
+			select
+			#consume[].netWorkResouseID# ebs_id
+			from dual
+		</iterate>
+		) a
+		where (ebs_id) not in
+		(SELECT
+		ebs_id
+		FROM
+		COMP_CASE_EBS_T
+		WHERE
+		res_pool_id = #resPoolId#
+		AND res_pool_part_id = #resPoolPartId#)
+	</select>
+
+	<insert id="insertEBSCount" parameterClass="EBSResCountInfo">
+		insert into
+		comp_ebs_res_count_t
+		(EBS_ID,
+		START_TIME,
+		END_TIME,
+		PERIOD_TIME,
+		SIZE_USED,
+		STANDARD_ID,
+		STANDARD_NAME,
+		RES_POOL_ID,
+		RES_POOL_PART_ID,
+		CREATE_TIME)
+		select
+		#ebsId#,
+		#startTime#,
+		#endTime#,
+		#periodTime#,
+		#sizeUsed#,
+		caset.standard_id,
+		standt.standard_name,
+		caset.res_pool_id,
+		caset.res_pool_part_id,
+		#createTime#
+		from
+		comp_case_ebs_t caset
+		left join
+		comp_standard_ebs_t standt
+		on
+		caset.standard_id = standt.standard_id
+		where
+		caset.ebs_id = #ebsId# and caset.res_pool_id
+		= #resPoolId# and
+		caset.res_pool_part_id = #resPoolPartId#
+	</insert>
+</sqlMap>

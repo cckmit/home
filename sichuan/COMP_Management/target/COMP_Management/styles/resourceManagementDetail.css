@@ -1,0 +1,61 @@
+@charset "utf-8";
+/* CSS Document 
+.search{
+	margin-top: 24px;
+	font-family: '微软雅黑';
+}*/
+.contentDetail{
+	width: 703px
+}
+.result{
+	float: left;
+	width: 100%;
+	margin-left: 60px;
+	margin-top: 5px
+}
+.label{
+	border-bottom: 1px solid #d8d8d8;
+	float: left;
+	width: 100%;
+	margin-bottom: 30px;
+}
+.label-bg{
+	background: url(../images/label-bg.png) no-repeat top left;
+	color: #444;
+	float: left;
+	width: 75px;
+	height: 24px;
+	line-height: 25px;
+	text-align: center
+}
+.result-list{
+	float: left;
+	width: 50%;	
+}
+.result-list li{
+	color: #666;
+	margin-bottom: 16px;
+}
+.result-list .result-name{
+	width: 132px;
+	text-align: right;
+	float: left;
+	margin-right: 14px;
+}
+.result-grid {
+	width: 85%;
+	margin-left: 63px
+}
+.result-grid th{
+	background:  #E3E3E3;
+	font-weight: 700;
+}
+.result-grid th,.result-grid td{
+	color: #666;
+	height: 28px;
+	line-height: 28px;
+	text-align: center
+}
+.even {
+	background: #EDEDED;
+}

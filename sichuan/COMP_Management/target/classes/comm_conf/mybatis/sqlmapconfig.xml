@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMapConfig 
+
+   PUBLIC "-//iBATIS.com//DTD SQL Map Config 2.0//EN" 
+
+   "http://www.ibatis.com/dtd/sql-map-config-2.dtd">
+
+<sqlMapConfig>
+
+	<settings cacheModelsEnabled="true" enhancementEnabled="true"
+
+		lazyLoadingEnabled="true" maxRequests="32" maxSessions="10"
+
+		maxTransactions="5" useStatementNamespaces="false" />
+
+		
+
+		
+
+	<typeHandler javaType="com.neusoft.mid.cloong.common.core.ItemType"
+
+		callback="com.neusoft.mid.cloong.common.core.ItemTypeHandler" />
+
+	<typeHandler javaType="com.neusoft.mid.cloong.common.core.ItemStatus"
+
+		callback="com.neusoft.mid.cloong.common.core.ItemStatusHandler" />
+
+	<typeHandler javaType="com.neusoft.mid.cloong.common.core.RecommendStatus"
+
+		callback="com.neusoft.mid.cloong.common.core.RecommendStatusHandler" />
+
+	<typeHandler javaType="com.neusoft.mid.cloong.common.core.UseStatus"
+
+		callback="com.neusoft.mid.cloong.common.core.UseStatusHandler" />
+
+	<typeHandler javaType="com.neusoft.mid.cloong.common.core.ResPoolStatus"
+
+		callback="com.neusoft.mid.cloong.common.core.ResPoolStatusHandler" />
+
+	<typeHandler javaType="com.neusoft.mid.cloong.identity.bean.core.UserStatus"
+
+		callback="com.neusoft.mid.cloong.identity.bean.core.UserStatusHandler" />
+
+	<typeHandler javaType="com.neusoft.mid.cloong.identity.bean.core.RoleStatus"
+
+		callback="com.neusoft.mid.cloong.identity.bean.core.RoleStatusHandler" />
+
+	<typeHandler javaType="com.neusoft.mid.cloong.identity.bean.core.UserStatus"
+
+		callback="com.neusoft.mid.cloong.identity.bean.core.UserStatusHandler" />
+
+	<typeHandler javaType="com.neusoft.mid.cloong.vm.core.VMStatus"
+
+		callback="com.neusoft.mid.cloong.vm.core.VMStatusHandler" />
+
+	<typeHandler javaType="com.neusoft.mid.cloong.pm.core.PMStatus"
+
+		callback="com.neusoft.mid.cloong.pm.core.PMStatusHandler" />
+
+	<typeHandler javaType="com.neusoft.mid.cloong.vmbak.core.VmBakStatus"
+
+		callback="com.neusoft.mid.cloong.vmbak.core.VmBakStatusHandler" />
+
+		
+
+	<sqlMap resource="com/neusoft/mid/cloong/identity/dao/Identity.xml" />
+
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/product/item/vm/action/ItemInfo.xml" />
+
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/product/item/vm/action/ItemTypeInfo.xml" />
+
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/product/item/vm/action/ItemAuditLogInfo.xml" />
+
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/product/item/user/action/UserAuditLogInfo.xml" />
+
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/product/standard/vm/action/VMStandardInfo.xml" />
+
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/system/config/action/Resource.xml" />
+
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/system/config/action/ResourcePart.xml" />
+
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/product/catalog/vm/action/QueryCatalogListAction.xml" />
+
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/product/standard/ebs/action/EBSStandardInfo.xml" />
+
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/user/order/OrderInfo.xml" />
+
+	<sqlMap resource="com/neusoft/mid/cloong/identity/dao/User.xml" />
+
+	<sqlMap resource="com/neusoft/mid/cloong/identity/dao/Permission.xml" />
+
+	<sqlMap resource="com/neusoft/mid/cloong/identity/dao/Role.xml" />
+
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/product/standard/base/StandardInfo.xml" />
+
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/product/standard/vm/action/VMStandardIsoInfo.xml" />
+
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/product/standard/pm/action/PMStandardInfo.xml" />
+
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/product/standard/vmbak/action/VMBASKStandardInfo.xml" />
+
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/user/order/mail/SentMail.xml" />
+
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/app/action/App.xml" />
+
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/resourceManagement/appView/performanceStatistics/action/StaDeviceWeek.xml" />
+
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/resourceManagement/appView/exceededStatistics/action/StaExceeded.xml"/>
+
+	<sqlMap resource="com/neusoft/mid/cloong/generator/SequenceIdGenerator.xml" />
+
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/resourceManagement/vm/action/VmInfo.xml" />
+
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/resourceManagement/pm/action/PmInfo.xml" />
+
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/resourceManagement/ebs/action/EbsInfo.xml" />
+
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/resourceManagement/miniPmPar/action/MiniPmParInfo.xml" />
+
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/resourceManagement/miniPm/action/MiniPmInfo.xml" />
+
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/resourceManagement/raid/action/RaidInfo.xml" />
+
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/resourceManagement/sw/action/SwInfo.xml" />
+
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/resourceManagement/rt/action/RtInfo.xml" />
+
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/resourceManagement/fw/action/FwInfo.xml" />
+
+	
+
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/resourceManagement/action/CreatTreeInfo.xml" />
+
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/resourceManagement/resView/action/StaCapacityInfo.xml" />
+
+	
+
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/resourceManagement/appView/deviceNum/action/DeviceNum.xml" />
+
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/resourceManagement/realTime/action/RealTime.xml" />
+
+
+
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/report/historyPerformance/action/HistoryPerformance.xml" />
+
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/report/devicePerformance/action/DevicePerformance.xml" />
+
+	<sqlMap resource="com/neusoft/mid/cloong/web/page/report/monthPerformance/action/MonthPerformance.xml" />
+
+
+
+	<sqlMap resource="com/neusoft/mid/cloong/identity/dao/PublicIp.xml"/>
+	
+	<sqlMap resource="com/neusoft/mid/cloong/identity/dao/Charges.xml"/>
+
+</sqlMapConfig>
+

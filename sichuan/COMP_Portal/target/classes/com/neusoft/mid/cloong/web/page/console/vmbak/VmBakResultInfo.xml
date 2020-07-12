@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="VmBakResultInfo">
+	
+	<typeAlias alias="VmBakResultInfo"
+		type="com.neusoft.mid.cloong.web.page.console.vmbak.info.VmBakResultInfo" />
+	<typeAlias alias="VmBakOperatorErrorInfo"
+		type="com.neusoft.mid.cloong.web.page.console.vmbak.info.VmBakOperatorErrorInfo" />	
+	<typeAlias alias="RespoolPartInfo"
+		type="com.neusoft.mid.cloong.web.page.host.vm.order.info.RespoolPartInfo" />	
+		
+	<select id="queryVmBakUserListAll" parameterClass="VmBakResultInfo"
+		resultClass="VmBakResultInfo">
+		SELECT
+			comp_case_vmbak_t.case_id caseId,
+			comp_case_vmbak_t.vmBak_id vmBakId,
+			comp_case_vmbak_t.vmBak_name vmBakName,
+			comp_case_vm_t.vm_name vmName,
+			comp_case_vmbak_t. status status,
+			comp_case_vmbak_t.backup_cyc backupCyc,
+			comp_case_vmbak_t.vm_id vmId,
+			comp_case_vm_t.vm_name vmName,
+			comp_case_vmbak_t.create_time createTime
+		FROM
+			comp_case_vmbak_t
+		LEFT JOIN comp_order_t ON comp_case_vmbak_t.order_id = comp_order_t.order_id
+		LEFT JOIN comp_case_vm_t ON comp_case_vmbak_t.vm_id = comp_case_vm_t.vm_id
+		LEFT JOIN comp_app_t ON comp_case_vm_t.app_id = comp_app_t.app_id
+		WHERE
+			comp_case_vmbak_t. status != #vmBakStatus#
+		AND comp_order_t.order_id IS NOT NULL
+		AND comp_order_t. status != '2'
+		AND comp_case_vm_t. STATUS != '3'
+		<isNotEmpty prepend="AND" property="vmId">
+			comp_case_vm_t.vm_id = #vmId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="vmName">
+			LOWER(comp_case_vm_t.vm_name) LIKE CONCAT('%',#vmName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="status">
+			comp_case_vmbak_t. status = #status#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="startTime">
+			<![CDATA[ comp_case_vmbak_t.create_time >= #startTime# ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="endTime">
+			<![CDATA[ comp_case_vmbak_t.create_time <= #endTime# ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="appIdList">
+			comp_case_vm_t.app_id IN
+			<iterate property="appIdList" conjunction="," close=")" open="(">
+				#appIdList[]#
+			</iterate>
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="appId">
+			comp_app_t.app_id = #appId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="vmBakId">
+			comp_case_vmbak_t.vmBak_id = #vmBakId#
+		</isNotEmpty>
+		ORDER BY comp_case_vmbak_t.create_time DESC
+	</select>
+	
+	<select id="countVmBakUserListAll" parameterClass="VmBakResultInfo" resultClass="java.lang.Integer">
+		SELECT count(comp_case_vmbak_t.case_id)
+		FROM
+			comp_case_vmbak_t
+		LEFT JOIN comp_order_t ON comp_case_vmbak_t.order_id = comp_order_t.order_id
+		LEFT JOIN comp_case_vm_t ON comp_case_vmbak_t.vm_id = comp_case_vm_t.vm_id
+		LEFT JOIN comp_app_t ON comp_case_vm_t.app_id = comp_app_t.app_id
+		WHERE
+			comp_case_vmbak_t. status != #vmBakStatus#
+		AND comp_order_t.order_id IS NOT NULL
+		AND comp_order_t. status != '2'
+		AND comp_case_vm_t. STATUS != '3'
+		<isNotEmpty prepend="AND" property="vmId">
+			comp_case_vm_t.vm_id = #vmId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="vmName">
+			LOWER(comp_case_vm_t.vm_name) LIKE CONCAT('%',#vmName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="status">
+			comp_case_vmbak_t. status = #status#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="startTime">
+			<![CDATA[ comp_case_vmbak_t.create_time >= #startTime# ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="endTime">
+			<![CDATA[ comp_case_vmbak_t.create_time <= #endTime# ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="appIdList">
+			comp_case_vm_t.app_id IN
+			<iterate property="appIdList" conjunction="," close=")" open="(">
+				#appIdList[]#
+			</iterate>
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="appId">
+			comp_app_t.app_id = #appId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="vmBakId">
+			comp_case_vmbak_t.vmBak_id = #vmBakId#
+		</isNotEmpty>
+	</select>
+	
+	<insert id="insertVmBakOperatorFailErrorInfo" parameterClass="VmBakOperatorErrorInfo">
+		insert
+		into COMP_VMBAK_ROLLBACK_FAIL_T (VMBAK_ID,FAIL_CAUSE,FAIL_CODE,RES_POOL_ID,RES_POOL_PART_ID,CREATE_TIME,SERIAL_NUM)
+		values(#vmBakId#,#failCause#,#failCode#,#resourcePoolId#,#resourcePoolPartId#,#createTime#,#serialNum#)
+	</insert>
+	
+	<select id="getRespoolPartIdByVmId" parameterClass="java.lang.String"
+		resultClass="RespoolPartInfo">
+		SELECT RES_POOL_PART_ID respoolPartId,RES_POOL_ID respoolId FROM
+		COMP_CASE_VM_T
+		where
+		VM_ID=#vmId#
+	</select>
+
+</sqlMap>

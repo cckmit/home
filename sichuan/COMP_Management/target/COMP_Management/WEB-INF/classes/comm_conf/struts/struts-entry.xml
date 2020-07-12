@@ -1,0 +1,759 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<!-- 这只浏览器时候缓存静态内容，默认值为true(生产环境下使用),开发阶段最好关闭 -->
+	<constant name="struts.serve.static.vrowserCache" value="false"></constant>
+	<!-- 当struts的配置文件修改后，系统是否自动重新加载该文件，默认为false(生产环境下使用),开发阶段最好打开 -->
+	<constant name="struts.serve.static.vrowserCache" value="true"></constant>
+	<constant name="struts.ui.theme" value="simple"></constant>
+
+	<package name="com.neusoft.mid.cloong.product.item" namespace="/product"
+		extends="struts-default">
+		<interceptors>
+			<interceptor name="authenticate" class="authenticateInterceptor" />
+			<interceptor name="turnPageInter" class="turnPageInterceptor" />
+			<interceptor-stack name="authStack">
+				<interceptor-ref name="authenticate" />
+				<interceptor-ref name="defaultStack" />
+				<interceptor-ref name="turnPageInter" />
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="authStack" />
+		<global-results>
+			<result name="LOGIN" type="redirectAction">logout</result>
+			<result name="error" type="chain">exceptionIntercepor</result>
+		</global-results>
+		<global-exception-mappings>
+			<exception-mapping exception="java.lang.Exception"
+				result="error" />
+		</global-exception-mappings>
+		<!-- 虚拟机条目查询 -->
+		<action name="vmItems" class="vmItemQueryListAction">
+			<result name="success">/WEB-INF/pages/product/item/vm/vm_list.jsp</result>
+			<result name="failure">/WEB-INF/pages/product/item/vm/vm_list.jsp</result>
+			<result name="error">/WEB-INF/pages/product/item/vm/vm_list.jsp</result>
+		</action>
+		<!-- 虚拟机条目创建 -->
+		<action name="vmItemCreateInfo" class="vmItemCreateInfoAction">
+			<result name="success">/WEB-INF/pages/product/item/vm/vm_add.jsp</result>
+			<result name="error" type="redirectAction"> 
+	          <param name="actionName">vmItems</param>
+	          <param name="msg">${msg}</param>
+	          <param name="errMsg">${errMsg}</param>
+	        </result>
+		</action>
+		<!-- 虚拟机条目修改跳转 -->
+		<action name="itemInfo" class="vmItemInfoAction">
+			<result name="success">/WEB-INF/pages/product/item/vm/vm_modify.jsp</result>
+			<result name="error" type="redirectAction"> 
+	          <param name="actionName">vmItems</param>
+	          <param name="msg">${msg}</param>
+	          <param name="errMsg">${errMsg}</param>
+	        </result>
+			<result name="failure" type="redirectAction"> 
+	          <param name="actionName">vmItems</param>
+	          <param name="msg">${msg}</param>
+	          <param name="errMsg">${errMsg}</param>
+	        </result>
+		</action>
+		<!-- 虚拟机条目详情跳转 -->
+		<action name="vmItemDetail" class="vmItemInfoAction">
+			<result name="success">/WEB-INF/pages/product/item/vm/vm_detail.jsp</result>
+			<result name="error" type="redirectAction"> 
+	          <param name="actionName">vmItems</param>
+	          <param name="msg">${msg}</param>
+	          <param name="errMsg">${errMsg}</param>
+	        </result>
+			<result name="failure" type="redirectAction"> 
+	          <param name="actionName">vmItems</param>
+	          <param name="msg">${msg}</param>
+	          <param name="errMsg">${errMsg}</param>
+	        </result>
+		</action>
+		<!-- 物理机条目查询 -->
+		<action name="pmItems" class="pmItemQueryListAction">
+			<result name="success">/WEB-INF/pages/product/item/pm/pm_list.jsp</result>
+			<result name="failure">/WEB-INF/pages/product/item/pm/pm_list.jsp</result>
+			<result name="error">/WEB-INF/pages/product/item/pm/pm_list.jsp</result>
+		</action>
+		<!-- 物理机条目创建 -->
+		<action name="pmItemCreateInfo" class="pmItemCreateInfoAction">
+			<result name="success">/WEB-INF/pages/product/item/pm/pm_add.jsp</result>
+			<result name="error" type="redirectAction"> 
+	          <param name="actionName">pmItems</param>
+	          <param name="msg">${msg}</param>
+	          <param name="errMsg">${errMsg}</param>
+	        </result>
+		</action>
+		<!-- 物理机条目修改跳转 -->
+		<action name="pmItemInfo" class="pmItemInfoAction">
+			<result name="success">/WEB-INF/pages/product/item/pm/pm_modify.jsp</result>
+			<result name="error" type="redirectAction"> 
+	          <param name="actionName">pmItems</param>
+	          <param name="msg">${msg}</param>
+	          <param name="errMsg">${errMsg}</param>
+	        </result>
+			<result name="failure" type="redirectAction"> 
+	          <param name="actionName">pmItems</param>
+	          <param name="msg">${msg}</param>
+	          <param name="errMsg">${errMsg}</param>
+	        </result>
+		</action>
+		<!-- 物理机条目详情跳转 -->
+		<action name="pmItemDetail" class="pmItemInfoAction">
+			<result name="success">/WEB-INF/pages/product/item/pm/pm_detail.jsp</result>
+			<result name="error" type="redirectAction"> 
+	          <param name="actionName">pmItems</param>
+	          <param name="msg">${msg}</param>
+	          <param name="errMsg">${errMsg}</param>
+	        </result>
+			<result name="failure" type="redirectAction"> 
+	          <param name="actionName">pmItems</param>
+	          <param name="msg">${msg}</param>
+	          <param name="errMsg">${errMsg}</param>
+	        </result>
+		</action>
+
+		<!-- 虚拟机备份条目查询 -->
+		<action name="vmbakItems" class="vmbakItemQueryListAction">
+			<result name="success">/WEB-INF/pages/product/item/vmbak/vmbak_list.jsp</result>
+			<result name="failure">/WEB-INF/pages/product/item/vmbak/vmbak_list.jsp</result>
+			<result name="error">/WEB-INF/pages/product/item/vmbak/vmbak_list.jsp</result>
+		</action>
+		<!-- 虚拟机备份条目创建 -->
+		<action name="vmbakItemCreateInfo" class="vmbakItemCreateInfoAction">
+			<result name="success">/WEB-INF/pages/product/item/vmbak/vmbak_add.jsp</result>
+			<result name="error" type="redirectAction"> 
+	          <param name="actionName">vmbakItems</param>
+	          <param name="msg">${msg}</param>
+	          <param name="errMsg">${errMsg}</param>
+	        </result>
+		</action>
+		<!-- 虚拟机备份条目修改跳转 -->
+		<action name="vmbakItemInfo" class="vmbakItemInfoAction">
+			<result name="success">/WEB-INF/pages/product/item/vmbak/vmbak_modify.jsp</result>
+			<result name="error" type="redirectAction"> 
+	          <param name="actionName">vmbakItems</param>
+	          <param name="msg">${msg}</param>
+	          <param name="errMsg">${errMsg}</param>
+	        </result>
+			<result name="failure" type="redirectAction"> 
+	          <param name="actionName">vmbakItems</param>
+	          <param name="msg">${msg}</param>
+	          <param name="errMsg">${errMsg}</param>
+	        </result>
+		</action>
+		<!-- 虚拟机备份条目详情跳转 -->
+		<action name="vmbakItemDetail" class="vmbakItemInfoAction">
+			<result name="success">/WEB-INF/pages/product/item/vmbak/vmbak_detail.jsp</result>
+			<result name="error" type="redirectAction"> 
+	          <param name="actionName">vmbakItems</param>
+	          <param name="msg">${msg}</param>
+	          <param name="errMsg">${errMsg}</param>
+	        </result>
+			<result name="failure" type="redirectAction"> 
+	          <param name="actionName">vmbakItems</param>
+	          <param name="msg">${msg}</param>
+	          <param name="errMsg">${errMsg}</param>
+	        </result>
+		</action>
+		<!-- 虚拟硬盘条目查询 -->
+		<action name="ebsItems" class="ebsItemQueryListAction">
+			<result name="success">/WEB-INF/pages/product/item/ebs/ebs_list.jsp</result>
+			<result name="failure">/WEB-INF/pages/product/item/ebs/ebs_list.jsp</result>
+			<result name="error">/WEB-INF/pages/product/item/ebs/ebs_list.jsp</result>
+		</action>
+		<!-- 虚拟硬盘条目创建 -->
+		<action name="ebsItemCreateInfo" class="ebsItemCreateInfoAction">
+			<result name="success">/WEB-INF/pages/product/item/ebs/ebs_add.jsp</result>
+			<result name="error" type="redirectAction"> 
+	          <param name="actionName">ebsItems</param>
+	          <param name="msg">${msg}</param>
+	          <param name="errMsg">${errMsg}</param>
+	        </result>
+		</action>
+		<!-- 虚拟硬盘条目修改跳转 -->
+		<action name="ebsItemInfo" class="ebsItemInfoAction">
+			<result name="success">/WEB-INF/pages/product/item/ebs/ebs_modify.jsp</result>
+			<result name="error" type="redirectAction"> 
+	          <param name="actionName">ebsItems</param>
+	          <param name="msg">${msg}</param>
+	          <param name="errMsg">${errMsg}</param>
+	        </result>
+			<result name="failure" type="redirectAction"> 
+	          <param name="actionName">ebsItems</param>
+	          <param name="msg">${msg}</param>
+	          <param name="errMsg">${errMsg}</param>
+	        </result>
+		</action>
+		<!-- 虚拟硬盘条目详情跳转 -->
+		<action name="ebsItemDetail" class="ebsItemInfoAction">
+			<result name="success">/WEB-INF/pages/product/item/ebs/ebs_detail.jsp</result>
+			<result name="error" type="redirectAction"> 
+	          <param name="actionName">ebsItems</param>
+	          <param name="msg">${msg}</param>
+	          <param name="errMsg">${errMsg}</param>
+	        </result>
+			<result name="failure" type="redirectAction"> 
+	          <param name="actionName">ebsItems</param>
+	          <param name="msg">${msg}</param>
+	          <param name="errMsg">${errMsg}</param>
+	        </result>
+		</action>
+		
+		<!-- 查询服务目录 -->
+		<action name="queryCatalog" method="catalogQueryList" class="queryCatalogListAction">
+			<result name="success">/WEB-INF/pages/product/catalog/vm/catalog_vm_list.jsp
+			</result>
+			<result name="error" type="chain">
+				<param name="actionName">queryCatalog</param>
+				<param name="errMsg">${errMsg}</param>
+			</result>
+			<result name="input">/WEB-INF/pages/product/catalog/vm/catalog_vm_list.jsp
+			</result>
+		</action>
+		<!-- 创建服务目录 -->
+		<action name="createCatalog" method="createCatalog" class="queryCatalogListAction">
+			<result name="success" type="chain">
+				<param name="actionName">queryCatalog</param>
+			</result>
+			<result name="error" type="chain">
+				<param name="actionName">queryCatalog</param>
+				<param name="errMsg">${errMsg}</param>
+			</result>
+			<result name="failure" type="chain">
+				<param name="actionName">queryCatalog</param>
+				<param name="errMsg">${errMsg}</param>
+			</result>
+			<result name="input" type="chain">
+				<param name="actionName">queryCatalog</param>
+			</result>
+		</action>
+		<!-- 修改服务目录 -->
+		<action name="modifyCatalog" method="modifyCatalog" class="queryCatalogListAction">
+			<result name="success" type="chain">
+				<param name="actionName">queryCatalog</param>
+				<param name="msg">${msg}</param>
+			</result>
+			<result name="error" type="chain">
+				<param name="actionName">queryCatalog</param>
+				<param name="errMsg">${errMsg}</param>
+			</result>
+			<result name="failure" type="chain">
+				<param name="actionName">queryCatalog</param>
+				<param name="errMsg">${errMsg}</param>
+			</result>
+			<result name="input" type="chain">
+				<param name="actionName">queryCatalog</param>
+			</result>
+		</action>
+		<!-- 删除服务目录 -->
+		<action name="delCatalog" method="delCatalog" class="queryCatalogListAction">
+			<result name="success" type="chain">
+				<param name="actionName">queryCatalog</param>
+			</result>
+			<result name="error" type="chain">
+				<param name="actionName">queryCatalog</param>
+				<param name="errMsg">${errMsg}</param>
+			</result>
+			<result name="failure" type="chain">
+				<param name="actionName">queryCatalog</param>
+				<param name="errMsg">${errMsg}</param>
+			</result>
+			<result name="input" type="chain">
+				<param name="actionName">queryCatalog</param>
+			</result>
+		</action>
+		
+	</package>
+	<package name="entry.json" extends="json-default">
+	<interceptors>
+			<interceptor name="authenticate" class="authenticateInterceptor" />
+			<interceptor name="turnPageInter" class="turnPageInterceptor" />
+			<interceptor-stack name="authStack">
+				<interceptor-ref name="authenticate" />
+				<interceptor-ref name="jsonValidationWorkflowStack" />
+				<interceptor-ref name="defaultStack" />
+				<interceptor-ref name="turnPageInter" />
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="authStack" />
+		<global-results>
+			<result name="LOGIN" type="redirectAction">logout</result>
+			<result name="error" type="chain">exceptionIntercepor</result>
+		</global-results>
+		<global-exception-mappings>
+			<exception-mapping exception="java.lang.Exception"
+				result="error" />
+		</global-exception-mappings>
+		<!-- 虚拟硬盘规格查询 -->
+		<action name="ebsStandardQuery" class="ebsStandardListAction">
+			<result type="json">
+				<param name="root">ebsStandardInfos</param>
+			</result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<!-- 虚拟硬盘规格详情 -->
+		<action name="ebsStandardDetail" class="ebsStandardInfoDetailAction">
+			<result type="json">
+				<param name="root">ebsStandardInfos</param>
+			</result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<!-- 虚拟硬盘条目保存-->
+		<action name="ebsItemsCreate" class="ebsItemCreateAction">
+			<result name="success" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<!-- 虚拟硬盘条目保存并提交 -->
+		<action name="ebsItemCreateAndSubmit" class="ebsItemCreateAndSubmitAction">
+			<result name="success" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<!-- 条目修改 -->
+		<action name="ebsItemUpdate" class="ebsItemUpdateAction">
+			<result name="success" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<!-- 条目修改并提交  -->
+		<action name="ebsItemUpdateAndSubmit" class="ebsItemUpdateAndSubmitAction">
+			<result name="success" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<!-- 虚拟机规格查询 -->
+		<action name="vmStandardQuery" class="VmStandardListAction">
+			<result type="json">
+				<param name="root">vmStandardInfos</param>
+			</result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<!-- 虚拟机规格详情 -->
+		<action name="vmStandardDetail" class="VmStandardInfoDetailAction">
+			<result type="json">
+				<param name="root">vmStandardInfos</param>
+			</result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<!-- 虚拟机条目保存-->
+		<action name="vmItemsCreate" class="vmItemCreateAction">
+			<result name="success" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<!-- 虚拟机条目保存并提交 -->
+		<action name="vmItemCreateAndSubmit" class="vmItemCreateAndSubmitAction">
+			<result name="success" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<!-- 条目提交 -->
+		<action name="itemSubmit" class="itemSubmitAction">
+			<result name="success" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+		</action>
+		<!-- 条目发布 -->
+		<action name="itemSend" class="itemSendAction">
+			<result name="success" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+		</action>
+		<!-- 条目删除 -->
+		<action name="itemDel" class="itemDeleteAction">
+			<result name="success" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+		</action>
+		<!-- 条目下架 -->
+		<action name="itemDown" class="itemDownAction">
+			<result name="success" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+		</action>
+		<!-- 条目修改 -->
+		<action name="vmItemUpdate" class="vmItemUpdateAction">
+			<result name="success" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<!-- 条目修改并提交  -->
+		<action name="vmItemUpdateAndSubmit" class="vmItemUpdateAndSubmitAction">
+			<result name="success" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<!-- 条目修改并提交  -->
+		<action name="itemAuditLog" class="itemAuditLogAction">
+			<result name="success" type="json">
+				<param name="root">itemAuditLogs</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">itemAuditLogs</param>
+			</result>
+		</action>
+		<!-- 条目推荐  -->
+		<action name="itemCommend" class="itemCommendAction">
+			<result name="success" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+		</action>
+		<!-- 条目取消推荐  -->
+		<action name="itemCloseCommend" class="itemCloseCommendAction">
+			<result name="success" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+		</action>
+		<!-- 条目ajax查询  -->
+		<action name="itemQuery" class="vmItemQueryListAction">
+			<result name="success" type="json">
+				<param name="root">itemInfos</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">itemInfos</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">itemInfos</param>
+			</result>
+		</action>
+		<!-- 条目ajax查询  -->
+		<action name="ebsItemQuery" class="ebsItemQueryListAction">
+			<result name="success" type="json">
+				<param name="root">itemInfos</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">itemInfos</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">itemInfos</param>
+			</result>
+		</action>
+		<!-- 物理机规格查询 -->
+		<action name="pmStandardQuery" class="PmStandardListAction">
+			<result type="json">
+				<param name="root">pmStandardInfos</param>
+			</result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<!-- 物理机条目ajax查询  -->
+		<action name="pmItemQuery" class="pmItemQueryListAction">
+			<result name="success" type="json">
+				<param name="root">itemInfos</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">itemInfos</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">itemInfos</param>
+			</result>
+		</action>
+		<!-- 物理机规格详情 -->
+		<action name="pmStandardDetail" class="PmStandardInfoDetailAction">
+			<result type="json">
+				<param name="root">pmStandardInfos</param>
+			</result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<!-- 物理机条目保存-->
+		<action name="pmItemsCreate" class="pmItemCreateAction">
+			<result name="success" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<!-- 条目修改并提交  -->
+		<action name="pmItemUpdateAndSubmit" class="pmItemUpdateAndSubmitAction">
+			<result name="success" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<!-- 条目修改 -->
+		<action name="pmItemUpdate" class="pmItemUpdateAction">
+			<result name="success" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<!-- 物理机条目保存并提交 -->
+		<action name="pmItemCreateAndSubmit" class="pmItemCreateAndSubmitAction">
+			<result name="success" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<!-- 虚拟机备份Action -->
+		<!-- 虚拟机备份条目保存-->
+		<action name="vmbakItemsCreate" class="vmbakItemCreateAction">
+			<result name="success" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<!-- 虚拟机备份规格详情 -->
+		<action name="vmbakStandardDetail" class="VMBAKStandardListQueryActionJson">
+			<result type="json">
+				<param name="root">vmbakStandardInfos</param>
+			</result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<!-- 虚拟机备份条目ajax查询  -->
+		<action name="vmbakItemQuery" class="vmbakItemQueryListAction">
+			<result name="success" type="json">
+				<param name="root">itemInfos</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">itemInfos</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">itemInfos</param>
+			</result>
+		</action>
+		<!-- 虚拟机备份条目修改 -->
+		<action name="vmbakItemUpdate" class="vmbakItemUpdateAction">
+			<result name="success" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<!-- 虚拟机备份条目修改并提交  -->
+		<action name="vmbakItemUpdateAndSubmit" class="vmbakItemUpdateAndSubmitAction">
+			<result name="success" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<!-- 虚拟机备份条目保存并提交 -->
+		<action name="vmbakItemCreateAndSubmit" class="vmbakItemCreateAndSubmitAction">
+			<result name="success" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="failure" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">resultMessage</param>
+			</result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		<!-- 虚拟机备份规格查询 (条目关联规格)-->
+		<action name="vmBakStandardQuery" class="VmBakStandardListAction">
+			<result type="json">
+				<param name="root">vmBakStandardInfos</param>
+			</result>
+			<result name="input" type="json">
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">fieldErrors\..+$</param>
+			</result>
+		</action>
+		
+	</package>
+</struts>

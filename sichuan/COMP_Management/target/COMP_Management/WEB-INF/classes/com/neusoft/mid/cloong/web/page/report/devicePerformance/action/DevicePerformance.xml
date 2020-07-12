@@ -1,0 +1,1396 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+    
+<sqlMap namespace="devicePerformance">
+
+	<typeAlias alias="devicePerformanceInfo" type="com.neusoft.mid.cloong.web.page.report.devicePerformance.info.DevicePerformanceInfo"/>
+	<typeAlias alias="deviceRealTimeInfo" type="com.neusoft.mid.cloong.web.page.report.devicePerformance.info.DeviceRealTimeInfo"/>
+
+	<!-- 取得CPUtop10使用率统计数据-对应柱状图 开始-->
+	<select id="getPmCpuDeviceTop10Performance" parameterClass="devicePerformanceInfo" resultClass="devicePerformanceInfo">
+		select sta.PM_ID deviceId, ROUND(SUM(sta.CPU_PROCESSOR_UTILIZATION)/count(sta.PM_ID),2) cpuProcessorUtilization, ROUND(SUM(sta.MEM_USED_PER)/count(sta.PM_ID),2) memUsedPer, 
+		count(sta.PM_ID), pm.PM_NAME deviceName
+		from comp_sta_pm_rt_t sta, comp_rm_pm_t pm
+		WHERE sta.PM_ID = pm.PM_ID
+		<isNotNull prepend="AND" property="timeType">
+			<isEqual prepend=" " property="timeType" compareValue="1"> 
+				sta.CREATE_TIME>=DATE_SUB(NOW(),INTERVAL 1 HOUR)
+			</isEqual>
+			<isEqual prepend=" " property="timeType" compareValue="24"> 
+				sta.CREATE_TIME>=DATE_SUB(NOW(),INTERVAL 24 HOUR)
+			</isEqual>
+		</isNotNull>
+		GROUP BY STA.PM_ID
+		ORDER BY cpuProcessorUtilization DESC
+		limit 10
+	</select>
+	
+	<select id="getVmCpuDeviceTop10Performance" parameterClass="devicePerformanceInfo" resultClass="devicePerformanceInfo">
+		select sta.VM_ID deviceId, ROUND(SUM(sta.CPU_PROCESSOR_UTILIZATION)/count(sta.VM_ID),2) cpuProcessorUtilization, ROUND(SUM(sta.MEM_USED_PER)/count(sta.VM_ID),2) memUsedPer, 
+		count(sta.VM_ID), vm.VM_NAME deviceName
+		from comp_sta_vm_rt_t sta, comp_rm_vm_t vm
+		WHERE sta.VM_ID = vm.VM_ID
+		<isNotNull prepend="AND" property="timeType">
+			<isEqual prepend=" " property="timeType" compareValue="1"> 
+				sta.CREATE_TIME>=DATE_SUB(NOW(),INTERVAL 1 HOUR)
+			</isEqual>
+			<isEqual prepend=" " property="timeType" compareValue="24"> 
+				sta.CREATE_TIME>=DATE_SUB(NOW(),INTERVAL 24 HOUR)
+			</isEqual>
+		</isNotNull>
+		GROUP BY STA.VM_ID
+		ORDER BY cpuProcessorUtilization DESC
+		limit 10
+	</select>
+	
+	<select id="getFWCpuDeviceTop10Performance" parameterClass="devicePerformanceInfo" resultClass="devicePerformanceInfo">
+		select sta.FIREWALL_ID deviceId, ROUND(SUM(sta.CPU_USED_PER)/count(sta.FIREWALL_ID),2) cpuProcessorUtilization, ROUND(SUM(sta.MEM_USED_PER)/count(sta.FIREWALL_ID),2) memUsedPer, 
+		count(sta.FIREWALL_ID), fw.FIREWALL_NAME deviceName
+		from comp_sta_firewall_rt_t sta, comp_rm_firewall_t fw
+		WHERE sta.FIREWALL_ID = fw.FIREWALL_ID
+		<isNotNull prepend="AND" property="timeType">
+			<isEqual prepend=" " property="timeType" compareValue="1"> 
+				sta.CREATE_TIME>=DATE_SUB(NOW(),INTERVAL 1 HOUR)
+			</isEqual>
+			<isEqual prepend=" " property="timeType" compareValue="24"> 
+				sta.CREATE_TIME>=DATE_SUB(NOW(),INTERVAL 24 HOUR)
+			</isEqual>
+		</isNotNull>
+		GROUP BY STA.FIREWALL_ID
+		ORDER BY cpuProcessorUtilization DESC
+		limit 10
+	</select>
+	
+	<select id="getRaidCpuDeviceTop10Performance" parameterClass="devicePerformanceInfo" resultClass="devicePerformanceInfo">
+		select sta.RAID_ID deviceId, ROUND(SUM(sta.HST_DISK_READ_BYTES)/count(sta.RAID_ID),2) hstDiskReadBytes, ROUND(SUM(sta.HST_DISK_WRITE_BYTES)/count(sta.RAID_ID),2) hstDiskWriteBytes, 
+		count(sta.RAID_ID), fw.RAID_NAME deviceName
+		from comp_sta_raid_rt_t sta, comp_rm_raid_t fw
+		WHERE sta.RAID_ID = fw.RAID_ID
+		<isNotNull prepend="AND" property="timeType">
+			<isEqual prepend=" " property="timeType" compareValue="1"> 
+				sta.CREATE_TIME>=DATE_SUB(NOW(),INTERVAL 1 HOUR)
+			</isEqual>
+			<isEqual prepend=" " property="timeType" compareValue="24"> 
+				sta.CREATE_TIME>=DATE_SUB(NOW(),INTERVAL 24 HOUR)
+			</isEqual>
+		</isNotNull>
+		GROUP BY STA.RAID_ID
+		ORDER BY hstDiskReadBytes DESC
+		limit 10
+	</select>
+	<!-- switch -->
+	<select id="getSwitchCpuDeviceTop10Performance" parameterClass="devicePerformanceInfo" resultClass="devicePerformanceInfo">
+		select sta.switch_id deviceId, 
+		       ROUND(SUM(sta.CPU_USED_PER)/count(sta.switch_id),2) cpuProcessorUtilization, 
+		       ROUND(SUM(sta.MEM_USED_PER)/count(sta.switch_id),2) memUsedPer, 
+		       count(sta.switch_id), 
+		       st.switch_NAME deviceName
+		  from comp_sta_switch_rt_t sta, comp_rm_switch_t st
+		WHERE sta.switch_id = st.switch_id
+		<isNotNull prepend="AND" property="timeType">
+			<isEqual prepend=" " property="timeType" compareValue="1"> 
+				sta.CREATE_TIME>=DATE_SUB(NOW(),INTERVAL 1 HOUR)
+			</isEqual>
+			<isEqual prepend=" " property="timeType" compareValue="24"> 
+				sta.CREATE_TIME>=DATE_SUB(NOW(),INTERVAL 24 HOUR)
+			</isEqual>
+		</isNotNull>
+		GROUP BY STA.switch_id
+		ORDER BY cpuProcessorUtilization DESC
+		limit 10
+	</select>
+
+    <!-- router -->
+	<select id="getRouterCpuDeviceTop10Performance" parameterClass="devicePerformanceInfo" resultClass="devicePerformanceInfo">
+		select sta.ROUTER_ID deviceId, 
+		       ROUND(SUM(sta.CPU_USED_PER)/count(sta.ROUTER_ID),2) cpuProcessorUtilization,  
+		       ROUND(SUM(sta.MEM_USED_PER)/count(sta.ROUTER_ID),2) memUsedPer, 
+		       count(sta.ROUTER_ID), 
+		       rt.ROUTER_NAME deviceName
+		  from comp_sta_router_rt_t sta, 
+		       COMP_RM_ROUTER_T rt
+		WHERE sta.ROUTER_ID = rt.ROUTER_ID
+		<isNotNull prepend="AND" property="timeType">
+			<isEqual prepend=" " property="timeType" compareValue="1"> 
+				sta.CREATE_TIME>=DATE_SUB(NOW(),INTERVAL 1 HOUR)
+			</isEqual>
+			<isEqual prepend=" " property="timeType" compareValue="24"> 
+				sta.CREATE_TIME>=DATE_SUB(NOW(),INTERVAL 24 HOUR)
+			</isEqual>
+		</isNotNull>
+		GROUP BY STA.ROUTER_ID
+		ORDER BY cpuProcessorUtilization DESC
+		limit 10
+	</select>
+	<!-- 取得CPUtop10使用率统计数据-对应柱状图 结束-->
+	
+	<!-- 取得memtop10使用率统计数据-对应柱状图 开始-->
+	<select id="getPmMemDeviceTop10Performance" parameterClass="devicePerformanceInfo" resultClass="devicePerformanceInfo">
+		select sta.PM_ID, ROUND(SUM(sta.CPU_PROCESSOR_UTILIZATION)/count(sta.PM_ID),2) cpuProcessorUtilization, ROUND(SUM(sta.MEM_USED_PER)/count(sta.PM_ID),2) memUsedPer, 
+		count(sta.PM_ID), pm.PM_NAME deviceName
+		from comp_sta_pm_rt_t sta, comp_rm_pm_t pm
+		WHERE sta.PM_ID = pm.PM_ID
+		<isNotNull prepend="AND" property="timeType">
+			<isEqual prepend=" " property="timeType" compareValue="1"> 
+				sta.CREATE_TIME>=DATE_SUB(NOW(),INTERVAL 1 HOUR)
+			</isEqual>
+			<isEqual prepend=" " property="timeType" compareValue="24"> 
+				sta.CREATE_TIME>=DATE_SUB(NOW(),INTERVAL 24 HOUR)
+			</isEqual>
+		</isNotNull>
+		GROUP BY STA.PM_ID
+		ORDER BY memUsedPer DESC
+		limit 10
+	</select>
+	<select id="getVmMemDeviceTop10Performance" parameterClass="devicePerformanceInfo" resultClass="devicePerformanceInfo">
+		select sta.VM_ID deviceId, ROUND(SUM(sta.CPU_PROCESSOR_UTILIZATION)/count(sta.VM_ID),2) cpuProcessorUtilization, ROUND(SUM(sta.MEM_USED_PER)/count(sta.VM_ID),2) memUsedPer, 
+		count(sta.VM_ID), vm.VM_NAME deviceName
+		from comp_sta_vm_rt_t sta, comp_rm_vm_t vm
+		WHERE sta.VM_ID = vm.VM_ID
+		<isNotNull prepend="AND" property="timeType">
+			<isEqual prepend=" " property="timeType" compareValue="1"> 
+				sta.CREATE_TIME>=DATE_SUB(NOW(),INTERVAL 1 HOUR)
+			</isEqual>
+			<isEqual prepend=" " property="timeType" compareValue="24"> 
+				sta.CREATE_TIME>=DATE_SUB(NOW(),INTERVAL 24 HOUR)
+			</isEqual>
+		</isNotNull>
+		GROUP BY STA.VM_ID
+		ORDER BY memUsedPer DESC
+		limit 10
+	</select>
+	<select id="getFWMemDeviceTop10Performance" parameterClass="devicePerformanceInfo" resultClass="devicePerformanceInfo">
+		select sta.FIREWALL_ID deviceId, ROUND(SUM(sta.CPU_USED_PER)/count(sta.FIREWALL_ID),2) cpuProcessorUtilization, ROUND(SUM(sta.MEM_USED_PER)/count(sta.FIREWALL_ID),2) memUsedPer, 
+		count(sta.FIREWALL_ID), fw.FIREWALL_NAME deviceName
+		from comp_sta_firewall_rt_t sta, comp_rm_firewall_t fw
+		WHERE sta.FIREWALL_ID = fw.FIREWALL_ID
+		<isNotNull prepend="AND" property="timeType">
+			<isEqual prepend=" " property="timeType" compareValue="1"> 
+				sta.CREATE_TIME>=DATE_SUB(NOW(),INTERVAL 1 HOUR)
+			</isEqual>
+			<isEqual prepend=" " property="timeType" compareValue="24"> 
+				sta.CREATE_TIME>=DATE_SUB(NOW(),INTERVAL 24 HOUR)
+			</isEqual>
+		</isNotNull>
+		GROUP BY STA.FIREWALL_ID
+		ORDER BY memUsedPer DESC
+		limit 10
+	</select>
+	<select id="getRaidMemDeviceTop10Performance" parameterClass="devicePerformanceInfo" resultClass="devicePerformanceInfo">
+		select sta.RAID_ID deviceId, ROUND(SUM(sta.HST_DISK_READ_BYTES)/count(sta.RAID_ID),2) hstDiskReadBytes, ROUND(SUM(sta.HST_DISK_WRITE_BYTES)/count(sta.RAID_ID),2) hstDiskWriteBytes, 
+		count(sta.RAID_ID), fw.RAID_NAME deviceName
+		from comp_sta_raid_rt_t sta, comp_rm_raid_t fw
+		WHERE sta.RAID_ID = fw.RAID_ID
+		<isNotNull prepend="AND" property="timeType">
+			<isEqual prepend=" " property="timeType" compareValue="1"> 
+				sta.CREATE_TIME>=DATE_SUB(NOW(),INTERVAL 1 HOUR)
+			</isEqual>
+			<isEqual prepend=" " property="timeType" compareValue="24"> 
+				sta.CREATE_TIME>=DATE_SUB(NOW(),INTERVAL 24 HOUR)
+			</isEqual>
+		</isNotNull>
+		GROUP BY STA.RAID_ID
+		ORDER BY hstDiskWriteBytes DESC
+		limit 10
+	</select>
+	<!-- switch -->
+	<select id="getSwitchMemDeviceTop10Performance" parameterClass="devicePerformanceInfo" resultClass="devicePerformanceInfo">
+		select sta.switch_id deviceId, 
+		       ROUND(SUM(sta.CPU_USED_PER)/count(sta.switch_id),2) cpuProcessorUtilization, 
+		       ROUND(SUM(sta.MEM_USED_PER)/count(sta.switch_id),2) memUsedPer, 
+		       count(sta.switch_id), 
+		       st.switch_NAME deviceName
+		  from comp_sta_switch_rt_t sta, 
+		       comp_rm_switch_t st
+		 WHERE sta.switch_id = st.switch_id
+		<isNotNull prepend="AND" property="timeType">
+			<isEqual prepend=" " property="timeType" compareValue="1"> 
+				sta.CREATE_TIME>=DATE_SUB(NOW(),INTERVAL 1 HOUR)
+			</isEqual>
+			<isEqual prepend=" " property="timeType" compareValue="24"> 
+				sta.CREATE_TIME>=DATE_SUB(NOW(),INTERVAL 24 HOUR)
+			</isEqual>
+		</isNotNull>
+		GROUP BY STA.switch_id
+		ORDER BY memUsedPer DESC
+		limit 10
+	</select>
+	
+    <!-- router -->
+	<select id="getRouterMemDeviceTop10Performance" parameterClass="devicePerformanceInfo" resultClass="devicePerformanceInfo">
+		select sta.ROUTER_ID deviceId, 
+		       ROUND(SUM(sta.CPU_USED_PER)/count(sta.ROUTER_ID),2) cpuProcessorUtilization,  
+		       ROUND(SUM(sta.MEM_USED_PER)/count(sta.ROUTER_ID),2) memUsedPer, 
+		       count(sta.ROUTER_ID), 
+		       rt.ROUTER_NAME deviceName
+		  from comp_sta_router_rt_t sta, 
+		       COMP_RM_ROUTER_T rt
+		WHERE sta.ROUTER_ID = rt.ROUTER_ID
+		<isNotNull prepend="AND" property="timeType">
+			<isEqual prepend=" " property="timeType" compareValue="1"> 
+				sta.CREATE_TIME>=DATE_SUB(NOW(),INTERVAL 1 HOUR)
+			</isEqual>
+			<isEqual prepend=" " property="timeType" compareValue="24"> 
+				sta.CREATE_TIME>=DATE_SUB(NOW(),INTERVAL 24 HOUR)
+			</isEqual>
+		</isNotNull>
+		GROUP BY STA.ROUTER_ID
+		ORDER BY memUsedPer DESC
+		limit 10
+	</select>
+	<!-- 取得memtop10使用率统计数据-对应柱状图 结束-->
+	
+	<!-- 取得吞吐量top10使用率统计数据-对应柱状图 开始-->
+	<select id="getFWHstDeviceTop10Performance" parameterClass="devicePerformanceInfo" resultClass="devicePerformanceInfo">
+		select sta.FIREWALL_ID deviceId, ROUND(SUM(sta.THROUGHPUT)/count(sta.FIREWALL_ID),2) throughput, 
+		count(sta.FIREWALL_ID), fw.FIREWALL_NAME deviceName
+		from comp_sta_firewall_rt_t sta, comp_rm_firewall_t fw
+		WHERE sta.FIREWALL_ID = fw.FIREWALL_ID
+		<isNotNull prepend="AND" property="timeType">
+			<isEqual prepend=" " property="timeType" compareValue="1"> 
+				sta.CREATE_TIME>=DATE_SUB(NOW(),INTERVAL 1 HOUR)
+			</isEqual>
+			<isEqual prepend=" " property="timeType" compareValue="24"> 
+				sta.CREATE_TIME>=DATE_SUB(NOW(),INTERVAL 24 HOUR)
+			</isEqual>
+		</isNotNull>
+		GROUP BY STA.FIREWALL_ID
+		ORDER BY throughput DESC
+		limit 10
+	</select>
+	<!-- 取得吞吐量top10使用率统计数据-对应柱状图 结束-->
+	
+	<!-- 取得交换机端口top10包总数统计数据-对应柱状图 -->
+	<select id="getSwIfPktsDeviceTop10Performance" parameterClass="devicePerformanceInfo" resultClass="devicePerformanceInfo">
+		select sta.SWITCH_PORT_ID deviceId, swif.SWITCH_IF_NAME deviceName, 
+		       sw.SWITCH_NAME deviceParentName, count(sta.SWITCH_PORT_ID),
+			   ROUND(SUM(IF_IN_NUCAST_PKTS + IF_OUT_NUCAST_PKTS)/count(sta.SWITCH_PORT_ID),2) pkts, 
+			   ROUND(SUM(IF_IN_DISCARDS + IF_OUT_DISCARDS)/count(sta.SWITCH_PORT_ID),2) discards,
+			   ROUND(SUM(IF_IN_OCTETS + IF_OUT_OCTETS)/count(sta.SWITCH_PORT_ID),2) octets
+		 from comp_sta_switch_port_rt_t sta, comp_rm_switch_t sw, comp_rm_switch_if_t swif
+		WHERE sta.SWITCH_PORT_ID = swif.SWITCH_IF_ID
+		  AND sta.SWITCH_ID = sw.SWITCH_ID
+		  AND sw.SWITCH_ID = swif.SWITCH_ID
+		<isNotNull prepend="AND" property="timeType">
+			<isEqual prepend=" " property="timeType" compareValue="1"> 
+				sta.CREATE_TIME>=DATE_SUB(NOW(),INTERVAL 1 HOUR)
+			</isEqual>
+			<isEqual prepend=" " property="timeType" compareValue="24"> 
+				sta.CREATE_TIME>=DATE_SUB(NOW(),INTERVAL 24 HOUR)
+			</isEqual>
+		</isNotNull>
+		GROUP BY STA.SWITCH_PORT_ID
+		ORDER BY pkts DESC
+		limit 10
+	</select>
+	
+	<!-- 取得交换机端口top10丢包数统计数据-对应柱状图 -->
+	<select id="getSwIfDiscardsDeviceTop10Performance" parameterClass="devicePerformanceInfo" resultClass="devicePerformanceInfo">
+		select sta.SWITCH_PORT_ID deviceId, swif.SWITCH_IF_NAME deviceName, 
+		       sw.SWITCH_NAME deviceParentName, count(sta.SWITCH_PORT_ID),
+			   ROUND(SUM(IF_IN_NUCAST_PKTS + IF_OUT_NUCAST_PKTS)/count(sta.SWITCH_PORT_ID),2) pkts, 
+			   ROUND(SUM(IF_IN_DISCARDS + IF_OUT_DISCARDS)/count(sta.SWITCH_PORT_ID),2) discards,
+			   ROUND(SUM(IF_IN_OCTETS + IF_OUT_OCTETS)/count(sta.SWITCH_PORT_ID),2) octets
+		 from comp_sta_switch_port_rt_t sta, comp_rm_switch_t sw, comp_rm_switch_if_t swif
+		WHERE sta.SWITCH_PORT_ID = swif.SWITCH_IF_ID
+		  AND sta.SWITCH_ID = sw.SWITCH_ID
+		  AND sw.SWITCH_ID = swif.SWITCH_ID
+		<isNotNull prepend="AND" property="timeType">
+			<isEqual prepend=" " property="timeType" compareValue="1"> 
+				sta.CREATE_TIME>=DATE_SUB(NOW(),INTERVAL 1 HOUR)
+			</isEqual>
+			<isEqual prepend=" " property="timeType" compareValue="24"> 
+				sta.CREATE_TIME>=DATE_SUB(NOW(),INTERVAL 24 HOUR)
+			</isEqual>
+		</isNotNull>
+		GROUP BY STA.SWITCH_PORT_ID
+		ORDER BY discards DESC
+		limit 10
+	</select>
+	
+	<!-- 取得交换机端口top10字节数统计数据-对应柱状图 -->
+	<select id="getSwIfOctetsDeviceTop10Performance" parameterClass="devicePerformanceInfo" resultClass="devicePerformanceInfo">
+		select sta.SWITCH_PORT_ID deviceId, swif.SWITCH_IF_NAME deviceName, 
+		       sw.SWITCH_NAME deviceParentName, count(sta.SWITCH_PORT_ID),
+			   ROUND(SUM(IF_IN_NUCAST_PKTS + IF_OUT_NUCAST_PKTS)/count(sta.SWITCH_PORT_ID),2) pkts, 
+			   ROUND(SUM(IF_IN_DISCARDS + IF_OUT_DISCARDS)/count(sta.SWITCH_PORT_ID),2) discards,
+			   ROUND(SUM(IF_IN_OCTETS + IF_OUT_OCTETS)/count(sta.SWITCH_PORT_ID),2) octets
+		 from comp_sta_switch_port_rt_t sta, comp_rm_switch_t sw, comp_rm_switch_if_t swif
+		WHERE sta.SWITCH_PORT_ID = swif.SWITCH_IF_ID
+		  AND sta.SWITCH_ID = sw.SWITCH_ID
+		  AND sw.SWITCH_ID = swif.SWITCH_ID
+		<isNotNull prepend="AND" property="timeType">
+			<isEqual prepend=" " property="timeType" compareValue="1"> 
+				sta.CREATE_TIME>=DATE_SUB(NOW(),INTERVAL 1 HOUR)
+			</isEqual>
+			<isEqual prepend=" " property="timeType" compareValue="24"> 
+				sta.CREATE_TIME>=DATE_SUB(NOW(),INTERVAL 24 HOUR)
+			</isEqual>
+		</isNotNull>
+		GROUP BY STA.SWITCH_PORT_ID
+		ORDER BY octets DESC
+		limit 10
+	</select>
+	
+	<!-- 取得路由器端口top10包总数统计数据-对应柱状图 -->
+	<select id="getRtIfPktsDeviceTop10Performance" parameterClass="devicePerformanceInfo" resultClass="devicePerformanceInfo">
+		select sta.ROUTER_PORT_ID deviceId, rmif.ROUTER_IF_NAME deviceName, 
+		       rm.ROUTER_NAME deviceParentName, count(sta.ROUTER_PORT_ID),
+			   ROUND(SUM(IF_IN_UCAST_PKTS + IF_OUT_UCAST_PKTS)/count(sta.ROUTER_PORT_ID),2) pkts, 
+			   ROUND(SUM(IF_IN_DISCARDS + IF_OUT_DISCARDS)/count(sta.ROUTER_PORT_ID),2) discards
+		 from comp_sta_router_port_rt_t sta, comp_rm_router_t rm, comp_rm_router_if_t rmif
+		WHERE sta.ROUTER_PORT_ID = rmif.ROUTER_IF_ID
+		  AND sta.ROUTER_ID = rm.ROUTER_ID
+		  AND rm.ROUTER_ID = rmif.ROUTER_ID
+		<isNotNull prepend="AND" property="timeType">
+			<isEqual prepend=" " property="timeType" compareValue="1"> 
+				sta.CREATE_TIME>=DATE_SUB(NOW(),INTERVAL 1 HOUR)
+			</isEqual>
+			<isEqual prepend=" " property="timeType" compareValue="24"> 
+				sta.CREATE_TIME>=DATE_SUB(NOW(),INTERVAL 24 HOUR)
+			</isEqual>
+		</isNotNull>
+		GROUP BY STA.ROUTER_PORT_ID
+		ORDER BY pkts DESC
+		limit 10
+	</select>
+	
+	<!-- 取得路由器端口top10丢包数统计数据-对应柱状图 -->
+	<select id="getRtIfDiscardsDeviceTop10Performance" parameterClass="devicePerformanceInfo" resultClass="devicePerformanceInfo">
+		select sta.ROUTER_PORT_ID deviceId, rmif.ROUTER_IF_NAME deviceName, 
+		       rm.ROUTER_NAME deviceParentName, count(sta.ROUTER_PORT_ID),
+			   ROUND(SUM(IF_IN_UCAST_PKTS + IF_OUT_UCAST_PKTS)/count(sta.ROUTER_PORT_ID),2) pkts, 
+			   ROUND(SUM(IF_IN_DISCARDS + IF_OUT_DISCARDS)/count(sta.ROUTER_PORT_ID),2) discards
+		 from comp_sta_router_port_rt_t sta, comp_rm_router_t rm, comp_rm_router_if_t rmif
+		WHERE sta.ROUTER_PORT_ID = rmif.ROUTER_IF_ID
+		  AND sta.ROUTER_ID = rm.ROUTER_ID
+		  AND rm.ROUTER_ID = rmif.ROUTER_ID
+		<isNotNull prepend="AND" property="timeType">
+			<isEqual prepend=" " property="timeType" compareValue="1"> 
+				sta.CREATE_TIME>=DATE_SUB(NOW(),INTERVAL 1 HOUR)
+			</isEqual>
+			<isEqual prepend=" " property="timeType" compareValue="24"> 
+				sta.CREATE_TIME>=DATE_SUB(NOW(),INTERVAL 24 HOUR)
+			</isEqual>
+		</isNotNull>
+		GROUP BY STA.ROUTER_PORT_ID
+		ORDER BY discards DESC
+		limit 10
+	</select>
+	
+	<!-- 取得物理机CPU、内存使用率统计列表的总数 -->
+	<select id="getSrvDevicePerformanceCount"  parameterClass="devicePerformanceInfo" resultClass="java.lang.Integer">
+		SELECT COUNT(DISTINCT PM_ID)
+		FROM comp_sta_pm_rt_t sta
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ sta.CREATE_TIME >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ sta.CREATE_TIME <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<!-- 取得物理机CPU、内存使用率统计列表的数据-->
+	<select id="getSrvDevicePerformance" parameterClass="devicePerformanceInfo" resultClass="devicePerformanceInfo">
+		SELECT sta.PM_ID as deviceId, 
+		       ROUND(AVG(CPU_PROCESSOR_UTILIZATION),2) as cpuProcessorUtilization, 
+		       ROUND(AVG(MEM_USED_PER),2) as memUsedPer,
+		       pm.PM_NAME as deviceName
+		from comp_sta_pm_rt_t sta, COMP_RM_PM_T pm
+		WHERE sta.PM_ID = pm.PM_ID
+		<dynamic>
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ sta.CREATE_TIME >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ sta.CREATE_TIME <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+	    GROUP BY deviceId
+	    <dynamic>
+	        <isEqual compareValue="cpu" property="performanceType">
+					ORDER BY cpuProcessorUtilization desc
+			</isEqual>
+			<isEqual compareValue="mem" property="performanceType">
+					ORDER BY memUsedPer desc
+			</isEqual>
+		</dynamic>
+	</select>
+	
+	<!-- 取得虚拟机CPU、内存使用率统计列表的总数 -->
+	<select id="getVMDevicePerformanceCount"  parameterClass="devicePerformanceInfo" resultClass="java.lang.Integer">
+		SELECT COUNT(DISTINCT VM_ID)
+		FROM comp_sta_vm_rt_t sta
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ sta.CREATE_TIME >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ sta.CREATE_TIME <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<!-- 取得虚拟机CPU、内存使用率统计列表的数据-->
+	<select id="getVMDevicePerformance" parameterClass="devicePerformanceInfo" resultClass="devicePerformanceInfo">
+		SELECT sta.VM_ID as deviceId, 
+		       ROUND(AVG(CPU_PROCESSOR_UTILIZATION),2) as cpuProcessorUtilization, 
+		       ROUND(AVG(MEM_USED_PER),2) as memUsedPer,
+		       device.VM_NAME as deviceName
+		from comp_sta_vm_rt_t sta, COMP_RM_VM_T device
+		WHERE sta.VM_ID = device.VM_ID
+		<dynamic>
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ sta.CREATE_TIME >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ sta.CREATE_TIME <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+	    GROUP BY deviceId
+	    <dynamic>
+	        <isEqual compareValue="cpu" property="performanceType">
+					ORDER BY cpuProcessorUtilization desc
+			</isEqual>
+			<isEqual compareValue="mem" property="performanceType">
+					ORDER BY memUsedPer desc
+			</isEqual>
+		</dynamic>
+	</select>
+	
+	<!-- 取得防火墙CPU、内存使用率统计列表的总数 -->
+	<select id="getFWDevicePerformanceCount"  parameterClass="devicePerformanceInfo" resultClass="java.lang.Integer">
+		SELECT COUNT(DISTINCT FIREWALL_ID)
+		FROM comp_sta_firewall_rt_t sta
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ sta.CREATE_TIME >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ sta.CREATE_TIME <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<!-- 取得防火墙CPU、内存使用率统计列表的数据-->
+	<select id="getFWDevicePerformance" parameterClass="devicePerformanceInfo" resultClass="devicePerformanceInfo">
+		SELECT sta.FIREWALL_ID as deviceId, 
+		       ROUND(AVG(CPU_USED_PER),2) as cpuProcessorUtilization, 
+		       ROUND(AVG(MEM_USED_PER),2) as memUsedPer,
+		       ROUND(AVG(sta.THROUGHPUT),2) as throughput,
+		       device.FIREWALL_NAME as deviceName
+		from comp_sta_firewall_rt_t sta, COMP_RM_FIREWALL_T device
+		WHERE sta.FIREWALL_ID = device.FIREWALL_ID
+		<dynamic>
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ sta.CREATE_TIME >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ sta.CREATE_TIME <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+	    GROUP BY deviceId
+	    <dynamic>
+	        <isEqual compareValue="cpu" property="performanceType">
+					ORDER BY cpuProcessorUtilization desc
+			</isEqual>
+			<isEqual compareValue="mem" property="performanceType">
+					ORDER BY memUsedPer desc
+			</isEqual>
+		</dynamic>
+	</select>
+	
+	<!-- 取得阵列CPU、内存使用率统计列表的总数 -->
+	<select id="getRAIDDevicePerformanceCount"  parameterClass="devicePerformanceInfo" resultClass="java.lang.Integer">
+		SELECT COUNT(DISTINCT RAID_ID)
+		FROM comp_sta_raid_rt_t sta
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ sta.CREATE_TIME >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ sta.CREATE_TIME <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+	</select>
+		
+	<!-- 取得阵列CPU、内存使用率统计列表的数据-->
+	<select id="getRAIDDevicePerformance" parameterClass="devicePerformanceInfo" resultClass="devicePerformanceInfo">
+		SELECT sta.RAID_ID as deviceId, 
+		       ROUND(AVG(HST_DISK_READ_BYTES),2) as hstDiskReadBytes, 
+		       ROUND(AVG(HST_DISK_WRITE_BYTES),2) as hstDiskWriteBytes,
+		       device.RAID_NAME as deviceName
+		from comp_sta_raid_rt_t sta, COMP_RM_RAID_T device
+		WHERE sta.RAID_ID = device.RAID_ID
+		<dynamic>
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ sta.CREATE_TIME >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ sta.CREATE_TIME <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+	    GROUP BY deviceId
+	    <dynamic>
+	        <isEqual compareValue="diskReadBytes" property="performanceType">
+					ORDER BY hstDiskReadBytes desc
+			</isEqual>
+			<isEqual compareValue="diskWriteBytes" property="performanceType">
+					ORDER BY hstDiskWriteBytes desc
+			</isEqual>
+		</dynamic>
+	</select>
+	
+	<!-- 取得交换机CPU、内存使用率统计列表的总数 -->
+	<select id="getSwitchDevicePerformanceCount"  parameterClass="devicePerformanceInfo" resultClass="java.lang.Integer">
+		SELECT COUNT(DISTINCT switch_id)
+		FROM comp_sta_switch_rt_t sta
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ sta.CREATE_TIME >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ sta.CREATE_TIME <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<!-- 取得交换机CPU、内存使用率统计列表的数据 -->
+	<select id="getSwitchDevicePerformance" parameterClass="devicePerformanceInfo" resultClass="devicePerformanceInfo">
+		SELECT sta.switch_id  deviceId, 
+		       ROUND(AVG(CPU_USED_PER),2)  cpuProcessorUtilization, 
+		       ROUND(AVG(MEM_USED_PER),2)  memUsedPer,
+		       st.switch_NAME  deviceName
+		  from comp_sta_switch_rt_t sta,
+		       comp_rm_switch_t st
+		 WHERE sta.switch_id = st.switch_id
+		<dynamic>
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ sta.CREATE_TIME >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ sta.CREATE_TIME <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+	    GROUP BY sta.switch_id
+	    <dynamic>
+	        <isEqual compareValue="cpu" property="performanceType">
+					ORDER BY cpuProcessorUtilization desc
+			</isEqual>
+			<isEqual compareValue="mem" property="performanceType">
+					ORDER BY memUsedPer desc
+			</isEqual>
+		</dynamic>
+	</select>
+	
+	<!-- 取得路由器CPU、内存使用率统计列表的总数 -->
+	<select id="getRouterDevicePerformanceCount"  parameterClass="devicePerformanceInfo" resultClass="java.lang.Integer">
+		SELECT COUNT(DISTINCT ROUTER_ID)
+		FROM comp_sta_router_rt_t sta
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ sta.CREATE_TIME >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ sta.CREATE_TIME <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<!-- 取得路由器CPU、内存使用率统计列表的数据 -->
+	<select id="getRouterDevicePerformance" parameterClass="devicePerformanceInfo" resultClass="devicePerformanceInfo">
+		SELECT sta.ROUTER_ID as deviceId, 
+		       ROUND(AVG(CPU_USED_PER),2) as cpuProcessorUtilization, 
+		       ROUND(AVG(MEM_USED_PER),2) as memUsedPer,
+		       rt.ROUTER_NAME as deviceName
+		 from comp_sta_router_rt_t sta, 
+		      COMP_RM_ROUTER_T rt
+		WHERE sta.ROUTER_ID = rt.ROUTER_ID
+		<dynamic>
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ sta.CREATE_TIME >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ sta.CREATE_TIME <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+	    GROUP BY deviceId
+	    <dynamic>
+	        <isEqual compareValue="cpu" property="performanceType">
+					ORDER BY cpuProcessorUtilization desc
+			</isEqual>
+			<isEqual compareValue="mem" property="performanceType">
+					ORDER BY memUsedPer desc
+			</isEqual>
+		</dynamic>
+	</select>
+	
+	
+	<!-- 取得交换机端口包总数、丢包数以及字节总数统计列表的总数 -->
+	<select id="getSwIfDevicePerformanceCount"  parameterClass="devicePerformanceInfo" resultClass="java.lang.Integer">
+		SELECT COUNT(DISTINCT SWITCH_PORT_ID)
+		FROM comp_sta_switch_port_rt_t sta
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ sta.CREATE_TIME >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ sta.CREATE_TIME <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<!-- 取得交换机端口包总数、丢包数以及字节总数统计列表的数据-->
+	<select id="getSwIfDevicePerformance" parameterClass="devicePerformanceInfo" resultClass="devicePerformanceInfo">
+		SELECT sta.SWITCH_PORT_ID as deviceId, 
+		       ROUND(AVG(IF_IN_NUCAST_PKTS + IF_OUT_NUCAST_PKTS ),2) AS pkts,
+			   ROUND(AVG(IF_IN_DISCARDS + IF_OUT_DISCARDS),2) AS discards,
+			   ROUND(AVG(IF_IN_OCTETS + IF_OUT_OCTETS),2) AS octets,
+		       swif.SWITCH_IF_NAME as deviceName,
+		       sw.SWITCH_NAME as deviceParentName
+		 from comp_sta_switch_port_rt_t sta, comp_rm_switch_t sw, comp_rm_switch_if_t swif
+		WHERE sta.SWITCH_PORT_ID = swif.SWITCH_IF_ID
+		  AND sta.SWITCH_ID = sw.SWITCH_ID
+		  AND sw.SWITCH_ID = swif.SWITCH_ID
+		<dynamic>
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ sta.CREATE_TIME >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ sta.CREATE_TIME <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+	    GROUP BY deviceId
+	    <dynamic>
+	        <isEqual compareValue="pkts" property="performanceType">
+					ORDER BY pkts desc
+			</isEqual>
+			<isEqual compareValue="discards" property="performanceType">
+					ORDER BY discards desc
+			</isEqual>
+			<isEqual compareValue="octets" property="performanceType">
+					ORDER BY octets desc
+			</isEqual>
+		</dynamic>
+	</select>
+	
+	<!-- 取得路由器端口包总数、丢包数以及字节总数统计列表的总数 -->
+	<select id="getRtIfDevicePerformanceCount"  parameterClass="devicePerformanceInfo" resultClass="java.lang.Integer">
+		SELECT COUNT(DISTINCT ROUTER_PORT_ID)
+		FROM comp_sta_router_port_rt_t sta
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ sta.CREATE_TIME >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ sta.CREATE_TIME <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<!-- 取得路由器端口包总数、丢包数以及字节总数统计列表的数据-->
+	<select id="getRtIfDevicePerformance" parameterClass="devicePerformanceInfo" resultClass="devicePerformanceInfo">
+		SELECT sta.ROUTER_PORT_ID as deviceId, 
+		       ROUND(AVG(IF_IN_UCAST_PKTS + IF_OUT_UCAST_PKTS ),2) AS pkts,
+			   ROUND(AVG(IF_IN_DISCARDS + IF_OUT_DISCARDS),2) AS discards,
+		       rmif.ROUTER_IF_NAME as deviceName,
+		       rm.ROUTER_NAME as deviceParentName
+		 from comp_sta_router_port_rt_t sta, comp_rm_router_t rm, comp_rm_router_if_t rmif
+		WHERE sta.ROUTER_PORT_ID = rmif.ROUTER_IF_ID
+		  AND sta.ROUTER_ID = rm.ROUTER_ID
+		  AND rm.ROUTER_ID = rmif.ROUTER_ID
+		<dynamic>
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ sta.CREATE_TIME >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ sta.CREATE_TIME <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+	    GROUP BY deviceId
+	    <dynamic>
+	        <isEqual compareValue="pkts" property="performanceType">
+					ORDER BY pkts desc
+			</isEqual>
+			<isEqual compareValue="discards" property="performanceType">
+					ORDER BY discards desc
+			</isEqual>
+		</dynamic>
+	</select>
+	
+	<!-- 取得设备列表_物理机 -->
+	<select id="getPmList" resultClass="devicePerformanceInfo">
+		SELECT  PM_ID AS deviceId,
+		        PM_NAME AS deviceName
+		FROM    COMP_RM_PM_T
+	</select>
+	<!-- 取得设备列表_虚拟机 -->
+	<select id="getVmList" resultClass="devicePerformanceInfo">
+		SELECT  VM_ID AS deviceId,
+		        VM_NAME AS deviceName
+		  FROM  COMP_RM_VM_T
+	</select>
+	<!-- 取得设备列表_防火墙 -->
+	<select id="getFwList" resultClass="devicePerformanceInfo">
+		SELECT  FIREWALL_ID AS deviceId,
+		        FIREWALL_NAME AS deviceName
+		  FROM  COMP_RM_FIREWALL_T
+	</select>
+	<!-- 取得设备列表_阵列 -->
+	<select id="getRaidList" resultClass="devicePerformanceInfo">
+		SELECT  RAID_ID AS deviceId,
+		        RAID_NAME AS deviceName
+		  FROM  COMP_RM_RAID_T
+	</select>
+	<!-- 取得设备列表_交换机 -->
+	<select id="getSwList" resultClass="devicePerformanceInfo">
+		SELECT  SWITCH_ID AS deviceId,
+		        SWITCH_NAME AS deviceName
+		  FROM  COMP_RM_SWITCH_T
+	</select>
+	<!-- 取得设备列表_路由器 -->
+	<select id="getRtList" resultClass="devicePerformanceInfo">
+		SELECT  ROUTER_ID AS deviceId,
+		        ROUTER_NAME AS deviceName
+		  FROM  COMP_RM_ROUTER_T
+	</select>
+	<!-- 取得设备列表_交换机端口 -->
+	<select id="getSwIfList" resultClass="devicePerformanceInfo">
+		SELECT  SWITCH_IF_ID AS deviceId,
+		        SWITCH_IF_NAME AS deviceName
+		  FROM  COMP_RM_SWITCH_IF_T
+	</select>
+	<!-- 取得设备列表_路由器端口 -->
+	<select id="getRtIfList" resultClass="devicePerformanceInfo">
+		SELECT  ROUTER_IF_ID AS deviceId,
+		        ROUTER_IF_NAME AS deviceName
+		  FROM  COMP_RM_ROUTER_IF_T
+	</select>
+
+    <!-- 取得性能统计查询列表的总数_物理机 -->
+	<select id="getPmPerformanceCount"  parameterClass="devicePerformanceInfo" resultClass="java.lang.Integer">
+		SELECT COUNT(*)
+		from comp_sta_pm_rt_t
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="deviceId">
+				PM_ID = #deviceId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ CREATE_TIME >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ CREATE_TIME <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<!-- 取得性能统计查询列表的总数_虚拟机  -->
+	<select id="getVmPerformanceCount"  parameterClass="devicePerformanceInfo" resultClass="java.lang.Integer">
+		SELECT COUNT(*)
+		from comp_sta_vm_rt_t
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="deviceId">
+				VM_ID = #deviceId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ CREATE_TIME >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ CREATE_TIME <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<!-- 取得性能统计查询列表的总数_防火墙 -->
+	<select id="getFwPerformanceCount"  parameterClass="devicePerformanceInfo" resultClass="java.lang.Integer">
+		SELECT COUNT(*)
+		from comp_sta_firewall_rt_t
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="deviceId">
+				firewall_ID = #deviceId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ CREATE_TIME >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ CREATE_TIME <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<!-- 取得性能统计查询列表的总数_阵列 -->
+	<select id="getRaidPerformanceCount"  parameterClass="devicePerformanceInfo" resultClass="java.lang.Integer">
+		SELECT COUNT(*)
+		from comp_sta_raid_rt_t
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="deviceId">
+				raid_ID = #deviceId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ CREATE_TIME >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ CREATE_TIME <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<!-- 取得性能统计查询列表的总数_交换机 -->
+	<select id="getSwPerformanceCount"  parameterClass="devicePerformanceInfo" resultClass="java.lang.Integer">
+		SELECT COUNT(*)
+		from comp_sta_switch_rt_t
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="deviceId">
+				SWITCH_ID = #deviceId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ CREATE_TIME >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ CREATE_TIME <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<!-- 取得性能统计查询列表的总数_路由器  -->
+	<select id="getRtPerformanceCount"  parameterClass="devicePerformanceInfo" resultClass="java.lang.Integer">
+		SELECT COUNT(*)
+		from comp_sta_router_rt_t
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="deviceId">
+				router_ID = #deviceId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ CREATE_TIME >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ CREATE_TIME <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<!-- 取得性能统计查询列表的总数_交换机端口 -->
+	<select id="getSwIfPerformanceCount"  parameterClass="devicePerformanceInfo" resultClass="java.lang.Integer">
+		SELECT COUNT(*)
+		from comp_sta_switch_port_rt_t
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="deviceId">
+				SWITCH_PORT_ID = #deviceId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ CREATE_TIME >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ CREATE_TIME <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<!-- 取得性能统计查询列表的总数_路由器端口  -->
+	<select id="getRtIfPerformanceCount"  parameterClass="devicePerformanceInfo" resultClass="java.lang.Integer">
+		SELECT COUNT(*)
+		from comp_sta_router_port_rt_t
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="deviceId">
+				router_PORT_ID = #deviceId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ CREATE_TIME >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ CREATE_TIME <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<!-- 取得性能统计查询列表数据_物理机 -->
+	<select id="getPmPerformance" parameterClass="devicePerformanceInfo" resultClass="devicePerformanceInfo">
+		SELECT CREATE_TIME AS reportDate,
+		       CPU_PROCESSOR_UTILIZATION AS cpuProcessorUtilization,
+		       MEM_USED_PER AS memUsedPer
+		from comp_sta_pm_rt_t
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="deviceId">
+				PM_ID = #deviceId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ CREATE_TIME >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ CREATE_TIME <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+		ORDER BY CREATE_TIME DESC
+	</select>
+	<!-- 取得性能统计查询列表数据_虚拟机 -->
+	<select id="getVmPerformance" parameterClass="devicePerformanceInfo" resultClass="devicePerformanceInfo">
+		SELECT CREATE_TIME AS reportDate,
+		       CPU_PROCESSOR_UTILIZATION AS cpuProcessorUtilization,
+		       MEM_USED_PER AS memUsedPer
+		from comp_sta_vm_rt_t
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="deviceId">
+				VM_ID = #deviceId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ CREATE_TIME >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ CREATE_TIME <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+		ORDER BY CREATE_TIME DESC
+	</select>
+	<!-- 取得性能统计查询列表数据_防火墙  -->
+	<select id="getFwPerformance" parameterClass="devicePerformanceInfo" resultClass="devicePerformanceInfo">
+		SELECT CREATE_TIME AS reportDate,
+		       CPU_USED_PER AS cpuProcessorUtilization,
+		       MEM_USED_PER AS memUsedPer,
+		       throughput
+		from comp_sta_firewall_rt_t
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="deviceId">
+				firewall_ID = #deviceId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ CREATE_TIME >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ CREATE_TIME <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+		ORDER BY CREATE_TIME DESC
+	</select>
+	<!-- 取得性能统计查询列表数据_阵列 -->
+	<select id="getRaidPerformance" parameterClass="devicePerformanceInfo" resultClass="devicePerformanceInfo">
+		SELECT CREATE_TIME AS reportDate,
+		       HST_DISK_READ_BYTES AS hstDiskReadBytes,
+		       HST_DISK_WRITE_BYTES AS hstDiskWriteBytes
+		from comp_sta_raid_rt_t
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="deviceId">
+				raid_ID = #deviceId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ CREATE_TIME >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ CREATE_TIME <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+		ORDER BY CREATE_TIME DESC
+	</select>
+	<!-- 取得性能统计查询列表数据_交换机 -->
+	<select id="getSwPerformance" parameterClass="devicePerformanceInfo" resultClass="devicePerformanceInfo">
+		SELECT CREATE_TIME AS reportDate,
+		       CPU_USED_PER AS cpuProcessorUtilization,
+		       MEM_USED_PER AS memUsedPer
+		from comp_sta_switch_rt_t
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="deviceId">
+				SWITCH_ID = #deviceId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ CREATE_TIME >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ CREATE_TIME <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+		ORDER BY CREATE_TIME DESC
+	</select>
+	<!-- 取得性能统计查询列表数据_路由器 -->
+	<select id="getRtPerformance" parameterClass="devicePerformanceInfo" resultClass="devicePerformanceInfo">
+		SELECT CREATE_TIME AS reportDate,
+		       CPU_USED_PER AS cpuProcessorUtilization,
+		       MEM_USED_PER AS memUsedPer
+		from comp_sta_router_rt_t
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="deviceId">
+				router_ID = #deviceId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ CREATE_TIME >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ CREATE_TIME <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+		ORDER BY CREATE_TIME DESC
+	</select>
+	<!-- 取得性能统计查询列表数据_交换机端口 -->
+	<select id="getSwIfPerformance" parameterClass="devicePerformanceInfo" resultClass="devicePerformanceInfo">
+		SELECT CREATE_TIME AS reportDate,
+			   ( IF_IN_NUCAST_PKTS + IF_OUT_NUCAST_PKTS ) AS pkts,
+			   ( IF_IN_DISCARDS + IF_OUT_DISCARDS ) AS discards,
+			   ( IF_IN_OCTETS + IF_OUT_OCTETS ) AS octets
+		FROM comp_sta_switch_port_rt_t
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="deviceId">
+				SWITCH_PORT_ID = #deviceId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ CREATE_TIME >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ CREATE_TIME <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+		ORDER BY CREATE_TIME DESC
+	</select>
+	<!-- 取得性能统计查询列表数据_路由器端口 -->
+	<select id="getRtIfPerformance" parameterClass="devicePerformanceInfo" resultClass="devicePerformanceInfo">
+		SELECT CREATE_TIME AS reportDate,
+		       ( IF_IN_UCAST_PKTS + IF_OUT_UCAST_PKTS ) AS pkts,
+			   ( IF_IN_DISCARDS + IF_OUT_DISCARDS ) AS discards
+		from comp_sta_router_port_rt_t
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="deviceId">
+				router_port_ID = #deviceId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="startDate">
+				<![CDATA[ CREATE_TIME >= #startDate# ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[ CREATE_TIME <= #endDate# ]]>
+			</isNotEmpty>
+		</dynamic>
+		ORDER BY CREATE_TIME DESC
+	</select>
+	
+	<!-- CPU、内存实时信息 开始-->
+	<select id="getPmDevicePerformanceRTDetail" parameterClass="deviceRealTimeInfo" resultClass="deviceRealTimeInfo">
+		SELECT sta.CPU_PROCESSOR_UTILIZATION cpuProcessorUtilization, sta.MEM_USED_PER memUsedPer,sta.CREATE_TIME createTime,
+	      		DATE_FORMAT(sta.CREATE_TIME,'%Y') YEAR,
+				DATE_FORMAT(sta.CREATE_TIME,'%m') MONTH,
+				DATE_FORMAT(sta.CREATE_TIME,'%d') DAY,
+				DATE_FORMAT(sta.CREATE_TIME,'%H') HOUR,
+				DATE_FORMAT(sta.CREATE_TIME,'%i') MINUTE,
+				DATE_FORMAT(sta.CREATE_TIME,'%s') SECOND
+		from comp_sta_pm_rt_t sta, comp_rm_pm_t pm
+		WHERE sta.PM_ID = pm.PM_ID
+		and sta.PM_ID = #deviceId#
+		and sta.CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+	</select>
+	<select id="getCpuMemPm" resultClass="deviceRealTimeInfo">
+		 SELECT T.CPU_PROCESSOR_UTILIZATION cpuProcessorUtilization, T.MEM_USED_PER memUsedPer,
+				CREATE_TIME CREATETIME,
+	            DATE_FORMAT(CREATE_TIME,'%Y') YEAR,
+				DATE_FORMAT(CREATE_TIME,'%m') MONTH,
+				DATE_FORMAT(CREATE_TIME,'%d') DAY,
+				DATE_FORMAT(CREATE_TIME,'%H') HOUR,
+				DATE_FORMAT(CREATE_TIME,'%i') MINUTE,
+				DATE_FORMAT(CREATE_TIME,'%s') SECOND
+		   FROM COMP_STA_PM_RT_T T,(SELECT MAX(CREATE_TIME) TIME 
+		   							  FROM COMP_STA_PM_RT_T 
+		   							 WHERE CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+									   AND PM_ID = #deviceId#) A 
+		  WHERE T.CREATE_TIME = A.TIME
+		    AND PM_ID = #deviceId#
+	</select>
+	
+	<select id="getVmDevicePerformanceRTDetail" parameterClass="deviceRealTimeInfo" resultClass="deviceRealTimeInfo">
+		SELECT sta.CPU_PROCESSOR_UTILIZATION cpuProcessorUtilization, sta.MEM_USED_PER memUsedPer,sta.CREATE_TIME createTime,
+	      		DATE_FORMAT(sta.CREATE_TIME,'%Y') YEAR,
+				DATE_FORMAT(sta.CREATE_TIME,'%m') MONTH,
+				DATE_FORMAT(sta.CREATE_TIME,'%d') DAY,
+				DATE_FORMAT(sta.CREATE_TIME,'%H') HOUR,
+				DATE_FORMAT(sta.CREATE_TIME,'%i') MINUTE,
+				DATE_FORMAT(sta.CREATE_TIME,'%s') SECOND
+		from comp_sta_vm_rt_t sta, comp_rm_vm_t vm
+		WHERE sta.VM_ID = vm.VM_ID
+		and sta.VM_ID = #deviceId#
+		and sta.CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+	</select>
+	<select id="getCpuMemVm" resultClass="deviceRealTimeInfo">
+		 SELECT T.CPU_PROCESSOR_UTILIZATION cpuProcessorUtilization, T.MEM_USED_PER memUsedPer,
+				CREATE_TIME CREATETIME,
+	            DATE_FORMAT(CREATE_TIME,'%Y') YEAR,
+				DATE_FORMAT(CREATE_TIME,'%m') MONTH,
+				DATE_FORMAT(CREATE_TIME,'%d') DAY,
+				DATE_FORMAT(CREATE_TIME,'%H') HOUR,
+				DATE_FORMAT(CREATE_TIME,'%i') MINUTE,
+				DATE_FORMAT(CREATE_TIME,'%s') SECOND
+		   FROM COMP_STA_VM_RT_T T,(SELECT MAX(CREATE_TIME) TIME 
+		   							  FROM COMP_STA_VM_RT_T 
+		   							 WHERE CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+									   AND VM_ID = #deviceId#) A 
+		  WHERE T.CREATE_TIME = A.TIME
+		    AND VM_ID = #deviceId#
+	</select>
+	
+	<select id="getFwDevicePerformanceRTDetail" parameterClass="deviceRealTimeInfo" resultClass="deviceRealTimeInfo">
+		SELECT sta.CPU_USED_PER cpuProcessorUtilization, sta.MEM_USED_PER memUsedPer, sta.THROUGHPUT throughput, sta.CREATE_TIME createTime,
+	      		DATE_FORMAT(sta.CREATE_TIME,'%Y') YEAR,
+				DATE_FORMAT(sta.CREATE_TIME,'%m') MONTH,
+				DATE_FORMAT(sta.CREATE_TIME,'%d') DAY,
+				DATE_FORMAT(sta.CREATE_TIME,'%H') HOUR,
+				DATE_FORMAT(sta.CREATE_TIME,'%i') MINUTE,
+				DATE_FORMAT(sta.CREATE_TIME,'%s') SECOND
+		from comp_sta_firewall_rt_t sta, comp_rm_firewall_t fw
+		WHERE sta.FIREWALL_ID = fw.FIREWALL_ID
+		and sta.FIREWALL_ID = #deviceId#
+		and sta.CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+	</select>
+	<select id="getCpuMemFw" resultClass="deviceRealTimeInfo">
+		 SELECT T.CPU_USED_PER cpuProcessorUtilization, T.MEM_USED_PER memUsedPer, T.THROUGHPUT throughput,
+				CREATE_TIME CREATETIME,
+	            DATE_FORMAT(CREATE_TIME,'%Y') YEAR,
+				DATE_FORMAT(CREATE_TIME,'%m') MONTH,
+				DATE_FORMAT(CREATE_TIME,'%d') DAY,
+				DATE_FORMAT(CREATE_TIME,'%H') HOUR,
+				DATE_FORMAT(CREATE_TIME,'%i') MINUTE,
+				DATE_FORMAT(CREATE_TIME,'%s') SECOND
+		   FROM comp_sta_firewall_rt_t T,(SELECT MAX(CREATE_TIME) TIME 
+		   							  FROM comp_sta_firewall_rt_t 
+		   							 WHERE CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+									   AND FIREWALL_ID = #deviceId#) A 
+		  WHERE T.CREATE_TIME = A.TIME
+		  AND FIREWALL_ID = #deviceId#
+	</select>
+	
+	
+	<select id="getRaidDevicePerformanceRTDetail" parameterClass="deviceRealTimeInfo" resultClass="deviceRealTimeInfo">
+		SELECT sta.HST_DISK_READ_BYTES hstDiskReadBytes, sta.HST_DISK_WRITE_BYTES hstDiskWriteBytes,sta.CREATE_TIME createTime,
+	      		DATE_FORMAT(sta.CREATE_TIME,'%Y') YEAR,
+				DATE_FORMAT(sta.CREATE_TIME,'%m') MONTH,
+				DATE_FORMAT(sta.CREATE_TIME,'%d') DAY,
+				DATE_FORMAT(sta.CREATE_TIME,'%H') HOUR,
+				DATE_FORMAT(sta.CREATE_TIME,'%i') MINUTE,
+				DATE_FORMAT(sta.CREATE_TIME,'%s') SECOND
+		from comp_sta_raid_rt_t sta, comp_rm_raid_t raid
+		WHERE sta.RAID_ID = raid.RAID_ID
+		and sta.RAID_ID = #deviceId#
+		and sta.CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+	</select>
+	<select id="getReadWriteBytesRaid" resultClass="deviceRealTimeInfo">
+		 SELECT T.HST_DISK_READ_BYTES hstDiskReadBytes, T.HST_DISK_WRITE_BYTES hstDiskWriteBytes,
+				CREATE_TIME CREATETIME,
+	            DATE_FORMAT(CREATE_TIME,'%Y') YEAR,
+				DATE_FORMAT(CREATE_TIME,'%m') MONTH,
+				DATE_FORMAT(CREATE_TIME,'%d') DAY,
+				DATE_FORMAT(CREATE_TIME,'%H') HOUR,
+				DATE_FORMAT(CREATE_TIME,'%i') MINUTE,
+				DATE_FORMAT(CREATE_TIME,'%s') SECOND
+		   FROM comp_sta_raid_rt_t T,(SELECT MAX(CREATE_TIME) TIME 
+		   							  FROM comp_sta_raid_rt_t 
+		   							 WHERE CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+									   AND RAID_ID = #deviceId#) A 
+		  WHERE T.CREATE_TIME = A.TIME
+		  AND RAID_ID = #deviceId#
+	</select>
+	
+	<select id="getSwitchDevicePerformanceRTDetail" parameterClass="deviceRealTimeInfo" resultClass="deviceRealTimeInfo">
+		SELECT sta.CPU_USED_PER cpuProcessorUtilization, sta.MEM_USED_PER memUsedPer,sta.CREATE_TIME createTime,
+	      		DATE_FORMAT(sta.CREATE_TIME,'%Y') YEAR,
+				DATE_FORMAT(sta.CREATE_TIME,'%m') MONTH,
+				DATE_FORMAT(sta.CREATE_TIME,'%d') DAY,
+				DATE_FORMAT(sta.CREATE_TIME,'%H') HOUR,
+				DATE_FORMAT(sta.CREATE_TIME,'%i') MINUTE,
+				DATE_FORMAT(sta.CREATE_TIME,'%s') SECOND
+		from comp_sta_switch_rt_t sta, comp_rm_switch_t st
+		WHERE sta.SWITCH_ID = st.SWITCH_ID
+		and sta.SWITCH_ID = #deviceId#
+		AND CPU_USED_PER !=''
+		and sta.CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+	</select>
+	
+	<select id="getRouterDevicePerformanceRTDetail" parameterClass="deviceRealTimeInfo" resultClass="deviceRealTimeInfo">
+		SELECT sta.CPU_USED_PER cpuProcessorUtilization, sta.MEM_USED_PER memUsedPer,sta.CREATE_TIME createTime,
+	      		DATE_FORMAT(sta.CREATE_TIME,'%Y') YEAR,
+				DATE_FORMAT(sta.CREATE_TIME,'%m') MONTH,
+				DATE_FORMAT(sta.CREATE_TIME,'%d') DAY,
+				DATE_FORMAT(sta.CREATE_TIME,'%H') HOUR,
+				DATE_FORMAT(sta.CREATE_TIME,'%i') MINUTE,
+				DATE_FORMAT(sta.CREATE_TIME,'%s') SECOND
+		from comp_sta_router_rt_t sta, comp_rm_router_t rt
+		WHERE sta.router_ID = rt.router_ID
+		and sta.router_ID = #deviceId#
+		AND CPU_USED_PER !=''
+		and sta.CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+	</select>
+	
+	
+	<select id="getCpuMemSwitch" resultClass="deviceRealTimeInfo">
+		 SELECT T.CPU_USED_PER cpuProcessorUtilization, T.MEM_USED_PER memUsedPer,
+				CREATE_TIME CREATETIME,
+	            DATE_FORMAT(CREATE_TIME,'%Y') YEAR,
+				DATE_FORMAT(CREATE_TIME,'%m') MONTH,
+				DATE_FORMAT(CREATE_TIME,'%d') DAY,
+				DATE_FORMAT(CREATE_TIME,'%H') HOUR,
+				DATE_FORMAT(CREATE_TIME,'%i') MINUTE,
+				DATE_FORMAT(CREATE_TIME,'%s') SECOND
+		   FROM COMP_STA_SWITCH_RT_T T,(SELECT MAX(CREATE_TIME) TIME 
+		   							  FROM COMP_STA_SWITCH_RT_T 
+		   							 WHERE CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+		   							   AND CPU_USED_PER !=''
+									   AND SWITCH_ID = #deviceId#) A 
+		  WHERE T.CREATE_TIME = A.TIME
+		    AND SWITCH_ID = #deviceId#
+	</select>
+	
+	<select id="getCpuMemRouter" resultClass="deviceRealTimeInfo">
+		 SELECT T.CPU_USED_PER cpuProcessorUtilization, T.MEM_USED_PER memUsedPer,
+				CREATE_TIME CREATETIME,
+	            DATE_FORMAT(CREATE_TIME,'%Y') YEAR,
+				DATE_FORMAT(CREATE_TIME,'%m') MONTH,
+				DATE_FORMAT(CREATE_TIME,'%d') DAY,
+				DATE_FORMAT(CREATE_TIME,'%H') HOUR,
+				DATE_FORMAT(CREATE_TIME,'%i') MINUTE,
+				DATE_FORMAT(CREATE_TIME,'%s') SECOND
+		   FROM COMP_STA_ROUTER_RT_T T,(SELECT MAX(CREATE_TIME) TIME 
+		   							  FROM COMP_STA_ROUTER_RT_T 
+		   							 WHERE CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+		   							   AND CPU_USED_PER !=''
+									   AND ROUTER_ID = #deviceId#) A 
+		  WHERE T.CREATE_TIME = A.TIME
+		    AND ROUTER_ID = #deviceId#
+	</select>
+	
+	<!-- 交换机接口 -->
+	<select id="getSwIfDevicePerformanceRTDetail" parameterClass="deviceRealTimeInfo" resultClass="deviceRealTimeInfo">
+		SELECT  ( IF_IN_NUCAST_PKTS + IF_OUT_NUCAST_PKTS ) AS pkts,
+			    ( IF_IN_DISCARDS + IF_OUT_DISCARDS ) AS discards,
+			    ( IF_IN_OCTETS + IF_OUT_OCTETS ) AS octets,
+			    sta.CREATE_TIME createTime,
+	      		DATE_FORMAT(sta.CREATE_TIME,'%Y') YEAR,
+				DATE_FORMAT(sta.CREATE_TIME,'%m') MONTH,
+				DATE_FORMAT(sta.CREATE_TIME,'%d') DAY,
+				DATE_FORMAT(sta.CREATE_TIME,'%H') HOUR,
+				DATE_FORMAT(sta.CREATE_TIME,'%i') MINUTE,
+				DATE_FORMAT(sta.CREATE_TIME,'%s') SECOND
+		 FROM comp_sta_switch_port_rt_t sta
+		WHERE sta.SWITCH_PORT_ID = #deviceId#
+		  AND (IF_IN_NUCAST_PKTS + IF_OUT_NUCAST_PKTS) !=''
+		  AND sta.CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+	</select>
+	
+	<!-- 交换机接口 -->
+	<select id="getPerformanceSwIf" resultClass="deviceRealTimeInfo">
+		 SELECT ( IF_IN_NUCAST_PKTS + IF_OUT_NUCAST_PKTS ) AS pkts,
+			    ( IF_IN_DISCARDS + IF_OUT_DISCARDS ) AS discards,
+			    ( IF_IN_OCTETS + IF_OUT_OCTETS ) AS octets,
+				CREATE_TIME CREATETIME,
+	            DATE_FORMAT(CREATE_TIME,'%Y') YEAR,
+				DATE_FORMAT(CREATE_TIME,'%m') MONTH,
+				DATE_FORMAT(CREATE_TIME,'%d') DAY,
+				DATE_FORMAT(CREATE_TIME,'%H') HOUR,
+				DATE_FORMAT(CREATE_TIME,'%i') MINUTE,
+				DATE_FORMAT(CREATE_TIME,'%s') SECOND
+		   FROM comp_sta_switch_port_rt_t T,(SELECT MAX(CREATE_TIME) TIME 
+		   							  FROM comp_sta_switch_port_rt_t 
+		   							 WHERE CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+		   							   AND ( IF_IN_NUCAST_PKTS + IF_OUT_NUCAST_PKTS ) !=''
+									   AND SWITCH_PORT_ID = #deviceId#) A 
+		  WHERE T.CREATE_TIME = A.TIME
+		    AND SWITCH_PORT_ID = #deviceId#
+	</select>
+	
+	<!-- 路由器端口 -->
+	<select id="getRtIfDevicePerformanceRTDetail" parameterClass="deviceRealTimeInfo" resultClass="deviceRealTimeInfo">
+		SELECT  ( IF_IN_UCAST_PKTS + IF_OUT_UCAST_PKTS ) AS pkts,
+			    ( IF_IN_DISCARDS + IF_OUT_DISCARDS ) AS discards,
+			    sta.CREATE_TIME createTime,
+	      		DATE_FORMAT(sta.CREATE_TIME,'%Y') YEAR,
+				DATE_FORMAT(sta.CREATE_TIME,'%m') MONTH,
+				DATE_FORMAT(sta.CREATE_TIME,'%d') DAY,
+				DATE_FORMAT(sta.CREATE_TIME,'%H') HOUR,
+				DATE_FORMAT(sta.CREATE_TIME,'%i') MINUTE,
+				DATE_FORMAT(sta.CREATE_TIME,'%s') SECOND
+		 FROM comp_sta_router_port_rt_t sta
+		WHERE sta.ROUTER_PORT_ID = #deviceId#
+		  AND (IF_IN_UCAST_PKTS + IF_OUT_UCAST_PKTS) !=''
+		  AND sta.CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+	</select>
+	
+	<!-- 路由器端口 -->
+	<select id="getPerformanceRtIf" resultClass="deviceRealTimeInfo">
+		 SELECT ( IF_IN_UCAST_PKTS + IF_OUT_UCAST_PKTS ) AS pkts,
+			    ( IF_IN_DISCARDS + IF_OUT_DISCARDS ) AS discards,
+				CREATE_TIME CREATETIME,
+	            DATE_FORMAT(CREATE_TIME,'%Y') YEAR,
+				DATE_FORMAT(CREATE_TIME,'%m') MONTH,
+				DATE_FORMAT(CREATE_TIME,'%d') DAY,
+				DATE_FORMAT(CREATE_TIME,'%H') HOUR,
+				DATE_FORMAT(CREATE_TIME,'%i') MINUTE,
+				DATE_FORMAT(CREATE_TIME,'%s') SECOND
+		   FROM comp_sta_router_port_rt_t T,(SELECT MAX(CREATE_TIME) TIME 
+		   							  FROM comp_sta_router_port_rt_t 
+		   							 WHERE CREATE_TIME >= DATE_FORMAT(DATE_ADD( NOW(), INTERVAL -24 HOUR),'%Y%m%d%H%i%s')
+		   							   AND ( IF_IN_UCAST_PKTS + IF_OUT_UCAST_PKTS ) !=''
+									   AND ROUTER_PORT_ID = #deviceId#) A 
+		  WHERE T.CREATE_TIME = A.TIME
+		    AND ROUTER_PORT_ID = #deviceId#
+	</select>
+	
+	<!-- 查询坐标起始点，结束点 -->
+	<select id="getDeviceMinMaxTime"  resultClass="deviceRealTimeInfo">
+		SELECT DATE_FORMAT(MINTIME,'%Y') MINYEAR,
+				DATE_FORMAT(MINTIME,'%m') MINMONTH,
+				DATE_FORMAT(MINTIME,'%d') MINDAY,
+				DATE_FORMAT(MINTIME,'%H') MINHOUR,
+				DATE_FORMAT(NOW(),'%Y') MAXYEAR,
+				DATE_FORMAT(NOW(),'%m') MAXMONTH,
+				DATE_FORMAT(NOW(),'%d') MAXDAY,
+				DATE_FORMAT(NOW(),'%H') MAXHOUR
+		FROM( SELECT DATE_ADD( NOW(), INTERVAL -24 HOUR) MINTIME FROM DUAL ) T;
+	</select>
+	
+	<!-- 没有数据时，横坐标时间点 -->
+	<select id="getDeviceAllPoint" resultClass="deviceRealTimeInfo">
+	      SELECT NULL USEDPER,
+	      		DATE_FORMAT(TIME,'%Y') YEAR,
+				DATE_FORMAT(TIME,'%m') MONTH,
+				DATE_FORMAT(TIME,'%d') DAY,
+				DATE_FORMAT(TIME,'%H') HOUR,
+				'00' MINUTE,
+				'00' SECOND
+			FROM ( 
+				SELECT DATE_ADD( NOW(), INTERVAL -23 HOUR) TIME FROM DUAL
+				UNION ALL
+				SELECT DATE_ADD( NOW(), INTERVAL -22 HOUR) TIME FROM DUAL
+				UNION ALL
+				SELECT DATE_ADD( NOW(), INTERVAL -21 HOUR) TIME FROM DUAL
+				UNION ALL
+				SELECT DATE_ADD( NOW(), INTERVAL -20 HOUR) TIME FROM DUAL
+				UNION ALL
+				SELECT DATE_ADD( NOW(), INTERVAL -19 HOUR) TIME FROM DUAL
+				UNION ALL
+				SELECT DATE_ADD( NOW(), INTERVAL -18 HOUR) TIME FROM DUAL
+				UNION ALL
+				SELECT DATE_ADD( NOW(), INTERVAL -17 HOUR) TIME FROM DUAL
+				UNION ALL
+				SELECT DATE_ADD( NOW(), INTERVAL -16 HOUR) TIME FROM DUAL
+				UNION ALL
+				SELECT DATE_ADD( NOW(), INTERVAL -15 HOUR) TIME FROM DUAL
+				UNION ALL
+				SELECT DATE_ADD( NOW(), INTERVAL -14 HOUR) TIME FROM DUAL
+				UNION ALL
+				SELECT DATE_ADD( NOW(), INTERVAL -13 HOUR) TIME FROM DUAL
+				UNION ALL
+				SELECT DATE_ADD( NOW(), INTERVAL -12 HOUR) TIME FROM DUAL
+				UNION ALL
+				SELECT DATE_ADD( NOW(), INTERVAL -11 HOUR) TIME FROM DUAL
+				UNION ALL
+				SELECT DATE_ADD( NOW(), INTERVAL -10 HOUR) TIME FROM DUAL
+				UNION ALL
+				SELECT DATE_ADD( NOW(), INTERVAL -9 HOUR) TIME FROM DUAL
+				UNION ALL
+				SELECT DATE_ADD( NOW(), INTERVAL -8 HOUR) TIME FROM DUAL
+				UNION ALL
+				SELECT DATE_ADD( NOW(), INTERVAL -7 HOUR) TIME FROM DUAL
+				UNION ALL
+				SELECT DATE_ADD( NOW(), INTERVAL -6 HOUR) TIME FROM DUAL
+				UNION ALL
+				SELECT DATE_ADD( NOW(), INTERVAL -5 HOUR) TIME FROM DUAL
+				UNION ALL
+				SELECT DATE_ADD( NOW(), INTERVAL -4 HOUR) TIME FROM DUAL
+				UNION ALL
+				SELECT DATE_ADD( NOW(), INTERVAL -3 HOUR) TIME FROM DUAL
+				UNION ALL
+				SELECT DATE_ADD( NOW(), INTERVAL -2 HOUR) TIME FROM DUAL
+				UNION ALL
+				SELECT DATE_ADD( NOW(), INTERVAL -1 HOUR) TIME FROM DUAL
+				UNION ALL
+				SELECT NOW() TIME FROM DUAL
+			 ) T
+		ORDER BY TIME
+	</select>
+	
+    <!-- CPU、内存实时信息 结束-->
+</sqlMap>
